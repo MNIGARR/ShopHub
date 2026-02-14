@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="max-w-6xl mx-auto p-6">
+      <h2 class="text-3xl font-bold text-gray-800 mb-8">Sifarişlərim</h2>
+
+      <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-50 text-gray-600 uppercase text-xs font-bold">
+            <tr>
+              <th class="p-4 border-b">Sifariş №</th>
+              <th class="p-4 border-b">Tarix</th>
+              <th class="p-4 border-b">Status</th>
+              <th class="p-4 border-b">Cəmi</th>
+              <th class="p-4 border-b text-center">Əməliyyat</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody" class="text-gray-700 divide-y"></tbody>
+        </table>
+      </div>
+
+      <div
+        id="orderDetailModal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      >
+        <div
+          class="bg-white rounded-2xl max-w-2xl w-full p-8 relative max-h-[90vh] overflow-y-auto"
+        >
+          <button
+            onclick="closeModal()"
+            class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
+          >
+            &times;
+          </button>
+          <h3 class="text-2xl font-bold mb-6 border-b pb-4">
+            Sifariş Detalları
+          </h3>
+          <div id="modalContent" class="space-y-6"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
