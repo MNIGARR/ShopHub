@@ -6,32 +6,28 @@
 // Products (optional for now):
 // GET    /api/products
 // GET    /api/products/:id
-
 const API_BASE = "http://localhost:5000"; // <-- backend portunu burda düzəlt
-
-// ---------------------------
 // Small helpers
-// ---------------------------
 const $ = (id) => document.getElementById(id);
 
 function safeJsonParse(str, fallback = null) {
-  try { return JSON.parse(str); } catch { return fallback; }
+  try {
+    return JSON.parse(str);
+  } catch {
+    return fallback;
+  }
 }
-
 function formatMoneyAZN(x) {
   const n = Number(x || 0);
   return `₼${n.toFixed(2)}`;
 }
-
 function normalizeRole(role) {
   // backend /login -> "Role" gələ bilər, /me -> "role"
   if (!role) return "";
   return String(role).trim().toLowerCase();
 }
 
-// ---------------------------
 // Toast
-// ---------------------------
 let toastTimer = null;
 function showToast({ title = "Bildiriş", message = "", type = "info" } = {}) {
   const wrap = $("toastWrap");
@@ -50,7 +46,7 @@ function showToast({ title = "Bildiriş", message = "", type = "info" } = {}) {
     info: "ℹ️",
     success: "✅",
     warn: "⚠️",
-    danger: "⛔"
+    danger: "⛔",
   };
   icon.textContent = icons[type] || "ℹ️";
 
@@ -65,9 +61,7 @@ function showToast({ title = "Bildiriş", message = "", type = "info" } = {}) {
   };
 }
 
-// ---------------------------
 // Auth storage
-// ---------------------------
 const AUTH_KEY = "shophub_auth_v1";
 
 function getAuth() {
@@ -88,9 +82,7 @@ function getUserFromAuth() {
   return getAuth()?.user || null;
 }
 
-// ---------------------------
 // API client
-// ---------------------------
 async function apiFetch(path, { method = "GET", body, auth = true } = {}) {
   const headers = { "Content-Type": "application/json" };
   if (auth) {
@@ -101,10 +93,9 @@ async function apiFetch(path, { method = "GET", body, auth = true } = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     method,
     headers,
-    cache: "no-store",          // ✅ bunu əlavə et
-    body: body ? JSON.stringify(body) : undefined
+    cache: "no-store", // ✅ bunu əlavə et
+    body: body ? JSON.stringify(body) : undefined,
   });
-
 
   // try parse
   const text = await res.text();
@@ -124,18 +115,14 @@ async function apiFetch(path, { method = "GET", body, auth = true } = {}) {
   return data;
 }
 
-// ---------------------------
 // Session state
-// ---------------------------
 const state = {
   sessionUser: null, // normalized { id, email, role }
   products: [],
-  cart: [] // [{ productId, qty, productSnapshot }]
+  cart: [], // [{ productId, qty, productSnapshot }]
 };
 
-// ---------------------------
 // UI: view switch
-// ---------------------------
 function showView(name) {
   const shop = $("viewShop");
   const admin = $("viewAdmin");
@@ -150,9 +137,7 @@ function showView(name) {
   }
 }
 
-// ---------------------------
 // UI: auth rendering
-// ---------------------------
 function updateAuthUI() {
   const authBtnLabel = $("authBtnLabel");
   const sessionInfo = $("sessionInfo");
@@ -171,7 +156,7 @@ function updateAuthUI() {
   }
 
   if (adminRoleChip) {
-    adminRoleChip.textContent = user ? (user.role || "user") : "guest";
+    adminRoleChip.textContent = user ? user.role || "user" : "guest";
   }
 }
 
@@ -180,9 +165,7 @@ function isAdmin() {
   return state.sessionUser?.role === "admin";
 }
 
-// ---------------------------
 // Auth modal open/close
-// ---------------------------
 function openAuthModal() {
   $("authBackdrop")?.classList.add("show");
 }
@@ -199,14 +182,12 @@ function closeResetPanel() {
   $("resetPanel")?.classList.add("hidden");
 }
 
-// ---------------------------
 // Real login
-// ---------------------------
 async function doLogin(email, password) {
   const data = await apiFetch("/api/auth/login", {
     method: "POST",
     body: { email, password },
-    auth: false
+    auth: false,
   });
 
   // login response: { token, user: { Id, Email, Role } }
@@ -218,7 +199,7 @@ async function doLogin(email, password) {
   const normalized = {
     id: u.id ?? u.Id ?? null,
     email: u.email ?? u.Email ?? "",
-    role: normalizeRole(u.role ?? u.Role ?? "")
+    role: normalizeRole(u.role ?? u.Role ?? ""),
   };
 
   setAuth({ token, user: normalized });
@@ -227,15 +208,13 @@ async function doLogin(email, password) {
   showToast({
     title: "Uğurlu giriş",
     message: `${normalized.email}`,
-    type: "success"
+    type: "success",
   });
 
   updateAuthUI();
 }
 
-// ---------------------------
 // Session check via /me
-// ---------------------------
 async function loadSessionFromToken() {
   const token = getToken();
   if (!token) {
@@ -253,7 +232,7 @@ async function loadSessionFromToken() {
     const normalized = {
       id: u.id ?? u.Id ?? null,
       email: u.email ?? u.Email ?? "",
-      role: normalizeRole(u.role ?? u.Role ?? "")
+      role: normalizeRole(u.role ?? u.Role ?? ""),
     };
 
     // keep token but refresh user
@@ -266,7 +245,7 @@ async function loadSessionFromToken() {
     showToast({
       title: "Sessiya bitdi",
       message: "Yenidən giriş edin.",
-      type: "warn"
+      type: "warn",
     });
   } finally {
     updateAuthUI();
@@ -281,16 +260,19 @@ function doLogout() {
   showToast({ title: "Çıxış", message: "Hesabdan çıxıldı.", type: "info" });
 }
 
-// ---------------------------
 // Products (minimal)
-// ---------------------------
 async function loadProducts() {
   // sən hələ “offline demo” da saxlaya bilərsən, amma backend var deyə real çəkək.
   // backend hazır deyilsə 404 verər — o halda demo data qoyacağıq.
   try {
-    const data = await apiFetch("/api/products", { method: "GET", auth: false });
+    const data = await apiFetch("/api/products", {
+      method: "GET",
+      auth: false,
+    });
     // data ya array ola bilər, ya {items: []} ola bilər. Biz elastik götürürük:
-    const items = Array.isArray(data) ? data : (data?.items || data?.products || []);
+    const items = Array.isArray(data)
+      ? data
+      : data?.items || data?.products || [];
     state.products = Array.isArray(items) ? items : [];
   } catch (e) {
     // fallback demo
@@ -298,7 +280,7 @@ async function loadProducts() {
     showToast({
       title: "Qeyd",
       message: "Backend məhsullar gəlmədi — demo məhsullara keçdim.",
-      type: "warn"
+      type: "warn",
     });
   }
 
@@ -318,8 +300,10 @@ function demoProducts() {
       brand: "Apple",
       color: "Qara",
       rating: 4.8,
-      images: ["https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80"],
-      specs: ["A17 Pro", "256GB", "USB-C", "ProMotion 120Hz"]
+      images: [
+        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80",
+      ],
+      specs: ["A17 Pro", "256GB", "USB-C", "ProMotion 120Hz"],
     },
     {
       id: 2,
@@ -330,8 +314,10 @@ function demoProducts() {
       brand: "Logitech",
       color: "Boz",
       rating: 4.6,
-      images: ["https://images.unsplash.com/photo-1585325701956-60dd9c8553bc?auto=format&fit=crop&w=1200&q=80"],
-      specs: ["Ergonomik", "USB-C şarj", "Multi-device"]
+      images: [
+        "https://images.unsplash.com/photo-1585325701956-60dd9c8553bc?auto=format&fit=crop&w=1200&q=80",
+      ],
+      specs: ["Ergonomik", "USB-C şarj", "Multi-device"],
     },
     {
       id: 3,
@@ -342,31 +328,30 @@ function demoProducts() {
       brand: "Apple",
       color: "Ağ",
       rating: 4.7,
-      images: ["https://images.unsplash.com/photo-1585386959984-a41552231693?auto=format&fit=crop&w=1200&q=80"],
-      specs: ["ANC", "Spatial Audio", "MagSafe"]
-    }
+      images: [
+        "https://images.unsplash.com/photo-1585386959984-a41552231693?auto=format&fit=crop&w=1200&q=80",
+      ],
+      specs: ["ANC", "Spatial Audio", "MagSafe"],
+    },
   ];
 }
 
-// ---------------------------
 // KPIs
-// ---------------------------
 function renderKPIs() {
   const products = state.products;
 
-  const categories = new Set(products.map(p => p.category).filter(Boolean));
+  const categories = new Set(products.map((p) => p.category).filter(Boolean));
   const users = []; // backend users endpoint varsa sonra edərik
   const orders = []; // cart->checkout hissəsində dolduracağıq
 
   $("kpiProducts") && ($("kpiProducts").textContent = String(products.length));
-  $("kpiCategories") && ($("kpiCategories").textContent = String(categories.size));
+  $("kpiCategories") &&
+    ($("kpiCategories").textContent = String(categories.size));
   $("kpiOrders") && ($("kpiOrders").textContent = String(orders.length));
   $("kpiUsers") && ($("kpiUsers").textContent = String(users.length));
 }
 
-// ---------------------------
 // Products UI + filters (simple)
-// ---------------------------
 function getProductId(p) {
   return p.id ?? p.Id ?? p.productId ?? p.ProductId;
 }
@@ -402,7 +387,9 @@ function productRating(p) {
 function productImages(p) {
   const imgs = p.images ?? p.Images ?? [];
   if (Array.isArray(imgs) && imgs.length) return imgs;
-  return ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80"];
+  return [
+    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80",
+  ];
 }
 
 function initFiltersFromProducts() {
@@ -412,18 +399,31 @@ function initFiltersFromProducts() {
 
   if (!categorySelect || !brandSelect || !colorSelect) return;
 
-  const categories = ["Hamısı", ...new Set(state.products.map(productCategory))];
+  const categories = [
+    "Hamısı",
+    ...new Set(state.products.map(productCategory)),
+  ];
   const brands = ["Hamısı", ...new Set(state.products.map(productBrand))];
   const colors = ["Hamısı", ...new Set(state.products.map(productColor))];
 
-  categorySelect.innerHTML = categories.map(x => `<option value="${x}">${x}</option>`).join("");
-  brandSelect.innerHTML = brands.map(x => `<option value="${x}">${x}</option>`).join("");
-  colorSelect.innerHTML = colors.map(x => `<option value="${x}">${x}</option>`).join("");
+  categorySelect.innerHTML = categories
+    .map((x) => `<option value="${x}">${x}</option>`)
+    .join("");
+  brandSelect.innerHTML = brands
+    .map((x) => `<option value="${x}">${x}</option>`)
+    .join("");
+  colorSelect.innerHTML = colors
+    .map((x) => `<option value="${x}">${x}</option>`)
+    .join("");
 
   // admin filters (optional)
-  $("admProductCategory") && ($("admProductCategory").innerHTML =
-    ["Hamısı", ...new Set(state.products.map(productCategory))].map(x => `<option value="${x}">${x}</option>`).join("")
-  );
+  $("admProductCategory") &&
+    ($("admProductCategory").innerHTML = [
+      "Hamısı",
+      ...new Set(state.products.map(productCategory)),
+    ]
+      .map((x) => `<option value="${x}">${x}</option>`)
+      .join(""));
 }
 
 function filteredProducts() {
@@ -438,24 +438,29 @@ function filteredProducts() {
   let list = [...state.products];
 
   if (q) {
-    list = list.filter(p => {
-      const s = `${productName(p)} ${productBrand(p)} ${productCategory(p)}`.toLowerCase();
+    list = list.filter((p) => {
+      const s =
+        `${productName(p)} ${productBrand(p)} ${productCategory(p)}`.toLowerCase();
       return s.includes(q);
     });
   }
-  list = list.filter(p => productPrice(p) >= minP && productPrice(p) <= maxP);
+  list = list.filter((p) => productPrice(p) >= minP && productPrice(p) <= maxP);
 
-  if (cat !== "Hamısı") list = list.filter(p => productCategory(p) === cat);
-  if (br !== "Hamısı") list = list.filter(p => productBrand(p) === br);
-  if (col !== "Hamısı") list = list.filter(p => productColor(p) === col);
-  if (inStock) list = list.filter(p => productStock(p) > 0);
+  if (cat !== "Hamısı") list = list.filter((p) => productCategory(p) === cat);
+  if (br !== "Hamısı") list = list.filter((p) => productBrand(p) === br);
+  if (col !== "Hamısı") list = list.filter((p) => productColor(p) === col);
+  if (inStock) list = list.filter((p) => productStock(p) > 0);
 
   // sort
   const sort = $("sortSelect")?.value || "featured";
-  if (sort === "price_asc") list.sort((a,b)=>productPrice(a)-productPrice(b));
-  if (sort === "price_desc") list.sort((a,b)=>productPrice(b)-productPrice(a));
-  if (sort === "rating_desc") list.sort((a,b)=>productRating(b)-productRating(a));
-  if (sort === "newest") list.sort((a,b)=>(getProductId(b)||0)-(getProductId(a)||0));
+  if (sort === "price_asc")
+    list.sort((a, b) => productPrice(a) - productPrice(b));
+  if (sort === "price_desc")
+    list.sort((a, b) => productPrice(b) - productPrice(a));
+  if (sort === "rating_desc")
+    list.sort((a, b) => productRating(b) - productRating(a));
+  if (sort === "newest")
+    list.sort((a, b) => (getProductId(b) || 0) - (getProductId(a) || 0));
 
   return list;
 }
@@ -476,12 +481,13 @@ function renderProducts() {
   }
   empty && empty.classList.add("hidden");
 
-  grid.innerHTML = list.map(p => {
-    const id = getProductId(p);
-    const img = productImages(p)[0];
-    const stock = productStock(p);
-    const stockLabel = stock > 0 ? `Stok: ${stock}` : `Stok yoxdur`;
-    return `
+  grid.innerHTML = list
+    .map((p) => {
+      const id = getProductId(p);
+      const img = productImages(p)[0];
+      const stock = productStock(p);
+      const stockLabel = stock > 0 ? `Stok: ${stock}` : `Stok yoxdur`;
+      return `
       <article class="glass p-4 hover:brightness-[1.03] transition">
         <div class="aspect-[4/3] rounded-2xl overflow-hidden border border-white/10 bg-black/20">
           <img src="${img}" alt="${productName(p)}" class="w-full h-full object-cover"/>
@@ -495,27 +501,30 @@ function renderProducts() {
           </div>
           <div class="mt-3 flex gap-2">
             <button class="btn btn-primary flex-1 text-sm" data-open-product="${id}">Detallar</button>
-            <button class="btn flex-1 text-sm" data-add-cart="${id}" ${stock<=0 ? "disabled" : ""}>
+            <button class="btn flex-1 text-sm" data-add-cart="${id}" ${stock <= 0 ? "disabled" : ""}>
               Səbətə
             </button>
           </div>
         </div>
       </article>
     `;
-  }).join("");
+    })
+    .join("");
 
   // bind buttons
-  grid.querySelectorAll("[data-open-product]").forEach(btn => {
-    btn.addEventListener("click", () => openProductModal(btn.getAttribute("data-open-product")));
+  grid.querySelectorAll("[data-open-product]").forEach((btn) => {
+    btn.addEventListener("click", () =>
+      openProductModal(btn.getAttribute("data-open-product")),
+    );
   });
-  grid.querySelectorAll("[data-add-cart]").forEach(btn => {
-    btn.addEventListener("click", () => addToCart(btn.getAttribute("data-add-cart")));
+  grid.querySelectorAll("[data-add-cart]").forEach((btn) => {
+    btn.addEventListener("click", () =>
+      addToCart(btn.getAttribute("data-add-cart")),
+    );
   });
 }
 
-// ---------------------------
 // Cart (minimal, UI works)
-// ---------------------------
 function loadCart() {
   const raw = safeJsonParse(localStorage.getItem("shophub_cart_v1"), []);
   state.cart = Array.isArray(raw) ? raw : [];
@@ -548,20 +557,28 @@ function renderCartBadge() {
 
 function addToCart(productId) {
   const id = Number(productId);
-  const p = state.products.find(x => Number(getProductId(x)) === id);
+  const p = state.products.find((x) => Number(getProductId(x)) === id);
   if (!p) return;
 
   if (productStock(p) <= 0) {
-    showToast({ title: "Stok yoxdur", message: "Bu məhsul stokda deyil.", type: "warn" });
+    showToast({
+      title: "Stok yoxdur",
+      message: "Bu məhsul stokda deyil.",
+      type: "warn",
+    });
     return;
   }
 
-  const existing = state.cart.find(x => Number(x.productId) === id);
+  const existing = state.cart.find((x) => Number(x.productId) === id);
   if (existing) existing.qty += 1;
   else state.cart.push({ productId: id, qty: 1, productSnapshot: p });
 
   saveCart();
-  showToast({ title: "Səbət", message: "Məhsul səbətə əlavə olundu.", type: "success" });
+  showToast({
+    title: "Səbət",
+    message: "Məhsul səbətə əlavə olundu.",
+    type: "success",
+  });
 }
 
 function clearCart() {
@@ -571,8 +588,12 @@ function clearCart() {
 
 function cartTotals() {
   const subtotal = state.cart.reduce((s, x) => {
-    const p = x.productSnapshot || state.products.find(pp => Number(getProductId(pp)) === Number(x.productId));
-    return s + (productPrice(p) * Number(x.qty || 0));
+    const p =
+      x.productSnapshot ||
+      state.products.find(
+        (pp) => Number(getProductId(pp)) === Number(x.productId),
+      );
+    return s + productPrice(p) * Number(x.qty || 0);
   }, 0);
   const shipping = subtotal > 0 ? 0 : 0; // demo
   return { subtotal, shipping, total: subtotal + shipping };
@@ -597,10 +618,15 @@ function renderCartDrawer() {
     itemsWrap.innerHTML = "";
   } else {
     empty && empty.classList.add("hidden");
-    itemsWrap.innerHTML = state.cart.map(x => {
-      const p = x.productSnapshot || state.products.find(pp => Number(getProductId(pp)) === Number(x.productId));
-      const img = productImages(p)[0];
-      return `
+    itemsWrap.innerHTML = state.cart
+      .map((x) => {
+        const p =
+          x.productSnapshot ||
+          state.products.find(
+            (pp) => Number(getProductId(pp)) === Number(x.productId),
+          );
+        const img = productImages(p)[0];
+        return `
         <div class="glass p-3 flex gap-3">
           <div class="h-16 w-16 rounded-2xl overflow-hidden border border-white/10 bg-black/20 shrink-0">
             <img src="${img}" class="w-full h-full object-cover" alt="">
@@ -617,49 +643,63 @@ function renderCartDrawer() {
           </div>
         </div>
       `;
-    }).join("");
+      })
+      .join("");
   }
 
   const { subtotal, shipping, total } = cartTotals();
-  $("cartSubtotal") && ($("cartSubtotal").textContent = formatMoneyAZN(subtotal));
-  $("cartShipping") && ($("cartShipping").textContent = formatMoneyAZN(shipping));
+  $("cartSubtotal") &&
+    ($("cartSubtotal").textContent = formatMoneyAZN(subtotal));
+  $("cartShipping") &&
+    ($("cartShipping").textContent = formatMoneyAZN(shipping));
   $("cartTotal") && ($("cartTotal").textContent = formatMoneyAZN(total));
 
   // bind controls
-  itemsWrap.querySelectorAll("[data-inc]").forEach(b => b.onclick = () => {
-    const id = Number(b.getAttribute("data-inc"));
-    const it = state.cart.find(x => Number(x.productId) === id);
-    if (it) it.qty += 1;
-    saveCart();
-  });
-  itemsWrap.querySelectorAll("[data-dec]").forEach(b => b.onclick = () => {
-    const id = Number(b.getAttribute("data-dec"));
-    const it = state.cart.find(x => Number(x.productId) === id);
-    if (it) {
-      it.qty -= 1;
-      if (it.qty <= 0) state.cart = state.cart.filter(x => Number(x.productId) !== id);
-      saveCart();
-    }
-  });
-  itemsWrap.querySelectorAll("[data-remove]").forEach(b => b.onclick = () => {
-    const id = Number(b.getAttribute("data-remove"));
-    state.cart = state.cart.filter(x => Number(x.productId) !== id);
-    saveCart();
-  });
+  itemsWrap.querySelectorAll("[data-inc]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        const id = Number(b.getAttribute("data-inc"));
+        const it = state.cart.find((x) => Number(x.productId) === id);
+        if (it) it.qty += 1;
+        saveCart();
+      }),
+  );
+  itemsWrap.querySelectorAll("[data-dec]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        const id = Number(b.getAttribute("data-dec"));
+        const it = state.cart.find((x) => Number(x.productId) === id);
+        if (it) {
+          it.qty -= 1;
+          if (it.qty <= 0)
+            state.cart = state.cart.filter((x) => Number(x.productId) !== id);
+          saveCart();
+        }
+      }),
+  );
+  itemsWrap.querySelectorAll("[data-remove]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        const id = Number(b.getAttribute("data-remove"));
+        state.cart = state.cart.filter((x) => Number(x.productId) !== id);
+        saveCart();
+      }),
+  );
 }
 
-// ---------------------------
 // Product modal (minimal)
-// ---------------------------
 function openProductModal(productId) {
   const id = Number(productId);
-  const p = state.products.find(x => Number(getProductId(x)) === id);
+  const p = state.products.find((x) => Number(getProductId(x)) === id);
   if (!p) return;
 
   $("pmTitle") && ($("pmTitle").textContent = productName(p));
-  $("pmMeta") && ($("pmMeta").textContent = `${productBrand(p)} • ${productCategory(p)}`);
+  $("pmMeta") &&
+    ($("pmMeta").textContent = `${productBrand(p)} • ${productCategory(p)}`);
   $("pmPrice") && ($("pmPrice").textContent = formatMoneyAZN(productPrice(p)));
-  $("pmStock") && ($("pmStock").textContent = productStock(p) > 0 ? `Stok: ${productStock(p)}` : "Stok yoxdur");
+  $("pmStock") &&
+    ($("pmStock").textContent =
+      productStock(p) > 0 ? `Stok: ${productStock(p)}` : "Stok yoxdur");
   $("pmColor") && ($("pmColor").textContent = productColor(p));
 
   const imgs = productImages(p);
@@ -667,13 +707,19 @@ function openProductModal(productId) {
 
   const thumbs = $("pmThumbs");
   if (thumbs) {
-    thumbs.innerHTML = imgs.slice(0, 4).map((url) =>
-      `<button class="btn p-0 overflow-hidden rounded-2xl border border-white/10 bg-black/20">
+    thumbs.innerHTML = imgs
+      .slice(0, 4)
+      .map(
+        (url) =>
+          `<button class="btn p-0 overflow-hidden rounded-2xl border border-white/10 bg-black/20">
          <img src="${url}" class="w-full h-16 object-cover" />
-       </button>`
-    ).join("");
+       </button>`,
+      )
+      .join("");
     [...thumbs.querySelectorAll("button")].forEach((btn, idx) => {
-      btn.onclick = () => { $("pmImage").src = imgs[idx]; };
+      btn.onclick = () => {
+        $("pmImage").src = imgs[idx];
+      };
     });
   }
 
@@ -681,10 +727,14 @@ function openProductModal(productId) {
   const pSpecs = p.specs ?? p.Specs ?? [];
   if (specs) {
     const arr = Array.isArray(pSpecs) ? pSpecs : String(pSpecs).split("\n");
-    specs.innerHTML = arr.filter(Boolean).map(s => `<li>${s}</li>`).join("");
+    specs.innerHTML = arr
+      .filter(Boolean)
+      .map((s) => `<li>${s}</li>`)
+      .join("");
   }
 
-  $("pmRatingChip") && ($("pmRatingChip").textContent = `${productRating(p).toFixed(1)}/5`);
+  $("pmRatingChip") &&
+    ($("pmRatingChip").textContent = `${productRating(p).toFixed(1)}/5`);
   $("pmReviews") && ($("pmReviews").textContent = "Demo rəylər");
 
   // add button
@@ -698,25 +748,29 @@ function closeProductModal() {
   $("productBackdrop")?.classList.remove("show");
 }
 
-// ---------------------------
 // Admin gate
-// ---------------------------
 function goAdmin() {
   if (!state.sessionUser) {
-    showToast({ title: "Giriş lazımdır", message: "Admin üçün əvvəlcə daxil olun.", type: "warn" });
+    showToast({
+      title: "Giriş lazımdır",
+      message: "Admin üçün əvvəlcə daxil olun.",
+      type: "warn",
+    });
     openAuthModal();
     return;
   }
   if (!isAdmin()) {
-    showToast({ title: "İcazə yoxdur", message: "Bu hissə yalnız admin üçündür.", type: "danger" });
+    showToast({
+      title: "İcazə yoxdur",
+      message: "Bu hissə yalnız admin üçündür.",
+      type: "danger",
+    });
     return;
   }
   showView("admin");
 }
 
-// ---------------------------
 // Bind UI events
-// ---------------------------
 function bindEvents() {
   // footer year
   $("year") && ($("year").textContent = String(new Date().getFullYear()));
@@ -728,10 +782,30 @@ function bindEvents() {
   $("navAdminBtn") && ($("navAdminBtn").onclick = goAdmin);
   $("navAdminBtn2") && ($("navAdminBtn2").onclick = goAdmin);
 
-  $("ctaBrowse") && ($("ctaBrowse").onclick = () => {
-    showView("shop");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
+  // Modal daxilində Login/Register keçidi
+$("showRegister").onclick = () => {
+  $("loginPanel").classList.add("hidden");
+  $("registerPanel").classList.remove("hidden");
+  $("showRegister").classList.add("text-white", "border-b-2", "border-blue-600");
+  $("showRegister").classList.remove("text-slate-500");
+  $("showLogin").classList.remove("text-white", "border-b-2", "border-blue-600");
+  $("showLogin").classList.add("text-slate-500");
+};
+
+$("showLogin").onclick = () => {
+  $("registerPanel").classList.add("hidden");
+  $("loginPanel").classList.remove("hidden");
+  $("showLogin").classList.add("text-white", "border-b-2", "border-blue-600");
+  $("showLogin").classList.remove("text-slate-500");
+  $("showRegister").classList.remove("text-white", "border-b-2", "border-blue-600");
+  $("showRegister").classList.add("text-slate-500");
+};
+
+  $("ctaBrowse") &&
+    ($("ctaBrowse").onclick = () => {
+      showView("shop");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
   $("ctaAdmin") && ($("ctaAdmin").onclick = goAdmin);
 
   // mobile nav
@@ -742,124 +816,218 @@ function bindEvents() {
   }
 
   // auth buttons
-  const openAuthBtns = ["authBtn", "authBtnSm", "authBtn2"].map($).filter(Boolean);
-  openAuthBtns.forEach(b => b.onclick = openAuthModal);
+  const openAuthBtns = ["authBtn", "authBtnSm", "authBtn2"]
+    .map($)
+    .filter(Boolean);
+  openAuthBtns.forEach((b) => (b.onclick = openAuthModal));
 
   $("closeAuthModal") && ($("closeAuthModal").onclick = closeAuthModal);
-  $("authBackdrop") && ($("authBackdrop").onclick = (e) => {
-    if (e.target?.id === "authBackdrop") closeAuthModal();
-  });
+  $("authBackdrop") &&
+    ($("authBackdrop").onclick = (e) => {
+      if (e.target?.id === "authBackdrop") closeAuthModal();
+    });
 
   // login
-  $("loginBtn") && ($("loginBtn").onclick = async () => {
-    const email = ($("loginEmail")?.value || "").trim();
-    const pass = $("loginPass")?.value || "";
-    if (!email || !pass) {
-      showToast({ title: "Xəta", message: "Email və şifrə daxil edin.", type: "warn" });
-      return;
-    }
-    try {
-      await doLogin(email, pass);
-      closeAuthModal();
-    } catch (e) {
-      showToast({ title: "Login alınmadı", message: e.message || "Xəta", type: "danger" });
-    }
-  });
+  $("loginBtn") &&
+    ($("loginBtn").onclick = async () => {
+      const email = ($("loginEmail")?.value || "").trim();
+      const pass = $("loginPass")?.value || "";
+      if (!email || !pass) {
+        showToast({
+          title: "Xəta",
+          message: "Email və şifrə daxil edin.",
+          type: "warn",
+        });
+        return;
+      }
+      try {
+        await doLogin(email, pass);
+        closeAuthModal();
+      } catch (e) {
+        showToast({
+          title: "Login alınmadı",
+          message: e.message || "Xəta",
+          type: "danger",
+        });
+      }
+    });
 
   // register (if backend has endpoint; otherwise shows info)
-  $("registerBtn") && ($("registerBtn").onclick = async () => {
-    const email = ($("regEmail")?.value || "").trim();
-    const pass = $("regPass")?.value || "";
-    if (!email || !pass) {
-      showToast({ title: "Xəta", message: "Email və şifrə daxil edin.", type: "warn" });
-      return;
-    }
+  // Register (Real integration)
+$("registerBtn") && ($("registerBtn").onclick = async () => {
+  const email = ($("regEmail")?.value || "").trim();
+  const pass = $("regPass")?.value || "";
+  
+  if (!email || !pass) {
+    showToast({ title: "Xəta", message: "Email və şifrə daxil edin.", type: "warn" });
+    return;
+  }
 
-    try {
-      // try typical endpoint
-      await apiFetch("/api/auth/register", {
-        method: "POST",
-        body: { email, password: pass },
-        auth: false
-      });
+  try {
+    // Backend-ə qeydiyyat sorğusu göndəririk
+    await apiFetch("/api/auth/register", {
+      method: "POST",
+      body: { email, password: pass },
+      auth: false
+    });
 
-      showToast({ title: "Qeydiyyat", message: "Hesab yaradıldı. İndi login edin.", type: "success" });
-      // optionally auto-login:
-      // await doLogin(email, pass); closeAuthModal();
-    } catch (e) {
-      showToast({
-        title: "Qeydiyyat yoxdur",
-        message: "Backend-də /api/auth/register yoxdursa, bu hissəni backend-ə əlavə etmək lazımdır.",
-        type: "warn"
-      });
-    }
-  });
+    showToast({ 
+      title: "Qeydiyyat uğurludur", 
+      message: "Hesabınız yaradıldı. İndi giriş edə bilərsiniz.", 
+      type: "success" 
+    });
+
+    // İstifadəçini avtomatik login panelinə yönləndirmək olar
+    // Və ya birbaşa login etmək:
+    await doLogin(email, pass);
+    closeAuthModal();
+
+  } catch (e) {
+    showToast({
+      title: "Qeydiyyat xətası",
+      message: e.message || "Bu email artıq istifadə olunur.",
+      type: "danger"
+    });
+  }
+});
 
   // logout
-  ["logoutBtn", "logoutBtn2"].map($).filter(Boolean).forEach(b => b.onclick = doLogout);
+  ["logoutBtn", "logoutBtn2"]
+    .map($)
+    .filter(Boolean)
+    .forEach((b) => (b.onclick = doLogout));
 
   // reset password (demo UI only)
   $("openResetBtn") && ($("openResetBtn").onclick = openResetPanel);
   $("closeResetBtn") && ($("closeResetBtn").onclick = closeResetPanel);
-  $("resetPassBtn") && ($("resetPassBtn").onclick = () => {
-    showToast({ title: "Demo", message: "Şifrə sıfırlama backend-də ayrıca yazılmalıdır.", type: "info" });
-  });
+  $("resetPassBtn") &&
+    ($("resetPassBtn").onclick = () => {
+      showToast({
+        title: "Demo",
+        message: "Şifrə sıfırlama backend-də ayrıca yazılmalıdır.",
+        type: "info",
+      });
+    });
 
   // filters
-  ["searchInput", "minPrice", "maxPrice", "categorySelect", "brandSelect", "colorSelect", "inStockOnly", "sortSelect"]
-    .map($).filter(Boolean)
-    .forEach(el => el.addEventListener("input", renderProducts));
+  [
+    "searchInput",
+    "minPrice",
+    "maxPrice",
+    "categorySelect",
+    "brandSelect",
+    "colorSelect",
+    "inStockOnly",
+    "sortSelect",
+  ]
+    .map($)
+    .filter(Boolean)
+    .forEach((el) => el.addEventListener("input", renderProducts));
 
-  $("resetFiltersBtn") && ($("resetFiltersBtn").onclick = () => {
-    $("searchInput") && ($("searchInput").value = "");
-    $("minPrice") && ($("minPrice").value = "");
-    $("maxPrice") && ($("maxPrice").value = "");
-    $("categorySelect") && ($("categorySelect").value = "Hamısı");
-    $("brandSelect") && ($("brandSelect").value = "Hamısı");
-    $("colorSelect") && ($("colorSelect").value = "Hamısı");
-    $("inStockOnly") && ($("inStockOnly").checked = false);
-    $("sortSelect") && ($("sortSelect").value = "featured");
-    renderProducts();
-  });
+  $("resetFiltersBtn") &&
+    ($("resetFiltersBtn").onclick = () => {
+      $("searchInput") && ($("searchInput").value = "");
+      $("minPrice") && ($("minPrice").value = "");
+      $("maxPrice") && ($("maxPrice").value = "");
+      $("categorySelect") && ($("categorySelect").value = "Hamısı");
+      $("brandSelect") && ($("brandSelect").value = "Hamısı");
+      $("colorSelect") && ($("colorSelect").value = "Hamısı");
+      $("inStockOnly") && ($("inStockOnly").checked = false);
+      $("sortSelect") && ($("sortSelect").value = "featured");
+      renderProducts();
+    });
 
   $("quickCheckoutBtn") && ($("quickCheckoutBtn").onclick = openCart);
 
   // cart drawer buttons
-  ["cartBtn", "cartBtnSm"].map($).filter(Boolean).forEach(b => b.onclick = openCart);
+  ["cartBtn", "cartBtnSm"]
+    .map($)
+    .filter(Boolean)
+    .forEach((b) => (b.onclick = openCart));
   $("closeCartBtn") && ($("closeCartBtn").onclick = closeCart);
   $("drawerBackdrop") && ($("drawerBackdrop").onclick = closeCart);
-  $("startShoppingBtn") && ($("startShoppingBtn").onclick = () => {
-    closeCart();
-    showView("shop");
-  });
-  $("clearCartBtn") && ($("clearCartBtn").onclick = () => {
-    clearCart();
-    showToast({ title: "Səbət", message: "Səbət təmizləndi.", type: "info" });
-  });
+  $("startShoppingBtn") &&
+    ($("startShoppingBtn").onclick = () => {
+      closeCart();
+      showView("shop");
+    });
+  $("clearCartBtn") &&
+    ($("clearCartBtn").onclick = () => {
+      clearCart();
+      showToast({ title: "Səbət", message: "Səbət təmizləndi.", type: "info" });
+    });
 
   // checkout (demo for now)
-  $("checkoutBtn") && ($("checkoutBtn").onclick = () => {
-    if (!state.cart.length) {
-      showToast({ title: "Səbət boşdur", message: "Əvvəl məhsul əlavə edin.", type: "warn" });
+  async function processCheckout() {
+    if (state.cart.length === 0) {
+      showToast({
+        title: "Səbət boşdur",
+        message: "Sifariş üçün məhsul əlavə edin.",
+        type: "warn",
+      });
       return;
     }
-    showToast({
-      title: "Checkout (demo)",
-      message: "İndi bunu backend-ə order yaratmağa bağlayacağıq.",
-      type: "info"
-    });
-  });
+
+    // İstifadəçinin daxil olub-olmadığını yoxlayırıq
+    if (!state.sessionUser) {
+      showToast({
+        title: "Giriş lazımdır",
+        message: "Sifariş üçün daxil olun.",
+        type: "warn",
+      });
+      openAuthModal();
+      return;
+    }
+
+    try {
+      // Backend-in gözlədiyi formatda data hazırlayırıq
+      const orderData = {
+        items: state.cart.map((item) => ({
+          productId: item.productId,
+          quantity: item.qty,
+          price: item.productSnapshot.price,
+        })),
+        totalAmount: cartTotals().total,
+      };
+
+      // Real API sorğusu
+      await apiFetch("/api/orders", {
+        method: "POST",
+        body: orderData,
+        auth: true,
+      });
+
+      // Uğurlu sifarişdən sonra
+      clearCart(); // Səbəti təmizləyirik
+      closeCart(); // Səbət panelini bağlayırıq
+
+      showToast({
+        title: "Sifariş uğurludur!",
+        message: "Sifarişiniz qəbul edildi. Tezliklə əlaqə saxlanılacaq.",
+        type: "success",
+      });
+    } catch (error) {
+      showToast({
+        title: "Sifariş alınmadı",
+        message: error.message || "Xəta baş verdi.",
+        type: "danger",
+      });
+    }
+  }
+
+  // Düyməyə bağlayırıq
+  $("checkoutBtn").onclick = processCheckout;
 
   // product modal close
-  $("closeProductModal") && ($("closeProductModal").onclick = closeProductModal);
-  $("productBackdrop") && ($("productBackdrop").onclick = (e) => {
-    if (e.target?.id === "productBackdrop") closeProductModal();
-  });
+  $("closeProductModal") &&
+    ($("closeProductModal").onclick = closeProductModal);
+  $("productBackdrop") &&
+    ($("productBackdrop").onclick = (e) => {
+      if (e.target?.id === "productBackdrop") closeProductModal();
+    });
 }
 
-// ---------------------------
 // Boot
-// ---------------------------
 async function init() {
   bindEvents();
   loadCart();
@@ -870,5 +1038,9 @@ async function init() {
 
 init().catch((e) => {
   console.error(e);
-  showToast({ title: "Xəta", message: e.message || "Naməlum xəta", type: "danger" });
+  showToast({
+    title: "Xəta",
+    message: e.message || "Naməlum xəta",
+    type: "danger",
+  });
 });

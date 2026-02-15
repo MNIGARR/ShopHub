@@ -1,997 +1,476 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="az">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ShopHub — Online Alış-veriş Platforması</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-  <style>
-    :root{
-      --bg0:#070A12;
-      --bg1:#0B1220;
-      --card: rgba(255,255,255,.06);
-      --card2: rgba(255,255,255,.08);
-      --stroke: rgba(255,255,255,.12);
-      --stroke2: rgba(255,255,255,.18);
-      --txt: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.68);
-      --muted2: rgba(255,255,255,.55);
-      --accent:#7C3AED;
-      --accent2:#22C55E;
-      --warn:#F59E0B;
-      --danger:#EF4444;
-      --info:#38BDF8;
-      --shadow: 0 18px 60px rgba(0,0,0,.45);
-      --shadow2: 0 8px 28px rgba(0,0,0,.38);
-      --radius: 18px;
-    }
-    html, body { height:100%; }
-    body{
-      background:
-        radial-gradient(1200px 700px at 12% 12%, rgba(124,58,237,.28) 0%, rgba(124,58,237,0) 55%),
-        radial-gradient(900px 600px at 86% 18%, rgba(56,189,248,.22) 0%, rgba(56,189,248,0) 55%),
-        radial-gradient(900px 700px at 60% 90%, rgba(34,197,94,.18) 0%, rgba(34,197,94,0) 55%),
-        linear-gradient(180deg, var(--bg0), var(--bg1));
-      color: var(--txt);
-      font-feature-settings: "ss01" 1, "ss02" 1, "cv11" 1;
-      letter-spacing: .2px;
-    }
-    * { -webkit-tap-highlight-color: transparent; }
-    .glass{
-      background: var(--card);
-      border: 1px solid var(--stroke);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      box-shadow: var(--shadow2);
-      border-radius: var(--radius);
-    }
-    .glass-2{
-      background: var(--card2);
-      border: 1px solid var(--stroke2);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      box-shadow: var(--shadow2);
-      border-radius: var(--radius);
-    }
-    .chip{
-      border: 1px solid var(--stroke);
-      background: rgba(255,255,255,.04);
-      border-radius: 999px;
-      padding: 6px 10px;
-      color: var(--muted);
-    }
-    .btn{
-      border-radius: 14px;
-      border: 1px solid var(--stroke);
-      background: rgba(255,255,255,.06);
-      padding: 10px 12px;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
-      user-select:none;
-    }
-    .btn:hover{ background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.20); }
-    .btn:active{ transform: translateY(1px) scale(.99); }
-    .btn-primary{
-      background: linear-gradient(135deg, rgba(124,58,237,.95), rgba(56,189,248,.75));
-      border: 1px solid rgba(255,255,255,.16);
-    }
-    .btn-primary:hover{ filter: brightness(1.05); }
-    .btn-danger{
-      background: rgba(239,68,68,.14);
-      border-color: rgba(239,68,68,.35);
-    }
-    .btn-success{
-      background: rgba(34,197,94,.14);
-      border-color: rgba(34,197,94,.35);
-    }
-    .btn-warn{
-      background: rgba(245,158,11,.14);
-      border-color: rgba(245,158,11,.35);
-    }
-
-    .field{
-      background: rgba(0,0,0,.20);
-      border: 1px solid var(--stroke);
-      border-radius: 14px;
-      padding: 10px 12px;
-      outline: none;
-      width: 100%;
-      color: var(--txt);
-      transition: border-color .15s ease, background .15s ease;
-    }
-    .field:focus{
-      border-color: rgba(124,58,237,.65);
-      background: rgba(0,0,0,.26);
-    }
-
-    .muted { color: var(--muted); }
-    .muted2 { color: var(--muted2); }
-    .fade-in{ animation: fadeIn .22s ease-out both; }
-    @keyframes fadeIn{ from{ opacity:0; transform: translateY(6px); } to{ opacity:1; transform: translateY(0); } }
-
-    .slide-in-right{ animation: slideInRight .22s ease-out both; }
-    @keyframes slideInRight{ from{ opacity:.4; transform: translateX(12px); } to{ opacity:1; transform: translateX(0); } }
-
-    .slide-up{ animation: slideUp .22s ease-out both; }
-    @keyframes slideUp{ from{ opacity:0; transform: translateY(12px); } to{ opacity:1; transform: translateY(0); } }
-
-    .shimmer{
-      position: relative;
-      overflow: hidden;
-    }
-    .shimmer::after{
-      content:"";
-      position:absolute;
-      inset:-60% -40%;
-      background: linear-gradient(110deg, rgba(255,255,255,0) 35%, rgba(255,255,255,.10) 50%, rgba(255,255,255,0) 65%);
-      transform: translateX(-40%);
-      animation: shimmer 2.4s ease-in-out infinite;
-    }
-    @keyframes shimmer{
-      0%{ transform: translateX(-35%); }
-      100%{ transform: translateX(35%); }
-    }
-
-    /* Modal/backdrop */
-    .backdrop{
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.55);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      display: none;
-      z-index: 60;
-      padding: 18px;
-    }
-    .backdrop.show{ display: flex; }
-    .modal{
-      max-width: 980px;
-      width: 100%;
-      margin: auto;
-      border-radius: 22px;
-      border: 1px solid var(--stroke);
-      background: rgba(12,18,32,.92);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    /* Drawer */
-    .drawer{
-      position: fixed;
-      inset: 0 0 0 auto;
-      width: min(440px, 92vw);
-      transform: translateX(110%);
-      transition: transform .22s ease;
-      z-index: 70;
-      border-left: 1px solid var(--stroke);
-      background: rgba(10,16,28,.90);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      box-shadow: -18px 0 60px rgba(0,0,0,.45);
-      display: flex;
-      flex-direction: column;
-    }
-    .drawer.show{ transform: translateX(0); }
-    .drawer-backdrop{
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.55);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      opacity: 0; pointer-events: none;
-      transition: opacity .22s ease;
-      z-index: 69;
-    }
-    .drawer-backdrop.show{ opacity: 1; pointer-events: auto; }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar{ height: 10px; width: 10px; }
-    ::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.16); border-radius: 999px; }
-    ::-webkit-scrollbar-thumb:hover{ background: rgba(255,255,255,.22); }
-    ::-webkit-scrollbar-track{ background: rgba(0,0,0,.12); }
-
-    /* Badge */
-    .badge{
-      min-width: 18px;
-      height: 18px;
-      padding: 0 6px;
-      border-radius: 999px;
-      background: rgba(124,58,237,.95);
-      border: 1px solid rgba(255,255,255,.14);
-      color: #fff;
-      font-size: 12px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-    }
-
-    /* Table */
-    .tbl{
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      overflow: hidden;
-      border-radius: 16px;
-      border: 1px solid var(--stroke);
-      background: rgba(255,255,255,.04);
-    }
-    .tbl th, .tbl td{
-      padding: 10px 12px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      vertical-align: top;
-      text-align: left;
-      font-size: 14px;
-    }
-    .tbl th{
-      color: rgba(255,255,255,.75);
-      background: rgba(255,255,255,.05);
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-    .tbl tr:last-child td{ border-bottom: none; }
-
-    /* Skeleton cards on first load */
-    .skeleton{
-      background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.10), rgba(255,255,255,.06));
-      background-size: 220% 100%;
-      animation: skeleton 1.3s ease-in-out infinite;
-      border-radius: 14px;
-    }
-    @keyframes skeleton{
-      0%{ background-position: 200% 0; }
-      100%{ background-position: -200% 0; }
-    }
-    /* Print-friendly */
-    @media print{
-      .no-print{ display: none !important; }
-      body{ background: #fff; color: #111; }
-    }
-  </style>
-</head>
-
-<body>
-  <div class="min-h-screen">
-    <!-- Topbar -->
-    <header class="no-print sticky top-0 z-50 border-b border-white/10 bg-black/25 backdrop-blur-xl">
-      <div class="mx-auto max-w-7xl px-4 py-3">
-        <div class="flex items-center gap-3">
-          <button id="mobileMenuBtn" class="btn lg:hidden" aria-label="Menyu">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShopHub | Premium Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./src/css/style.css" />
+    <style>
+      /* Sənin app.js-dəki .show klaslarını aktivləşdirmək üçün */
+      .backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+      .backdrop.show {
+        display: flex !important;
+      }
+      #cartDrawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 400px;
+        max-width: 90%;
+        background: #111827;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        z-index: 2000;
+        padding: 2rem;
+        border-left: 1px solid #374151;
+      }
+      #cartDrawer.show {
+        transform: translateX(0);
+      }
+      .glass {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body class="bg-[#0f172a] text-slate-200 min-h-screen font-sans">
+    <header
+      class="glass sticky top-0 z-[100] border-b border-white/5 backdrop-blur-xl bg-[#0f172a]/80"
+    >
+      <div
+        class="container mx-auto px-4 h-20 flex justify-between items-center"
+      >
+        <div
+          id="navShopBtn"
+          class="flex items-center gap-2 cursor-pointer group"
+        >
+          <div
+            class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="text-white"
+            >
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+              <path d="M3 6h18" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
             </svg>
-          </button>
-          <div class="flex items-center gap-2">
-            <div class="h-9 w-9 rounded-2xl bg-gradient-to-br from-violet-500/90 via-fuchsia-500/60 to-sky-400/70 border border-white/15 shadow-lg"></div>
-            <div>
-              <div class="text-sm font-semibold leading-4">ShopHub</div>
-              <div class="text-xs muted2 leading-4">Online Alış-veriş Platforması (Demo)</div>
-            </div>
           </div>
-          <div class="ml-auto flex items-center gap-2">
-            <div class="hidden md:flex items-center gap-2">
-              <button id="navShopBtn" class="btn btn-primary">Mağaza</button>
-              <button id="navAdminBtn" class="btn">Admin Panel</button>
-            </div>
-            <div class="hidden sm:flex items-center gap-2">
-              <button id="authBtn" class="btn">
-                <span id="authBtnLabel">Giriş / Qeydiyyat</span>
-              </button>
-              <button id="cartBtn" class="btn relative">
-                <span class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m14-9l2 9M9 22a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z" />
-                  </svg>
-                  <span class="hidden md:inline">Səbət</span>
-                </span>
-                <span id="cartBadge" class="badge absolute -top-2 -right-2 hidden">0</span>
-              </button>
-            </div>
-
-            <div class="sm:hidden flex items-center gap-2">
-              <button id="cartBtnSm" class="btn relative" aria-label="Səbət">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m14-9l2 9M9 22a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z" />
-                </svg>
-                <span id="cartBadgeSm" class="badge absolute -top-2 -right-2 hidden">0</span>
-              </button>
-              <button id="authBtnSm" class="btn" aria-label="Hesab">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </button>
-            </div>
-          </div>
+          <span class="text-xl font-bold tracking-tight text-white uppercase"
+            >Shop<span class="text-blue-500">Hub</span></span
+          >
         </div>
-        <!-- Mobile nav -->
-        <div id="mobileNav" class="lg:hidden hidden mt-3 glass p-3">
-          <div class="flex flex-col gap-2">
-            <button id="navShopBtn2" class="btn btn-primary w-full">Mağaza</button>
-            <button id="navAdminBtn2" class="btn w-full">Admin Panel</button>
-            <div class="h-px bg-white/10 my-1"></div>
-            <button id="authBtn2" class="btn w-full">Giriş / Qeydiyyat</button>
-          </div>
+
+        <nav
+          class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400"
+        >
+          <button id="navShopBtn2" class="hover:text-white transition-colors">
+            Mağaza
+          </button>
+          <button id="navAdminBtn" class="hover:text-white transition-colors">
+            Admin Panel
+          </button>
+        </nav>
+
+        <div class="flex items-center gap-4">
+          <button
+            id="authBtn"
+            class="btn btn-sm bg-white/5 border border-white/10 px-4 py-2 rounded-lg text-xs hover:bg-white/10"
+          >
+            <span id="authBtnLabel">Giriş / Qeydiyyat</span>
+          </button>
+          <button
+            id="cartBtn"
+            class="relative p-2 hover:bg-white/5 rounded-full transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="8" cy="21" r="1" />
+              <circle cx="19" cy="21" r="1" />
+              <path
+                d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"
+              />
+            </svg>
+            <span
+              id="cartBadge"
+              class="hidden absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#0f172a]"
+              >0</span
+            >
+          </button>
         </div>
       </div>
     </header>
 
-    <main class="mx-auto max-w-7xl px-4 py-6">
-      <!-- Hero -->
-      <section class="no-print glass p-6 md:p-8 mb-6 relative overflow-hidden">
-        <div class="absolute -top-24 -right-20 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl"></div>
-        <div class="absolute -bottom-24 -left-10 h-72 w-72 rounded-full bg-sky-400/20 blur-3xl"></div>
-        <div class="relative flex flex-col md:flex-row gap-6 md:gap-10 items-start md:items-center">
+    <main class="container mx-auto px-4 py-10">
+      <section id="viewShop" class="space-y-10">
+        <div
+          class="glass p-12 rounded-[32px] text-center border border-white/5"
+        >
+          <h1 class="text-4xl md:text-5xl font-black text-white mb-4">
+            Müasir Onlayn Alış-veriş
+          </h1>
+          <p class="text-slate-400 max-w-2xl mx-auto mb-8">
+            ShopHub ilə ən son texnoloji məhsulları kəşf edin, səbətə əlavə edin
+            və sürətli sifariş yaradın.
+          </p>
+          <button
+            id="ctaBrowse"
+            class="bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-blue-600/30 hover:scale-105 transition-transform"
+          >
+            Məhsullara Bax
+          </button>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-10">
+          <aside class="w-full lg:w-64 space-y-6 shrink-0">
+            <div class="glass p-6 rounded-2xl border border-white/5">
+              <h3 class="font-bold text-white mb-4">Axtarış</h3>
+              <input
+                id="searchInput"
+                class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500"
+                placeholder="Axtar..."
+              />
+
+              <h3 class="font-bold text-white mt-8 mb-4">Kateqoriya</h3>
+              <select
+                id="categorySelect"
+                class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none"
+              ></select>
+
+              <h3 class="font-bold text-white mt-8 mb-4">Qiymət</h3>
+              <div class="flex gap-2">
+                <input
+                  id="minPrice"
+                  type="number"
+                  class="w-1/2 bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs"
+                  placeholder="Min"
+                />
+                <input
+                  id="maxPrice"
+                  type="number"
+                  class="w-1/2 bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs"
+                  placeholder="Max"
+                />
+              </div>
+            </div>
+          </aside>
+
           <div class="flex-1">
-            <div class="flex flex-wrap items-center gap-2 mb-3">
-              <span class="chip">Sürətli axtarış</span>
-              <span class="chip">Filterlər</span>
-              <span class="chip">Səbət & Checkout</span>
-              <span class="chip">Admin Panel</span>
+            <div class="flex justify-between items-center mb-8">
+              <span
+                id="resultCount"
+                class="text-sm text-slate-500 uppercase tracking-widest font-semibold"
+                >0 məhsul tapıldı</span
+              >
+              <select
+                id="sortSelect"
+                class="bg-transparent border-none text-sm text-slate-400 outline-none"
+              >
+                <option value="featured">Sıralama</option>
+                <option value="price_asc">Ucuzdan bahaya</option>
+                <option value="price_desc">Bahadan ucuza</option>
+              </select>
             </div>
-            <h1 class="text-2xl md:text-4xl font-semibold leading-tight">
-              ShopHub — müasir online alış-veriş sistemi (Diplom layihəsi üçün demo)
-            </h1>
-            <p class="mt-3 muted max-w-2xl">
-              Məhsulları kateqoriya üzrə araşdırın, filter tətbiq edin, səbətə əlavə edin və sifariş yaradın.
-              Admin paneldə isə məhsullar, sifarişlər və istifadəçilər idarə olunur.
-            </p>
-            <div class="mt-5 flex flex-wrap items-center gap-2">
-              <button id="ctaBrowse" class="btn btn-primary">Məhsullara bax</button>
-              <button id="ctaAdmin" class="btn">Admin panelə keç</button>
-              <button id="ctaDemoOrder" class="btn btn-success">Demo sifariş yarat</button>
-            </div>
-          </div>
-          <div class="w-full md:w-[420px] glass-2 p-4 md:p-5">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="text-sm font-semibold">Sürətli göstəricilər</div>
-                <div class="text-xs muted2">Demo data + localStorage</div>
-              </div>
-              <div class="chip text-xs">Offline UI</div>
-            </div>
-            <div class="mt-4 grid grid-cols-2 gap-3">
-              <div class="glass p-3">
-                <div class="text-xs muted2">Məhsul</div>
-                <div id="kpiProducts" class="text-xl font-semibold mt-1">—</div>
-              </div>
-              <div class="glass p-3">
-                <div class="text-xs muted2">Kateqoriya</div>
-                <div id="kpiCategories" class="text-xl font-semibold mt-1">—</div>
-              </div>
-              <div class="glass p-3">
-                <div class="text-xs muted2">Sifariş</div>
-                <div id="kpiOrders" class="text-xl font-semibold mt-1">—</div>
-              </div>
-              <div class="glass p-3">
-                <div class="text-xs muted2">İstifadəçi</div>
-                <div id="kpiUsers" class="text-xl font-semibold mt-1">—</div>
-              </div>
+
+            <div
+              id="productsGrid"
+              class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+            ></div>
+
+            <div
+              id="emptyState"
+              class="hidden glass p-20 text-center rounded-3xl border border-dashed border-white/10"
+            >
+              <p class="text-slate-500">Heç bir məhsul tapılmadı.</p>
+              <button
+                id="resetFiltersBtn"
+                class="text-blue-500 text-sm mt-4 underline"
+              >
+                Filtrləri təmizlə
+              </button>
             </div>
           </div>
         </div>
       </section>
-      <!-- Views -->
-      <section id="viewShop" class="fade-in">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <!-- Filters -->
-          <aside class="lg:col-span-4 xl:col-span-3 glass p-5 no-print">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="text-sm font-semibold">Axtarış & Filterlər</div>
-                <div class="text-xs muted2">Kateqoriya, qiymət, marka, rəng, stok</div>
-              </div>
-              <button id="resetFiltersBtn" class="btn text-sm">Sıfırla</button>
-            </div>
-            <div class="mt-4 space-y-4">
-              <div>
-                <label class="text-xs muted2">Axtarış</label>
-                <input id="searchInput" class="field mt-1" placeholder="Məs: Air, iPhone, Logitech..." />
-              </div>
 
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="text-xs muted2">Min qiymət (₼)</label>
-                  <input id="minPrice" type="number" min="0" class="field mt-1" placeholder="0" />
-                </div>
-                <div>
-                  <label class="text-xs muted2">Max qiymət (₼)</label>
-                  <input id="maxPrice" type="number" min="0" class="field mt-1" placeholder="9999" />
-                </div>
+      <section id="viewAdmin" class="hidden space-y-6">
+        <div class="glass p-8 rounded-3xl border border-white/5">
+          <h2 class="text-2xl font-bold text-white mb-6">İdarəetmə Paneli</h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="glass p-6 rounded-2xl bg-white/5">
+              <div id="kpiProducts" class="text-3xl font-black text-blue-500">
+                0
               </div>
-              <div>
-                <label class="text-xs muted2">Kateqoriya</label>
-                <select id="categorySelect" class="field mt-1"></select>
-              </div>
-              <div>
-                <label class="text-xs muted2">Marka</label>
-                <select id="brandSelect" class="field mt-1"></select>
-              </div>
-              <div>
-                <label class="text-xs muted2">Rəng</label>
-                <select id="colorSelect" class="field mt-1"></select>
-              </div>
-              <div class="flex items-center justify-between gap-3">
-                <label class="text-sm">
-                  <input id="inStockOnly" type="checkbox" class="mr-2 accent-violet-500">
-                  Yalnız stokda olanlar
-                </label>
-                <span id="resultCount" class="text-xs chip">—</span>
-              </div>
-
-              <div class="flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2">
-                  <label class="text-xs muted2">Sıralama</label>
-                </div>
-                <select id="sortSelect" class="field text-sm w-56">
-                  <option value="featured">Önə çıxan</option>
-                  <option value="price_asc">Qiymət: artan</option>
-                  <option value="price_desc">Qiymət: azalan</option>
-                  <option value="rating_desc">Reytinq: yüksək</option>
-                  <option value="newest">Ən yeni</option>
-                </select>
+              <div class="text-[10px] uppercase text-slate-500 mt-1">
+                Məhsullar
               </div>
             </div>
-
-            <div class="mt-5 glass p-4">
-              <div class="text-sm font-semibold">Tipik user flow</div>
-              <ol class="mt-2 text-sm muted space-y-1 list-decimal ml-5">
-                <li>Məhsulu seçin</li>
-                <li>Səbətə əlavə edin</li>
-                <li>Checkout → Sifariş yaradın</li>
-                <li>Admin paneldə sifarişi görün</li>
-              </ol>
-              <button id="quickCheckoutBtn" class="btn btn-primary w-full mt-4">Səbətə keç</button>
+            <div
+              id="adminRoleChip"
+              class="glass p-6 rounded-2xl bg-white/5 text-sm font-bold flex items-center justify-center uppercase"
+            >
+              GUEST
             </div>
-          </aside>
-
-          <!-- Products -->
-          <section class="lg:col-span-8 xl:col-span-9">
-            <div class="flex items-center justify-between mb-3">
-              <div>
-                <div class="text-sm font-semibold">Məhsullar</div>
-                <div class="text-xs muted2">Detallı səhifə, reytinq, oxşar məhsullar</div>
-              </div>
-              <div class="flex items-center gap-2 no-print">
-                <button id="viewModeGridBtn" class="btn btn-primary text-sm">Grid</button>
-                <button id="viewModeListBtn" class="btn text-sm">List</button>
-              </div>
-            </div>
-
-            <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
-
-            <div id="emptyState" class="hidden glass p-8 mt-4">
-              <div class="text-lg font-semibold">Nəticə tapılmadı</div>
-              <div class="muted mt-1">Filterləri yumşaldın və ya “Sıfırla” düyməsini basın.</div>
-            </div>
-          </section>
+          </div>
         </div>
       </section>
-
-      <!-- Admin View -->
-      <section id="viewAdmin" class="hidden fade-in">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <!-- Sidebar -->
-          <aside class="lg:col-span-4 xl:col-span-3 glass p-5 no-print">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="text-sm font-semibold">Admin Panel</div>
-                <div class="text-xs muted2">Məhsul • Sifariş • İstifadəçi</div>
-              </div>
-              <span class="chip text-xs" id="adminRoleChip">—</span>
-            </div>
-
-            <div class="mt-4 space-y-2">
-              <button data-admin-tab="dashboard" class="btn btn-primary w-full text-left">Dashboard</button>
-              <button data-admin-tab="products" class="btn w-full text-left">Məhsullar</button>
-              <button data-admin-tab="orders" class="btn w-full text-left">Sifarişlər</button>
-              <button data-admin-tab="users" class="btn w-full text-left">İstifadəçilər</button>
-              <div class="h-px bg-white/10 my-2"></div>
-              <button id="exportBtn" class="btn w-full text-left">Export (JSON)</button>
-              <button id="resetDataBtn" class="btn btn-danger w-full text-left">Demo datanı sıfırla</button>
-            </div>
-
-            <div class="mt-5 glass p-4">
-              <div class="text-sm font-semibold">Admin giriş (demo)</div>
-              <div class="muted text-sm mt-1">
-                Admin paneldə dəyişikliklər localStorage-də saxlanılır.
-              </div>
-              <div class="mt-3 flex items-center justify-between">
-                <button id="createAdminBtn" class="btn btn-success text-sm">Admin yarat</button>
-                <button id="logoutBtn" class="btn text-sm">Çıxış</button>
-              </div>
-            </div>
-          </aside>
-
-          <!-- Content -->
-          <section class="lg:col-span-8 xl:col-span-9">
-            <!-- Dashboard -->
-            <div id="adminTabDashboard" class="glass p-5">
-              <div class="flex items-center justify-between gap-3">
-                <div>
-                  <div class="text-sm font-semibold">Dashboard</div>
-                  <div class="text-xs muted2">Satışlar, sifariş statusu, stok analitikası</div>
-                </div>
-                <div class="flex items-center gap-2 no-print">
-                  <button id="seedOrderBtn" class="btn btn-success text-sm">Demo sifariş əlavə et</button>
-                  <button id="printBtn" class="btn text-sm">Çap</button>
-                </div>
-              </div>
-
-              <div class="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <div class="glass p-4">
-                  <div class="text-xs muted2">Cəmi gəlir (₼)</div>
-                  <div id="admRevenue" class="text-2xl font-semibold mt-1">—</div>
-                </div>
-                <div class="glass p-4">
-                  <div class="text-xs muted2">Sifariş sayı</div>
-                  <div id="admOrders" class="text-2xl font-semibold mt-1">—</div>
-                </div>
-                <div class="glass p-4">
-                  <div class="text-xs muted2">Stokda məhsul</div>
-                  <div id="admInStock" class="text-2xl font-semibold mt-1">—</div>
-                </div>
-                <div class="glass p-4">
-                  <div class="text-xs muted2">Low-stock (&lt;= 5)</div>
-                  <div id="admLowStock" class="text-2xl font-semibold mt-1">—</div>
-                </div>
-              </div>
-
-              <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div class="glass p-4">
-                  <div class="flex items-center justify-between">
-                    <div class="text-sm font-semibold">Sifariş statusları</div>
-                    <span class="chip text-xs">Son 30 gün (demo)</span>
-                  </div>
-                  <div class="mt-3">
-                    <canvas id="ordersStatusChart" height="160"></canvas>
-                  </div>
-                </div>
-                <div class="glass p-4">
-                  <div class="flex items-center justify-between">
-                    <div class="text-sm font-semibold">Kateqoriya üzrə məhsul</div>
-                    <span class="chip text-xs">Aktiv kataloq</span>
-                  </div>
-                  <div class="mt-3">
-                    <canvas id="categoryChart" height="160"></canvas>
-                  </div>
-                </div>
-              </div>
-
-              <div class="mt-4 glass p-4">
-                <div class="flex items-center justify-between">
-                  <div class="text-sm font-semibold">Son sifarişlər</div>
-                  <button class="btn text-sm no-print" data-admin-tab-jump="orders">Hamısı</button>
-                </div>
-                <div class="mt-3 overflow-auto">
-                  <table class="tbl">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Tarix</th>
-                        <th>Müştəri</th>
-                        <th>Status</th>
-                        <th>Cəm (₼)</th>
-                      </tr>
-                    </thead>
-                    <tbody id="recentOrdersTbody"></tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            <!-- Products -->
-            <div id="adminTabProducts" class="hidden glass p-5">
-              <div class="flex items-center justify-between gap-3">
-                <div>
-                  <div class="text-sm font-semibold">Məhsul idarəetməsi</div>
-                  <div class="text-xs muted2">Əlavə et • Redaktə et • Sil • Stok idarəsi</div>
-                </div>
-                <div class="flex items-center gap-2 no-print">
-                  <button id="newProductBtn" class="btn btn-primary text-sm">Yeni məhsul</button>
-                </div>
-              </div>
-
-              <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 no-print">
-                <div>
-                  <label class="text-xs muted2">Axtarış</label>
-                  <input id="admProductSearch" class="field mt-1" placeholder="Ad, marka, kateqoriya..." />
-                </div>
-                <div>
-                  <label class="text-xs muted2">Kateqoriya</label>
-                  <select id="admProductCategory" class="field mt-1"></select>
-                </div>
-                <div>
-                  <label class="text-xs muted2">Stok</label>
-                  <select id="admProductStock" class="field mt-1">
-                    <option value="all">Hamısı</option>
-                    <option value="instock">Stokda</option>
-                    <option value="out">Stokda yoxdur</option>
-                    <option value="low">Low-stock (&lt;=5)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="mt-4 overflow-auto">
-                <table class="tbl">
-                  <thead>
-                    <tr>
-                      <th>Məhsul</th>
-                      <th>Kateqoriya</th>
-                      <th>Marka</th>
-                      <th>Qiymət</th>
-                      <th>Stok</th>
-                      <th class="no-print">Əməliyyat</th>
-                    </tr>
-                  </thead>
-                  <tbody id="adminProductsTbody"></tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Orders -->
-            <div id="adminTabOrders" class="hidden glass p-5">
-              <div class="flex items-center justify-between gap-3">
-                <div>
-                  <div class="text-sm font-semibold">Sifarişlər</div>
-                  <div class="text-xs muted2">Status yenilə • Detallara bax</div>
-                </div>
-                <div class="flex items-center gap-2 no-print">
-                  <select id="admOrderStatusFilter" class="field text-sm w-56">
-                    <option value="all">Bütün statuslar</option>
-                    <option value="pending">Pending</option>
-                    <option value="paid">Paid</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="mt-4 overflow-auto">
-                <table class="tbl">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Tarix</th>
-                      <th>Müştəri</th>
-                      <th>Məhsullar</th>
-                      <th>Cəm (₼)</th>
-                      <th>Status</th>
-                      <th class="no-print">Əməliyyat</th>
-                    </tr>
-                  </thead>
-                  <tbody id="adminOrdersTbody"></tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Users -->
-            <div id="adminTabUsers" class="hidden glass p-5">
-              <div class="flex items-center justify-between gap-3">
-                <div>
-                  <div class="text-sm font-semibold">İstifadəçilər</div>
-                  <div class="text-xs muted2">Rollar • Aktivlik • Qeydiyyat tarixi</div>
-                </div>
-                <div class="flex items-center gap-2 no-print">
-                  <input id="admUserSearch" class="field text-sm w-64" placeholder="Email üzrə axtar..." />
-                </div>
-              </div>
-
-              <div class="mt-4 overflow-auto">
-                <table class="tbl">
-                  <thead>
-                    <tr>
-                      <th>Email</th>
-                      <th>Rol</th>
-                      <th>Qeydiyyat</th>
-                      <th>Son giriş</th>
-                      <th class="no-print">Əməliyyat</th>
-                    </tr>
-                  </thead>
-                  <tbody id="adminUsersTbody"></tbody>
-                </table>
-              </div>
-            </div>
-
-          </section>
-        </div>
-      </section>
-
-      <footer class="mt-8 mb-10 text-center muted2 text-sm">
-        © <span id="year"></span> ShopHub — Diplom layihəsi üçün UI demo. Məlumatlar localStorage-də saxlanılır.
-      </footer>
     </main>
-  </div>
 
-  <!-- Cart Drawer -->
-  <div id="drawerBackdrop" class="drawer-backdrop no-print"></div>
-  <aside id="cartDrawer" class="drawer no-print" aria-label="Səbət">
-    <div class="p-4 border-b border-white/10">
-      <div class="flex items-center justify-between">
-        <div>
-          <div class="text-sm font-semibold">Səbət</div>
-          <div class="text-xs muted2" id="cartSub">—</div>
-        </div>
-        <button id="closeCartBtn" class="btn" aria-label="Bağla">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
+    <div id="drawerBackdrop" class="backdrop z-[1500]"></div>
+    <aside id="cartDrawer" class="p-6 flex flex-col">
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl font-bold text-white">
+          Səbət
+          <span
+            id="cartSub"
+            class="text-sm font-normal text-slate-500 ml-2"
+          ></span>
+        </h2>
+        <button
+          id="closeCartBtn"
+          class="p-2 hover:bg-white/10 rounded-full transition-colors"
+        >
+          &times;
         </button>
       </div>
-    </div>
 
-    <div class="p-4 flex-1 overflow-auto">
-      <div id="cartItems" class="space-y-3"></div>
+      <div
+        id="cartItems"
+        class="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar"
+      ></div>
 
-      <div id="cartEmpty" class="hidden glass p-5 text-center mt-3">
-        <div class="text-sm font-semibold">Səbət boşdur</div>
-        <div class="text-sm muted mt-1">Məhsul əlavə edib checkout edin.</div>
-        <button id="startShoppingBtn" class="btn btn-primary w-full mt-4">Məhsullara qayıt</button>
+      <div
+        id="cartEmpty"
+        class="hidden text-center py-20 flex-1 flex flex-col justify-center"
+      >
+        <p class="text-slate-500 mb-6">Səbətiniz hələ ki boşdur.</p>
+        <button
+          id="startShoppingBtn"
+          class="bg-white/5 border border-white/10 px-6 py-3 rounded-xl hover:bg-white/10"
+        >
+          Alış-verişə davam et
+        </button>
       </div>
-    </div>
 
-    <div class="p-4 border-t border-white/10">
-      <div class="glass p-4">
-        <div class="flex items-center justify-between text-sm">
-          <span class="muted">Ara cəm</span>
-          <span id="cartSubtotal">₼0.00</span>
+      <div class="mt-auto pt-8 border-t border-white/5 space-y-4">
+        <div class="flex justify-between text-sm">
+          <span class="text-slate-500">Ara cəm:</span
+          ><span id="cartSubtotal" class="font-medium">0.00 ₼</span>
         </div>
-        <div class="flex items-center justify-between text-sm mt-2">
-          <span class="muted">Çatdırılma</span>
-          <span id="cartShipping">₼0.00</span>
+        <div class="flex justify-between text-xl font-bold text-white">
+          <span>Toplam:</span
+          ><span id="cartTotal" class="text-blue-500">0.00 ₼</span>
         </div>
-        <div class="h-px bg-white/10 my-3"></div>
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-semibold">Cəm</span>
-          <span id="cartTotal" class="text-lg font-semibold">₼0.00</span>
-        </div>
-
-        <button id="checkoutBtn" class="btn btn-primary w-full mt-4">Checkout</button>
-        <button id="clearCartBtn" class="btn btn-danger w-full mt-2">Səbəti təmizlə</button>
+        <button
+          id="checkoutBtn"
+          class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-xl shadow-blue-600/20 hover:bg-blue-700"
+        >
+          Checkout
+        </button>
+        <button
+          id="clearCartBtn"
+          class="w-full text-xs text-slate-500 hover:text-red-400 py-2"
+        >
+          Səbəti təmizlə
+        </button>
       </div>
-    </div>
-  </aside>
-  <!-- Product Modal -->
-  <div id="productBackdrop" class="backdrop no-print" role="dialog" aria-modal="true">
-    <div class="modal slide-up">
-      <div class="p-4 md:p-5 border-b border-white/10 flex items-center justify-between gap-3">
-        <div class="min-w-0">
-          <div id="pmTitle" class="text-sm md:text-base font-semibold truncate">—</div>
-          <div class="text-xs muted2 mt-1" id="pmMeta">—</div>
+    </aside>
+
+    <div id="authBackdrop" class="backdrop">
+      <div class="modal max-w-md p-10 overflow-hidden">
+        <div class="flex justify-between items-center mb-8">
+          <div class="flex gap-4">
+            <button
+              id="showLogin"
+              class="text-2xl font-bold text-white border-b-2 border-blue-600 pb-1"
+            >
+              Giriş
+            </button>
+            <button
+              id="showRegister"
+              class="text-2xl font-bold text-slate-500 hover:text-white pb-1"
+            >
+              Qeydiyyat
+            </button>
+          </div>
+          <button
+            id="closeAuthModal"
+            class="text-slate-400 hover:text-white text-2xl"
+          >
+            &times;
+          </button>
         </div>
-        <div class="flex items-center gap-2">
-          <button id="pmAddBtn" class="btn btn-primary">Səbətə əlavə et</button>
-          <button id="closeProductModal" class="btn" aria-label="Bağla">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
+
+        <div id="loginPanel" class="space-y-5">
+          <input
+            id="loginEmail"
+            type="email"
+            class="w-full bg-black/20 border border-white/10 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-blue-500"
+            placeholder="E-poçt ünvanınız"
+          />
+          <input
+            id="loginPass"
+            type="password"
+            class="w-full bg-black/20 border border-white/10 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-blue-500"
+            placeholder="Şifrəniz"
+          />
+          <button
+            id="loginBtn"
+            class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-600/20 hover:bg-blue-700"
+          >
+            Daxil Ol
+          </button>
+          <button
+            id="openResetBtn"
+            class="w-full text-center text-xs text-slate-500 hover:text-white transition-colors"
+          >
+            Şifrəmi unutmuşam
+          </button>
+        </div>
+
+        <div id="registerPanel" class="hidden space-y-5">
+          <input
+            id="regEmail"
+            type="email"
+            class="w-full bg-black/20 border border-white/10 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-blue-500"
+            placeholder="Yeni E-poçt ünvanı"
+          />
+          <input
+            id="regPass"
+            type="password"
+            class="w-full bg-black/20 border border-white/10 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-blue-500"
+            placeholder="Yeni Şifrə"
+          />
+          <button
+            id="registerBtn"
+            class="w-full bg-green-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-green-600/20 hover:bg-green-700"
+          >
+            Qeydiyyatı Tamamla
           </button>
         </div>
       </div>
-
-      <div class="p-4 md:p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div class="glass p-3">
-          <div class="aspect-[4/3] rounded-2xl overflow-hidden border border-white/10 bg-black/20">
-            <img id="pmImage" alt="Məhsul şəkli" class="w-full h-full object-cover"/>
-          </div>
-
-          <div class="mt-3 grid grid-cols-4 gap-2" id="pmThumbs"></div>
-        </div>
-
-        <div>
-          <div class="flex items-center justify-between gap-3">
-            <div class="text-2xl font-semibold" id="pmPrice">—</div>
-            <div class="flex items-center gap-2">
-              <span class="chip text-xs" id="pmStock">—</span>
-              <span class="chip text-xs" id="pmColor">—</span>
-            </div>
-          </div>
-
-          <div class="mt-3 glass p-4">
-            <div class="text-sm font-semibold">Xüsusiyyətlər</div>
-            <ul id="pmSpecs" class="mt-2 text-sm muted space-y-1 list-disc ml-5"></ul>
-          </div>
-
-          <div class="mt-3 glass p-4">
-            <div class="flex items-center justify-between">
-              <div class="text-sm font-semibold">Reytinq</div>
-              <div class="chip text-xs" id="pmRatingChip">—</div>
-            </div>
-            <div class="mt-3 flex items-center gap-3">
-              <div id="pmStars" class="flex items-center gap-1"></div>
-              <div class="text-sm muted" id="pmReviews">—</div>
-            </div>
-
-            <div class="mt-4">
-              <div class="text-xs muted2 mb-2">Sürətli qiymətləndirmə (demo)</div>
-              <div class="flex flex-wrap gap-2">
-                <button class="btn text-sm" data-rate="5">5</button>
-                <button class="btn text-sm" data-rate="4">4</button>
-                <button class="btn text-sm" data-rate="3">3</button>
-                <button class="btn text-sm" data-rate="2">2</button>
-                <button class="btn text-sm" data-rate="1">1</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-3 glass p-4">
-            <div class="text-sm font-semibold">Oxşar məhsullar</div>
-            <div id="pmSimilar" class="mt-3 grid grid-cols-2 gap-3"></div>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- Auth Modal -->
-  <div id="authBackdrop" class="backdrop no-print" role="dialog" aria-modal="true">
-    <div class="modal slide-up" style="max-width: 860px;">
-      <div class="p-4 md:p-5 border-b border-white/10 flex items-center justify-between">
+    <div
+      id="toastWrap"
+      class="fixed top-8 right-8 z-[3000] pointer-events-none"
+    >
+      <div
+        id="toast"
+        class="hidden glass p-5 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-4 min-w-[320px] pointer-events-auto animate-slide-in"
+      >
+        <div
+          id="toastIcon"
+          class="w-10 h-10 bg-blue-500/20 text-blue-500 rounded-full flex items-center justify-center text-xl"
+        ></div>
         <div>
-          <div class="text-sm font-semibold">Hesab</div>
-          <div class="text-xs muted2">Giriş • Qeydiyyat • Şifrə sıfırlama (demo)</div>
+          <div id="toastTitle" class="text-sm font-bold text-white"></div>
+          <div id="toastMsg" class="text-xs text-slate-400 mt-1"></div>
         </div>
-        <button id="closeAuthModal" class="btn" aria-label="Bağla">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
+        <button id="toastClose" class="ml-auto text-slate-500 hover:text-white">
+          &times;
         </button>
       </div>
+    </div>
 
-      <div class="p-4 md:p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="glass p-4">
-          <div class="flex items-center justify-between">
-            <div class="text-sm font-semibold">Giriş</div>
-            <span class="chip text-xs">User/Admin</span>
-          </div>
-          <div class="mt-3 space-y-3">
-            <div>
-              <label class="text-xs muted2">Email</label>
-              <input id="loginEmail" class="field mt-1" placeholder="məs: user@demo.az">
-            </div>
-            <div>
-              <label class="text-xs muted2">Şifrə</label>
-              <input id="loginPass" type="password" class="field mt-1" placeholder="••••••••">
-            </div>
-            <button id="loginBtn" class="btn btn-primary w-full">Daxil ol</button>
-            <button id="openResetBtn" class="btn w-full">Şifrəni unutdum</button>
-            <div class="text-xs muted2">Demo admin: <span class="chip text-xs">admin@shophub.az</span> şifrə: <span class="chip text-xs">Admin123!</span></div>
-          </div>
+    <div id="productBackdrop" class="backdrop">
+      <div
+        class="modal max-w-4xl p-0 overflow-hidden flex flex-col md:flex-row min-h-[500px]"
+      >
+        <div
+          class="md:w-1/2 bg-black/40 p-8 flex flex-col items-center justify-center relative"
+        >
+          <img
+            id="pmImage"
+            class="max-w-full h-72 object-contain transition-transform hover:scale-105 duration-500"
+            src=""
+            alt=""
+          />
+          <div id="pmThumbs" class="flex gap-3 mt-8"></div>
+          <div
+            id="pmRatingChip"
+            class="absolute top-6 left-6 bg-yellow-500/20 text-yellow-500 px-3 py-1 rounded-full text-xs font-black"
+          ></div>
         </div>
-
-        <div class="glass p-4">
-          <div class="flex items-center justify-between">
-            <div class="text-sm font-semibold">Qeydiyyat</div>
-            <span class="chip text-xs">Email + Şifrə</span>
+        <div class="md:w-1/2 p-10 flex flex-col">
+          <button
+            id="closeProductModal"
+            class="absolute top-6 right-6 text-slate-500 hover:text-white text-3xl"
+          >
+            &times;
+          </button>
+          <div
+            id="pmMeta"
+            class="text-blue-500 text-xs font-bold uppercase tracking-widest mb-2"
+          ></div>
+          <h2
+            id="pmTitle"
+            class="text-3xl font-black text-white leading-tight mb-4"
+          ></h2>
+          <div id="pmPrice" class="text-3xl font-bold text-white mb-2"></div>
+          <div
+            id="pmStock"
+            class="text-xs font-bold text-slate-500 mb-8 uppercase tracking-widest"
+          ></div>
+          <div class="flex-1">
+            <h4
+              class="text-xs font-bold text-slate-500 uppercase mb-3 tracking-widest"
+            >
+              Texniki Özəlliklər
+            </h4>
+            <ul id="pmSpecs" class="space-y-2 text-sm text-slate-400"></ul>
           </div>
-          <div class="mt-3 space-y-3">
-            <div>
-              <label class="text-xs muted2">Email</label>
-              <input id="regEmail" class="field mt-1" placeholder="məs: ad@domain.az">
-            </div>
-            <div>
-              <label class="text-xs muted2">Şifrə</label>
-              <input id="regPass" type="password" class="field mt-1" placeholder="minimum 6 simvol">
-            </div>
-            <button id="registerBtn" class="btn btn-success w-full">Hesab yarat</button>
-
-            <div class="h-px bg-white/10 my-2"></div>
-            <div class="text-sm font-semibold">Cari sessiya</div>
-            <div id="sessionInfo" class="text-sm muted mt-1">Daxil olmamısınız.</div>
-            <button id="logoutBtn2" class="btn w-full mt-2">Çıxış</button>
-          </div>
-        </div>
-
-        <div id="resetPanel" class="md:col-span-2 hidden glass p-4">
-          <div class="flex items-center justify-between">
-            <div class="text-sm font-semibold">Şifrə sıfırlama (demo)</div>
-            <button id="closeResetBtn" class="btn text-sm">Bağla</button>
-          </div>
-          <div class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div class="md:col-span-2">
-              <label class="text-xs muted2">Email</label>
-              <input id="resetEmail" class="field mt-1" placeholder="hesab email-i">
-            </div>
-            <div>
-              <label class="text-xs muted2">Yeni şifrə</label>
-              <input id="resetNewPass" class="field mt-1" type="password" placeholder="yeni şifrə">
-            </div>
-          </div>
-          <button id="resetPassBtn" class="btn btn-warn w-full mt-3">Şifrəni yenilə</button>
-          <div class="text-xs muted2 mt-2">Qeyd: Bu yalnız UI demo-dur (email göndərilmir).</div>
+          <button
+            id="pmAddBtn"
+            class="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold shadow-xl shadow-blue-600/20 hover:bg-blue-700 mt-8"
+          >
+            Səbətə Əlavə Et
+          </button>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Admin Product Modal -->
-  <div id="admProductBackdrop" class="backdrop no-print" role="dialog" aria-modal="true">
-    <div class="modal slide-up" style="max-width: 920px;">
-      <div class="p-4 md:p-5 border-b border-white/10 flex items-center justify-between">
-        <div>
-          <div id="admProdModalTitle" class="text-sm font-semibold">Məhsul</div>
-          <div class="text-xs muted2">Əlavə / Redaktə</div>
-        </div>
-        <button id="closeAdmProductModal" class="btn" aria-label="Bağla">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
+    <footer
+      class="container mx-auto px-4 py-20 text-center border-t border-white/5 mt-20"
+    >
+      <p class="text-slate-500 text-sm">
+        © <span id="year">2026</span> ShopHub E-Commerce Platform. Müəllif
+        hüquqları qorunur.
+      </p>
+    </footer>
 
-      <div class="p-4 md:p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="glass p-4 space-y-3">
-          <div>
-            <label class="text-xs muted2">Ad</label>
-            <input id="admPName" class="field mt-1" placeholder="Məhsul adı">
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="text-xs muted2">Qiymət (₼)</label>
-              <input id="admPPrice" type="number" min="0" class="field mt-1" placeholder="0">
-            </div>
-            <div>
-              <label class="text-xs muted2">Stok</label>
-              <input id="admPStock" type="number" min="0" class="field mt-1" placeholder="0">
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="text-xs muted2">Kateqoriya</label>
-              <input id="admPCategory" class="field mt-1" placeholder="məs: Elektronika">
-            </div>
-            <div>
-              <label class="text-xs muted2">Marka</label>
-              <input id="admPBrand" class="field mt-1" placeholder="məs: Apple">
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="text-xs muted2">Rəng</label>
-              <input id="admPColor" class="field mt-1" placeholder="məs: Qara">
-            </div>
-            <div>
-              <label class="text-xs muted2">Reytinq (0-5)</label>
-              <input id="admPRating" type="number" step="0.1" min="0" max="5" class="field mt-1" placeholder="4.6">
-            </div>
-          </div>
-          <div>
-            <label class="text-xs muted2">Şəkillər (URL, vergül ilə)</label>
-            <input id="admPImages" class="field mt-1" placeholder="https://... , https://...">
-          </div>
-        </div>
-
-        <div class="glass p-4 space-y-3">
-          <div>
-            <label class="text-xs muted2">Qısa təsvir</label>
-            <textarea id="admPDesc" class="field mt-1" rows="3" placeholder="Məhsul haqqında qısa məlumat..."></textarea>
-          </div>
-          <div>
-            <label class="text-xs muted2">Xüsusiyyətlər (hər sətir bir maddə)</label>
-            <textarea id="admPSpecs" class="field mt-1" rows="6" placeholder="Məs: 2 il zəmanət&#10;USB-C&#10;Sürətli şarj"></textarea>
-          </div>
-          <div class="flex items-center gap-2">
-            <button id="saveProductBtn" class="btn btn-primary flex-1">Yadda saxla</button>
-            <button id="cancelProductBtn" class="btn flex-1">Ləğv et</button>
-          </div>
-          <div id="admProdHint" class="text-xs muted2">Yadda saxlandıqdan sonra dəyişikliklər kataloqda görünəcək.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Toast -->
-  <div id="toastWrap" class="fixed bottom-4 left-0 right-0 z-[80] px-4 pointer-events-none">
-    <div id="toast" class="mx-auto max-w-md hidden glass-2 p-3 pointer-events-auto">
-      <div class="flex items-start gap-3">
-        <div id="toastIcon" class="mt-0.5 h-8 w-8 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center"></div>
-        <div class="flex-1 min-w-0">
-          <div id="toastTitle" class="text-sm font-semibold">—</div>
-          <div id="toastMsg" class="text-sm muted mt-0.5">—</div>
-        </div>
-        <button id="toastClose" class="btn px-2 py-1">Bağla</button>
-      </div>
-    </div>
-  </div> 
-  <script type="module" src="./src/js/app.js"></script>
-</body>
+    <script type="module" src="./src/js/app.js"></script>
+  </body>
 </html>
