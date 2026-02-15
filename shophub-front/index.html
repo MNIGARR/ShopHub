@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ShopHub — Online Alış-veriş Platforması (Demo)</title>
+  <title>ShopHub — Online Alış-veriş Platforması</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
@@ -242,7 +242,6 @@
       0%{ background-position: 200% 0; }
       100%{ background-position: -200% 0; }
     }
-
     /* Print-friendly */
     @media print{
       .no-print{ display: none !important; }
@@ -262,7 +261,6 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
           </button>
-
           <div class="flex items-center gap-2">
             <div class="h-9 w-9 rounded-2xl bg-gradient-to-br from-violet-500/90 via-fuchsia-500/60 to-sky-400/70 border border-white/15 shadow-lg"></div>
             <div>
@@ -270,13 +268,11 @@
               <div class="text-xs muted2 leading-4">Online Alış-veriş Platforması (Demo)</div>
             </div>
           </div>
-
           <div class="ml-auto flex items-center gap-2">
             <div class="hidden md:flex items-center gap-2">
               <button id="navShopBtn" class="btn btn-primary">Mağaza</button>
               <button id="navAdminBtn" class="btn">Admin Panel</button>
             </div>
-
             <div class="hidden sm:flex items-center gap-2">
               <button id="authBtn" class="btn">
                 <span id="authBtnLabel">Giriş / Qeydiyyat</span>
@@ -307,7 +303,6 @@
             </div>
           </div>
         </div>
-
         <!-- Mobile nav -->
         <div id="mobileNav" class="lg:hidden hidden mt-3 glass p-3">
           <div class="flex flex-col gap-2">
@@ -325,7 +320,6 @@
       <section class="no-print glass p-6 md:p-8 mb-6 relative overflow-hidden">
         <div class="absolute -top-24 -right-20 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl"></div>
         <div class="absolute -bottom-24 -left-10 h-72 w-72 rounded-full bg-sky-400/20 blur-3xl"></div>
-
         <div class="relative flex flex-col md:flex-row gap-6 md:gap-10 items-start md:items-center">
           <div class="flex-1">
             <div class="flex flex-wrap items-center gap-2 mb-3">
@@ -341,14 +335,12 @@
               Məhsulları kateqoriya üzrə araşdırın, filter tətbiq edin, səbətə əlavə edin və sifariş yaradın.
               Admin paneldə isə məhsullar, sifarişlər və istifadəçilər idarə olunur.
             </p>
-
             <div class="mt-5 flex flex-wrap items-center gap-2">
               <button id="ctaBrowse" class="btn btn-primary">Məhsullara bax</button>
               <button id="ctaAdmin" class="btn">Admin panelə keç</button>
               <button id="ctaDemoOrder" class="btn btn-success">Demo sifariş yarat</button>
             </div>
           </div>
-
           <div class="w-full md:w-[420px] glass-2 p-4 md:p-5">
             <div class="flex items-center justify-between">
               <div>
@@ -378,7 +370,6 @@
           </div>
         </div>
       </section>
-
       <!-- Views -->
       <section id="viewShop" class="fade-in">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -391,7 +382,6 @@
               </div>
               <button id="resetFiltersBtn" class="btn text-sm">Sıfırla</button>
             </div>
-
             <div class="mt-4 space-y-4">
               <div>
                 <label class="text-xs muted2">Axtarış</label>
@@ -408,22 +398,18 @@
                   <input id="maxPrice" type="number" min="0" class="field mt-1" placeholder="9999" />
                 </div>
               </div>
-
               <div>
                 <label class="text-xs muted2">Kateqoriya</label>
                 <select id="categorySelect" class="field mt-1"></select>
               </div>
-
               <div>
                 <label class="text-xs muted2">Marka</label>
                 <select id="brandSelect" class="field mt-1"></select>
               </div>
-
               <div>
                 <label class="text-xs muted2">Rəng</label>
                 <select id="colorSelect" class="field mt-1"></select>
               </div>
-
               <div class="flex items-center justify-between gap-3">
                 <label class="text-sm">
                   <input id="inStockOnly" type="checkbox" class="mr-2 accent-violet-500">
@@ -560,7 +546,6 @@
                     <canvas id="ordersStatusChart" height="160"></canvas>
                   </div>
                 </div>
-
                 <div class="glass p-4">
                   <div class="flex items-center justify-between">
                     <div class="text-sm font-semibold">Kateqoriya üzrə məhsul</div>
@@ -766,7 +751,6 @@
       </div>
     </div>
   </aside>
-
   <!-- Product Modal -->
   <div id="productBackdrop" class="backdrop no-print" role="dialog" aria-modal="true">
     <div class="modal slide-up">

@@ -5,6 +5,8 @@ export const endpoints = {
     register: () => `${API_BASE}/auth/register`,
     login: () => `${API_BASE}/auth/login`,
     me: () => `${API_BASE}/auth/me`,
+    forgotPassword: () => `${API_BASE}/auth/forgot-password`,
+    resetPassword: () => `${API_BASE}/auth/reset-password`,
   },
   products: {
     list: () => `${API_BASE}/products`,

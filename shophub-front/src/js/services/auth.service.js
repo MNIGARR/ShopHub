@@ -58,3 +58,11 @@ export function isAdmin() {
   const u = getUser();
   return (u?.role || "").toLowerCase() === "admin";
 }
+
+// src/js/services/auth.service.js daxilinə əlavə et
+export async function sendResetEmail(email) {
+  return await apiFetch(endpoints.auth.forgotPassword(), {
+    method: "POST",
+    body: { email },
+  });
+}
