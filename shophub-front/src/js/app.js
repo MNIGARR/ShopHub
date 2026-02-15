@@ -885,7 +885,6 @@ $("showLogin").onclick = () => {
         });
       }
     });
-
   // register (if backend has endpoint; otherwise shows info)
   // Register (Real integration)
 $("registerBtn") && ($("registerBtn").onclick = async () => {
@@ -970,10 +969,7 @@ $("registerBtn") && ($("registerBtn").onclick = async () => {
       $("sortSelect") && ($("sortSelect").value = "featured");
       renderProducts();
     });
-
   $("quickCheckoutBtn") && ($("quickCheckoutBtn").onclick = openCart);
-
-  // cart drawer buttons
   ["cartBtn", "cartBtnSm"]
     .map($)
     .filter(Boolean)
@@ -990,7 +986,6 @@ $("registerBtn") && ($("registerBtn").onclick = async () => {
       clearCart();
       showToast({ title: "Səbət", message: "Səbət təmizləndi.", type: "info" });
     });
-
   // checkout (demo for now)
   async function processCheckout() {
     if (state.cart.length === 0) {
@@ -1001,7 +996,6 @@ $("registerBtn") && ($("registerBtn").onclick = async () => {
       });
       return;
     }
-
     // İstifadəçinin daxil olub-olmadığını yoxlayırıq
     if (!state.sessionUser) {
       showToast({
@@ -1022,18 +1016,14 @@ $("registerBtn") && ($("registerBtn").onclick = async () => {
         })),
         totalAmount: cartTotals().total,
       };
-
       // Real API sorğusu
       await apiFetch("/api/orders", {
         method: "POST",
         body: orderData,
         auth: true,
       });
-
-      // Uğurlu sifarişdən sonra
       clearCart(); // Səbəti təmizləyirik
       closeCart(); // Səbət panelini bağlayırıq
-
       showToast({
         title: "Sifariş uğurludur!",
         message: "Sifarişiniz qəbul edildi. Tezliklə əlaqə saxlanılacaq.",
@@ -1047,11 +1037,7 @@ $("registerBtn") && ($("registerBtn").onclick = async () => {
       });
     }
   }
-
-  // Düyməyə bağlayırıq
   $("checkoutBtn").onclick = processCheckout;
-
-  // product modal close
   $("closeProductModal") &&
     ($("closeProductModal").onclick = closeProductModal);
   $("productBackdrop") &&
@@ -1068,7 +1054,6 @@ async function init() {
   await loadProducts(); // məhsulları çəkir (alınmasa demo)
   showView("shop");
 }
-
 init().catch((e) => {
   console.error(e);
   showToast({
@@ -1077,3 +1062,84 @@ init().catch((e) => {
     type: "danger",
   });
 });
+// Admin Panel: Yeni Məhsul Əlavə Etmə Funksiyası (DÜZƏLDİLMİŞ VERSİYA)
+const addProductForm = document.getElementById("addProductForm");
+
+if (addProductForm) {
+  addProductForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // Dəyərləri götürürük
+    const name = document.getElementById("admProdName").value;
+    const price = document.getElementById("admProdPrice").value;
+    const stock = document.getElementById("admProdStock").value;
+    const category = document.getElementById("admProdCategory").value;
+    const image = document.getElementById("admProdImage").value;
+
+    // Validasiya
+    if (!name || !price || !stock || !category || !image) {
+      alert("Zəhmət olmasa bütün xanaları doldurun!");
+      return;
+    }
+
+    try {
+      // Düzəliş 1: apiFetch istifadə edirik (Tokeni avtomatik qoyur)
+      await apiFetch("/api/products", {
+        method: "POST",
+        body: {
+          name: name,
+          price: parseFloat(price),
+          stock: parseInt(stock),
+          category: category,
+          image: image
+        }
+      });
+
+      // Uğurlu nəticə
+      alert("Məhsul uğurla əlavə edildi!");
+      addProductForm.reset(); 
+      
+      // Düzəliş 2: Funksiya adını düzəltdik (fetchProducts -> loadProducts)
+      await loadProducts(); 
+      renderAdminTable(); // Cədvəli yeniləyirik
+      
+    } catch (error) {
+      console.error("Xəta:", error);
+      alert("Xəta baş verdi: " + error.message);
+    }
+  });
+}
+
+// --- Məhsul Silmə Funksiyası ---
+async function deleteProduct(id) {
+  // 1. Əvvəlcə təsdiq istəyirik
+  if (!confirm("Bu məhsulu silmək istədiyinizə əminsiniz?")) return;
+
+  try {
+    // 2. Backend-ə silmə sorğusu göndəririk
+    // Qeyd: Backend-də DELETE metodu aktiv olmalıdır
+    await apiFetch(`/api/products/${id}`, { method: "DELETE" });
+
+    // 3. Uğurlu olduqda istifadəçiyə xəbər veririk
+    showToast({ 
+      title: "Silindi", 
+      message: "Məhsul bazadan silindi.", 
+      type: "success" 
+    });
+
+    // 4. Cədvəli yeniləmək üçün məhsulları təzədən yükləyirik
+    await loadProducts(); 
+    renderAdminTable(); 
+
+  } catch (e) {
+    console.error(e);
+    showToast({ 
+      title: "Xəta", 
+      message: "Silinmə zamanı xəta baş verdi (Server cavab vermir və ya icazə yoxdur).", 
+      type: "danger" 
+    });
+  }
+}
+
+// VACİB: HTML-dən (onclick) çağıra bilmək üçün funksiyanı qlobal edirik
+window.deleteProduct = deleteProduct;
