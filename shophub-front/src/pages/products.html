@@ -1,46 +1,64 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>ShopHub | Products</title>
-  <link rel="stylesheet" href="../css/base.css" />
-  <link rel="stylesheet" href="../css/pages/products.css" />
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ShopHub | Products</title>
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/pages/products.css" />
+  </head>
+  <body>
+    <div
+      id="productsGrid"
+      class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"
+    ></div>
 
-  <!-- Navbar -->
-  <header id="navbar"></header>
+    <div class="flex flex-col items-center mt-12 space-y-4">
+      <div
+        class="inline-flex items-center bg-white border rounded-xl shadow-sm p-1"
+      >
+        <button
+          id="prevPage"
+          class="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+        </button>
 
-  <main class="container">
-    <h1>Products</h1>
+        <div id="pageNumbers" class="flex px-2 space-x-1"></div>
 
-    <div class="filters">
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="Search products..."
-      />
-
-      <select id="sortSelect">
-        <option value="">Sort by</option>
-        <option value="price_asc">Price ↑</option>
-        <option value="price_desc">Price ↓</option>
-      </select>
+        <button
+          id="nextPage"
+          class="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </button>
+      </div>
+      <p id="totalInfo" class="text-sm text-gray-500 font-medium"></p>
     </div>
 
-    <div id="productsList" class="products-grid">
-      <!-- JS render -->
-    </div>
-  </main>
-
-  <!-- Footer -->
-  <footer id="footer"></footer>
-
-  <script type="module">
-    import { initProductsPage } from "../js/ui/products.js";
-    initProductsPage();
-  </script>
-
-  <script type="module" src="../js/app.js"></script>
-</body>
+    <script src="../js/products.js"></script>
+  </body>
 </html>

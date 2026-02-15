@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Checkout - ShopHub</title>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto py-12 px-4">
+        <h1 class="text-3xl font-bold mb-8">Sifarişi rəsmiləşdir</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border">
+                <h2 class="text-xl font-semibold mb-4 border-b pb-2">Məhsullar</h2>
+                <div id="checkoutItems" class="space-y-4">
+                    </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border h-fit">
+                <h2 class="text-xl font-semibold mb-4 border-b pb-2">Cəmi</h2>
+                <div class="space-y-2 mb-6">
+                    <div class="flex justify-between"><span>Məhsullar:</span><span id="subtotal">0.00 AZN</span></div>
+                    <div class="flex justify-between"><span>Çatdırılma:</span><span>5.00 AZN</span></div>
+                    <div class="flex justify-between text-xl font-bold pt-2 border-t mt-2">
+                        <span>Toplam:</span><span id="totalPrice">0.00 AZN</span>
+                    </div>
+                </div>
+                
+                <button id="btnCheckout" class="w-full bg-black text-white py-4 rounded-xl font-bold hover:bg-gray-800 transition disabled:bg-gray-400">
+                    Sifarişi tamamla
+                </button>
+                <p id="msg" class="mt-4 text-center text-sm font-medium"></p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../js/checkout.js"></script>
+</body>
+</html>
