@@ -158,6 +158,19 @@ function updateAuthUI() {
   if (adminRoleChip) {
     adminRoleChip.textContent = user ? user.role || "user" : "guest";
   }
+
+  // updateAuthUI funksiyasının daxilinə əlavə et
+const adminBtn = document.getElementById("navAdminBtn");
+if (adminBtn) {
+    if (isAdmin()) {
+        console.log("İstifadəçi admindir, düymə göstərilir...");
+        adminBtn.classList.remove("hidden");
+        adminBtn.style.display = "block"; // Tailwind klası işləməsə, birbaşa style ilə göstər
+    } else {
+        adminBtn.classList.add("hidden");
+        adminBtn.style.display = "none";
+    }
+}
 }
 
 function isAdmin() {
@@ -349,6 +362,26 @@ function renderKPIs() {
     ($("kpiCategories").textContent = String(categories.size));
   $("kpiOrders") && ($("kpiOrders").textContent = String(orders.length));
   $("kpiUsers") && ($("kpiUsers").textContent = String(users.length));
+}
+
+function renderAdminTable() {
+    const tableBody = $("adminProductsTable");
+    if (!tableBody) return;
+
+    tableBody.innerHTML = state.products.map(p => `
+        <tr class="hover:bg-white/5 transition-colors">
+            <td class="px-6 py-4 font-medium text-white">${productName(p)}</td>
+            <td class="px-6 py-4">${formatMoneyAZN(productPrice(p))}</td>
+            <td class="px-6 py-4">
+                <span class="chip ${productStock(p) > 0 ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}">
+                    ${productStock(p)} ədəd
+                </span>
+            </td>
+            <td class="px-6 py-4">
+                <button class="text-red-500 hover:text-red-400 font-bold" onclick="deleteProduct(${getProductId(p)})">Sil</button>
+            </td>
+        </tr>
+    `).join("");
 }
 
 // Products UI + filters (simple)
@@ -768,6 +801,7 @@ function goAdmin() {
     return;
   }
   showView("admin");
+  renderAdminTable(); // Bu sətri əlavə et
 }
 
 // Bind UI events
@@ -978,7 +1012,6 @@ $("registerBtn") && ($("registerBtn").onclick = async () => {
       openAuthModal();
       return;
     }
-
     try {
       // Backend-in gözlədiyi formatda data hazırlayırıq
       const orderData = {

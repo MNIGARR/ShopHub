@@ -84,15 +84,9 @@
           >
         </div>
 
-        <nav
-          class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400"
-        >
-          <button id="navShopBtn2" class="hover:text-white transition-colors">
-            Mağaza
-          </button>
-          <button id="navAdminBtn" class="hover:text-white transition-colors">
-            Admin Panel
-          </button>
+        <nav class=" md:flex items-center gap-8 text-sm font-medium text-slate-400">
+            <button id="navShopBtn2" class="hover:text-white transition-colors">Mağaza</button>
+            <button id="navAdminBtn" class=" hover:text-white transition-colors">Admin Panel</button>
         </nav>
 
         <div class="flex items-center gap-4">
@@ -225,25 +219,46 @@
         </div>
       </section>
 
-      <section id="viewAdmin" class="hidden space-y-6">
-        <div class="glass p-8 rounded-3xl border border-white/5">
-          <h2 class="text-2xl font-bold text-white mb-6">İdarəetmə Paneli</h2>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="glass p-6 rounded-2xl bg-white/5">
-              <div id="kpiProducts" class="text-3xl font-black text-blue-500">
-                0
-              </div>
-              <div class="text-[10px] uppercase text-slate-500 mt-1">
-                Məhsullar
-              </div>
-            </div>
-            <div
-              id="adminRoleChip"
-              class="glass p-6 rounded-2xl bg-white/5 text-sm font-bold flex items-center justify-center uppercase"
-            >
-              GUEST
-            </div>
+      <section id="viewAdmin" class="hidden space-y-10">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div class="glass p-6 rounded-3xl border border-white/5">
+            <div id="kpiProducts" class="text-3xl font-black text-blue-500">0</div>
+            <div class="text-xs uppercase text-slate-500 mt-1 tracking-widest">Məhsul Sayı</div>
           </div>
+          <div class="glass p-6 rounded-3xl border border-white/5">
+            <div id="adminRoleChip" class="text-xl font-bold text-green-500 uppercase">GUEST</div>
+            <div class="text-xs uppercase text-slate-500 mt-1 tracking-widest">Səlahiyyət</div>
+          </div>
+          <button id="logoutBtn" class="glass p-6 rounded-3xl border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors">
+            Çıxış Et
+          </button>
+        </div>
+
+        <div class="glass p-8 rounded-[32px] border border-white/5">
+          <h3 class="text-xl font-bold text-white mb-6">Yeni Məhsul Əlavə Et</h3>
+          <form id="addProductForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <input type="text" id="admProdName" placeholder="Məhsulun adı" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">
+            <input type="number" id="admProdPrice" placeholder="Qiymət (AZN)" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">
+            <input type="number" id="admProdStock" placeholder="Stok sayı" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">
+            <input type="text" id="admProdCategory" placeholder="Kateqoriya" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">
+            <input type="text" id="admProdImage" placeholder="Şəkil URL (Cloudinary)" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">
+            <button type="submit" class="bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors">Yadda Saxla</button>
+          </form>
+        </div>
+
+        <div class="glass rounded-[32px] border border-white/5 overflow-hidden">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-white/5 text-slate-400 uppercase text-[10px] tracking-widest">
+              <tr>
+                <th class="px-6 py-4 font-bold">Məhsul</th>
+                <th class="px-6 py-4 font-bold">Qiymət</th>
+                <th class="px-6 py-4 font-bold">Stok</th>
+                <th class="px-6 py-4 font-bold">Əməliyyat</th>
+              </tr>
+            </thead>
+            <tbody id="adminProductsTable" class="divide-y divide-white/5">
+              </tbody>
+          </table>
         </div>
       </section>
     </main>
