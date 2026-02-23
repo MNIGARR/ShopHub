@@ -420,6 +420,19 @@
       </div>
     </div>
 
+
+    <div id="confirmBackdrop" class="backdrop">
+      <div class="glass p-8 rounded-[32px] border border-white/10 max-w-sm w-full text-center">
+        <div class="w-16 h-16 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-6">!</div>
+        <h3 class="text-xl font-bold text-white mb-2">Məhsul Silinsin?</h3>
+        <p class="text-slate-400 text-sm mb-8">Bu əməliyyat geri qaytarıla bilməz. Davam etmək istəyirsiniz?</p>
+        <div class="flex gap-4">
+          <button id="confirmCancel" class="flex-1 px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium transition-colors">Ləğv et</button>
+          <button id="confirmOk" class="flex-1 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg shadow-red-600/20 transition-all">Bəli, Sil</button>
+        </div>
+      </div>
+    </div>
+
     <div id="productBackdrop" class="backdrop">
       <div
         class="modal max-w-4xl p-0 overflow-hidden flex flex-col md:flex-row min-h-[500px]"

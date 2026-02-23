@@ -27,38 +27,34 @@ function normalizeRole(role) {
   return String(role).trim().toLowerCase();
 }
 
-// Toast
-let toastTimer = null;
-function showToast({ title = "Bildiriş", message = "", type = "info" } = {}) {
-  const wrap = $("toastWrap");
-  const toast = $("toast");
-  const tTitle = $("toastTitle");
-  const tMsg = $("toastMsg");
-  const icon = $("toastIcon");
-  const close = $("toastClose");
+function showToast({ title, message, type = "success" }) {
+  const toast = document.getElementById("toast");
+  const toastTitle = document.getElementById("toastTitle");
+  const toastMsg = document.getElementById("toastMsg");
+  const toastIcon = document.getElementById("toastIcon");
 
-  if (!toast || !tTitle || !tMsg || !icon || !close) return;
+  // Məlumatları doldururuq
+  toastTitle.innerText = title;
+  toastMsg.innerText = message;
 
-  tTitle.textContent = title;
-  tMsg.textContent = message;
+  // Tipə görə rəng və ikon dəyişirik
+  if (type === "success") {
+    toastIcon.innerHTML = "✓"; // Uğur ikonu
+    toastIcon.className = "w-10 h-10 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center text-xl";
+  } else {
+    toastIcon.innerHTML = "✕"; // Xəta ikonu
+    toastIcon.className = "w-10 h-10 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center text-xl";
+  }
 
-  const icons = {
-    info: "ℹ️",
-    success: "✅",
-    warn: "⚠️",
-    danger: "⛔",
-  };
-  icon.textContent = icons[type] || "ℹ️";
-
+  // Toast-u göstəririk
   toast.classList.remove("hidden");
+  toast.classList.add("flex"); // Tailwind-də flex olmalıdır ki, elementlər düzülsün
 
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.add("hidden"), 3500);
-
-  close.onclick = () => {
-    clearTimeout(toastTimer);
+  // 4 saniyə sonra gizlədirik
+  setTimeout(() => {
     toast.classList.add("hidden");
-  };
+    toast.classList.remove("flex");
+  }, 4000);
 }
 
 // Auth storage
@@ -302,52 +298,20 @@ async function loadProducts() {
   initFiltersFromProducts();
 }
 
-function demoProducts() {
-  return [
-    {
-      id: 1,
-      name: "Apple iPhone 15 Pro",
-      price: 3299,
-      stock: 8,
-      category: "Telefon",
-      brand: "Apple",
-      color: "Qara",
-      rating: 4.8,
-      images: [
-        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80",
-      ],
-      specs: ["A17 Pro", "256GB", "USB-C", "ProMotion 120Hz"],
-    },
-    {
-      id: 2,
-      name: "Logitech MX Master 3S",
-      price: 219,
-      stock: 4,
-      category: "Aksesuar",
-      brand: "Logitech",
-      color: "Boz",
-      rating: 4.6,
-      images: [
-        "https://images.unsplash.com/photo-1585325701956-60dd9c8553bc?auto=format&fit=crop&w=1200&q=80",
-      ],
-      specs: ["Ergonomik", "USB-C şarj", "Multi-device"],
-    },
-    {
-      id: 3,
-      name: "AirPods Pro 2",
-      price: 499,
-      stock: 0,
-      category: "Audio",
-      brand: "Apple",
-      color: "Ağ",
-      rating: 4.7,
-      images: [
-        "https://images.unsplash.com/photo-1585386959984-a41552231693?auto=format&fit=crop&w=1200&q=80",
-      ],
-      specs: ["ANC", "Spatial Audio", "MagSafe"],
-    },
-  ];
+function updateCategoryDropdown() {
+    const select = $("categorySelect");
+    if (!select) return;
+
+    // Mövcud məhsullardan unikal kateqoriyaları götürürük
+    const categories = ["Bütün Kateqoriyalar", ...new Set(state.products.map(p => p.category))];
+    
+    select.innerHTML = categories.map(cat => 
+        `<option value="${cat === "Bütün Kateqoriyalar" ? "" : cat}">${cat}</option>`
+    ).join("");
 }
+
+// loadProducts funksiyasının sonuna updateCategoryDropdown(); sətrini əlavə et
+
 
 // KPIs
 function renderKPIs() {
@@ -418,11 +382,23 @@ function productRating(p) {
 }
 
 function productImages(p) {
+
+  console.log("Məhsulun datası:", p);
+  // 1. Şəkil üçün müxtəlif ehtimalları yoxlayırıq (image, Image, imageUrl ola bilər)
+  const imgStr = p.image ?? p.Image ?? p.imageUrl;
+  
+  if (imgStr && typeof imgStr === 'string' && imgStr.trim() !== '') {
+    return [imgStr];
+  }
+ 
+  // 2. Köhnə məhsullar üçün (massiv formatı): p.images və ya p.Images
   const imgs = p.images ?? p.Images ?? [];
-  if (Array.isArray(imgs) && imgs.length) return imgs;
-  return [
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80",
-  ];
+  if (Array.isArray(imgs) && imgs.length > 0) {
+    return imgs;
+  }
+ 
+  // 3. Heç biri yoxdursa, default şəkil göstəriləcək
+  return ["https://qudahalloween.com/cdn/shop/articles/her_600x.jpg?v=1719392898"];
 }
 
 function initFiltersFromProducts() {
@@ -1096,9 +1072,12 @@ if (addProductForm) {
       });
 
       // Uğurlu nəticə
-      alert("Məhsul uğurla əlavə edildi!");
-      addProductForm.reset(); 
-      
+      showToast({ 
+        title: "Uğurlu!", 
+        message: "Məhsul bazaya əlavə edildi.", 
+        type: "success" 
+      });
+            
       // Düzəliş 2: Funksiya adını düzəltdik (fetchProducts -> loadProducts)
       await loadProducts(); 
       renderAdminTable(); // Cədvəli yeniləyirik
@@ -1110,36 +1089,51 @@ if (addProductForm) {
   });
 }
 
-// --- Məhsul Silmə Funksiyası ---
 async function deleteProduct(id) {
-  // 1. Əvvəlcə təsdiq istəyirik
-  if (!confirm("Bu məhsulu silmək istədiyinizə əminsiniz?")) return;
+    const backdrop = document.getElementById("confirmBackdrop");
+    const okBtn = document.getElementById("confirmOk");
+    const cancelBtn = document.getElementById("confirmCancel");
 
-  try {
-    // 2. Backend-ə silmə sorğusu göndəririk
-    // Qeyd: Backend-də DELETE metodu aktiv olmalıdır
-    await apiFetch(`/api/products/${id}`, { method: "DELETE" });
-
-    // 3. Uğurlu olduqda istifadəçiyə xəbər veririk
-    showToast({ 
-      title: "Silindi", 
-      message: "Məhsul bazadan silindi.", 
-      type: "success" 
+    backdrop.classList.add("show");
+    // Düymələrə kliklənməni gözləyən yeni bir Promise yaradırıq
+    const userConfirmed = await new Promise((resolve) => {
+        okBtn.onclick = () => {
+            backdrop.classList.remove("show");
+            resolve(true);
+        };
+        cancelBtn.onclick = () => {
+            backdrop.classList.remove("show");
+            resolve(false);
+        };
+        // Arxa fona klikləyəndə də bağlansın
+        backdrop.onclick = (e) => {
+            if (e.target === backdrop) {
+                backdrop.classList.remove("show");
+                resolve(false);
+            }
+        };
     });
 
-    // 4. Cədvəli yeniləmək üçün məhsulları təzədən yükləyirik
-    await loadProducts(); 
-    renderAdminTable(); 
+    if (!userConfirmed) return;
+    // SİLME PROSESİ BAŞLAYIR
+    try {
+        await apiFetch(`/api/products/${id}`, { method: "DELETE" });
 
-  } catch (e) {
-    console.error(e);
-    showToast({ 
-      title: "Xəta", 
-      message: "Silinmə zamanı xəta baş verdi (Server cavab vermir və ya icazə yoxdur).", 
-      type: "danger" 
-    });
-  }
+        showToast({ 
+            title: "Uğurla Silindi", 
+            message: "Məhsul artıq siyahıda yoxdur.", 
+            type: "success" 
+        });
+
+        await loadProducts(); 
+        renderAdminTable(); 
+    } catch (e) {
+        showToast({ 
+            title: "Xəta!", 
+            message: "Silinmə baş tutmadı.", 
+            type: "danger" 
+        });
+    }
 }
-
 // VACİB: HTML-dən (onclick) çağıra bilmək üçün funksiyanı qlobal edirik
 window.deleteProduct = deleteProduct;
