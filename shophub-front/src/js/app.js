@@ -284,13 +284,12 @@ async function loadProducts() {
       : data?.items || data?.products || [];
     state.products = Array.isArray(items) ? items : [];
   } catch (e) {
-    // fallback demo
-    state.products = demoProducts();
-    showToast({
-      title: "Qeyd",
-      message: "Backend məhsullar gəlmədi — demo məhsullara keçdim.",
-      type: "warn",
-    });
+      state.products = [];
+      showToast({
+        title: "Xəta",
+        message: e.message || "Məhsullar yüklənmədi.",
+        type: "danger",
+      });
   }
 
   renderKPIs();
