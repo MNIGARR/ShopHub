@@ -284,13 +284,12 @@ function doLogout() {
 
 // Products (minimal)
 async function loadProducts() {
-  // sən hələ “offline demo” da saxlaya bilərsən, amma backend var deyə real çəkək.
   try {
-    const data = await apiFetch("/api/products", {
+    const data = await apiFetch("/api/products?pageSize=100", {
       method: "GET",
       auth: false,
     });
-    // data ya array ola bilər, ya {items: []} ola bilər. Biz elastik götürürük:
+    // Backend returns { page, pageSize, total, totalPages, items }
     const items = Array.isArray(data)
       ? data
       : data?.items || data?.products || [];
@@ -393,23 +392,25 @@ function productRating(p) {
 }
 
 function productImages(p) {
-
-  console.log("Məhsulun datası:", p);
-  // 1. Şəkil üçün müxtəlif ehtimalları yoxlayırıq (image, Image, imageUrl ola bilər)
+  // 1. Direct string field (from admin form or simple backends)
   const imgStr = p.image ?? p.Image ?? p.imageUrl;
-  
   if (imgStr && typeof imgStr === 'string' && imgStr.trim() !== '') {
     return [imgStr];
   }
- 
-  // 2. Köhnə məhsullar üçün (massiv formatı): p.images və ya p.Images
+
+  // 2. Array field: p.images or p.Images
   const imgs = p.images ?? p.Images ?? [];
   if (Array.isArray(imgs) && imgs.length > 0) {
-    return imgs;
+    // Backend returns [{url:"...", sortOrder:0}] objects — extract the URL strings
+    return imgs.map(item => {
+      if (typeof item === 'string') return item;
+      // Handle {url: "..."} or {Url: "..."} objects
+      return item?.url ?? item?.Url ?? "";
+    }).filter(Boolean);
   }
- 
-  // 3. Heç biri yoxdursa, default şəkil göstəriləcək
-  return ["https://qudahalloween.com/cdn/shop/articles/her_600x.jpg?v=1719392898"];
+
+  // 3. Fallback — no image available
+  return ["https://via.placeholder.com/400x300?text=No+Image"];
 }
 
 function initFiltersFromProducts() {
@@ -1083,7 +1084,7 @@ if (addProductForm) {
           price: parseFloat(price),
           stock: parseInt(stock),
           category: category,
-          image: image
+          image: [image]
         }
       });
 
