@@ -134,15 +134,30 @@ function showView(name) {
 }
 
 // UI: auth rendering
+// In updateAuthUI(), update the authBtn behavior:
 function updateAuthUI() {
-  const authBtnLabel = $("authBtnLabel");
+  const authBtn = $("authBtn");
   const sessionInfo = $("sessionInfo");
   const adminRoleChip = $("adminRoleChip");
 
   const user = state.sessionUser;
 
-  if (authBtnLabel) {
-    authBtnLabel.textContent = user ? user.email : "Giriş / Qeydiyyat";
+  if (authBtn) {
+    const label = $("authBtnLabel");
+    if (user) {
+      // Logged in: show email, clicking logs out
+      if (label) label.textContent = user.email;
+      authBtn.href = "#";
+      authBtn.onclick = (e) => {
+        e.preventDefault();
+        doLogout();
+      };
+    } else {
+      // Not logged in: link to login page
+      if (label) label.textContent = "Giriş / Qeydiyyat";
+      authBtn.href = "/src/pages/auth/login.html";
+      authBtn.onclick = null;
+    }
   }
 
   if (sessionInfo) {
@@ -155,18 +170,17 @@ function updateAuthUI() {
     adminRoleChip.textContent = user ? user.role || "user" : "guest";
   }
 
-  // updateAuthUI funksiyasının daxilinə əlavə et
-const adminBtn = document.getElementById("navAdminBtn");
-if (adminBtn) {
+  // Admin button visibility
+  const adminBtn = document.getElementById("navAdminBtn");
+  if (adminBtn) {
     if (isAdmin()) {
-        console.log("İstifadəçi admindir, düymə göstərilir...");
-        adminBtn.classList.remove("hidden");
-        adminBtn.style.display = "block"; // Tailwind klası işləməsə, birbaşa style ilə göstər
+      adminBtn.classList.remove("hidden");
+      adminBtn.style.display = "block";
     } else {
-        adminBtn.classList.add("hidden");
-        adminBtn.style.display = "none";
+      adminBtn.classList.add("hidden");
+      adminBtn.style.display = "none";
     }
-}
+  }
 }
 
 function isAdmin() {
@@ -176,13 +190,12 @@ function isAdmin() {
 
 // Auth modal open/close
 function openAuthModal() {
-  $("authBackdrop")?.classList.add("show");
+  // Redirect to login page instead of opening modal
+  window.location.href = "/src/pages/auth/login.html";
 }
-function closeAuthModal() {
-  $("authBackdrop")?.classList.remove("show");
-  // reset panels
-  $("resetPanel")?.classList.add("hidden");
-}
+// function closeAuthModal() {
+//   // No longer needed — kept as empty for backward compatibility
+// }
 
 function openResetPanel() {
   $("resetPanel")?.classList.remove("hidden");
@@ -272,7 +285,6 @@ function doLogout() {
 // Products (minimal)
 async function loadProducts() {
   // sən hələ “offline demo” da saxlaya bilərsən, amma backend var deyə real çəkək.
-  // backend hazır deyilsə 404 verər — o halda demo data qoyacağıq.
   try {
     const data = await apiFetch("/api/products", {
       method: "GET",
@@ -743,7 +755,7 @@ function openProductModal(productId) {
 
   $("pmRatingChip") &&
     ($("pmRatingChip").textContent = `${productRating(p).toFixed(1)}/5`);
-  $("pmReviews") && ($("pmReviews").textContent = "Demo rəylər");
+  $("pmReviews") && ($("pmReviews").textContent = "Rəylər hələlik yoxdur");
 
   // add button
   const addBtn = $("pmAddBtn");
@@ -757,6 +769,7 @@ function closeProductModal() {
 }
 
 // Admin gate
+// Admin gate — updated
 function goAdmin() {
   if (!state.sessionUser) {
     showToast({
@@ -764,7 +777,7 @@ function goAdmin() {
       message: "Admin üçün əvvəlcə daxil olun.",
       type: "warn",
     });
-    openAuthModal();
+    window.location.href = "/src/pages/auth/login.html"; // redirect instead of modal
     return;
   }
   if (!isAdmin()) {
@@ -776,7 +789,7 @@ function goAdmin() {
     return;
   }
   showView("admin");
-  renderAdminTable(); // Bu sətri əlavə et
+  renderAdminTable();
 }
 
 // Bind UI events
@@ -791,24 +804,8 @@ function bindEvents() {
   $("navAdminBtn") && ($("navAdminBtn").onclick = goAdmin);
   $("navAdminBtn2") && ($("navAdminBtn2").onclick = goAdmin);
 
-  // Modal daxilində Login/Register keçidi
-$("showRegister").onclick = () => {
-  $("loginPanel").classList.add("hidden");
-  $("registerPanel").classList.remove("hidden");
-  $("showRegister").classList.add("text-white", "border-b-2", "border-blue-600");
-  $("showRegister").classList.remove("text-slate-500");
-  $("showLogin").classList.remove("text-white", "border-b-2", "border-blue-600");
-  $("showLogin").classList.add("text-slate-500");
-};
+ 
 
-$("showLogin").onclick = () => {
-  $("registerPanel").classList.add("hidden");
-  $("loginPanel").classList.remove("hidden");
-  $("showLogin").classList.add("text-white", "border-b-2", "border-blue-600");
-  $("showLogin").classList.remove("text-slate-500");
-  $("showRegister").classList.remove("text-white", "border-b-2", "border-blue-600");
-  $("showRegister").classList.add("text-slate-500");
-};
 
   $("ctaBrowse") &&
     ($("ctaBrowse").onclick = () => {
@@ -837,85 +834,105 @@ $("showLogin").onclick = () => {
     });
 
   // login
-  $("loginBtn") &&
-    ($("loginBtn").onclick = async () => {
-      const email = ($("loginEmail")?.value || "").trim();
-      const pass = $("loginPass")?.value || "";
-      if (!email || !pass) {
-        showToast({
-          title: "Xəta",
-          message: "Email və şifrə daxil edin.",
-          type: "warn",
-        });
-        return;
+
+    // Auth — redirect to login page (modal was removed)
+  // authBtn is now an <a> link, so no onclick needed for opening modal.
+  // But if user is logged in, clicking should log out instead:
+  const authBtn = $("authBtn");
+  if (authBtn) {
+    authBtn.onclick = (e) => {
+      if (state.sessionUser) {
+        e.preventDefault();
+        doLogout();
       }
-      try {
-        await doLogin(email, pass);
-        closeAuthModal();
-      } catch (e) {
-        showToast({
-          title: "Login alınmadı",
-          message: e.message || "Xəta",
-          type: "danger",
-        });
-      }
-    });
-  // register (if backend has endpoint; otherwise shows info)
-  // Register (Real integration)
-$("registerBtn") && ($("registerBtn").onclick = async () => {
-  const email = ($("regEmail")?.value || "").trim();
-  const pass = $("regPass")?.value || "";
-  
-  if (!email || !pass) {
-    showToast({ title: "Xəta", message: "Email və şifrə daxil edin.", type: "warn" });
-    return;
+      // If not logged in, the <a href="./src/pages/login.html"> navigates naturally
+    };
   }
-
-  try {
-    // Backend-ə qeydiyyat sorğusu göndəririk
-    await apiFetch("/api/auth/register", {
-      method: "POST",
-      body: { email, password: pass },
-      auth: false
-    });
-
-    showToast({ 
-      title: "Qeydiyyat uğurludur", 
-      message: "Hesabınız yaradıldı. İndi giriş edə bilərsiniz.", 
-      type: "success" 
-    });
-
-    // İstifadəçini avtomatik login panelinə yönləndirmək olar
-    // Və ya birbaşa login etmək:
-    await doLogin(email, pass);
-    closeAuthModal();
-
-  } catch (e) {
-    showToast({
-      title: "Qeydiyyat xətası",
-      message: e.message || "Bu email artıq istifadə olunur.",
-      type: "danger"
-    });
-  }
-});
 
   // logout
   ["logoutBtn", "logoutBtn2"]
     .map($)
     .filter(Boolean)
     .forEach((b) => (b.onclick = doLogout));
+//   $("loginBtn") &&
+//     ($("loginBtn").onclick = async () => {
+//       const email = ($("loginEmail")?.value || "").trim();
+//       const pass = $("loginPass")?.value || "";
+//       if (!email || !pass) {
+//         showToast({
+//           title: "Xəta",
+//           message: "Email və şifrə daxil edin.",
+//           type: "warn",
+//         });
+//         return;
+//       }
+//       try {
+//         await doLogin(email, pass);
+//         closeAuthModal();
+//       } catch (e) {
+//         showToast({
+//           title: "Login alınmadı",
+//           message: e.message || "Xəta",
+//           type: "danger",
+//         });
+//       }
+//     });
+//   // register (if backend has endpoint; otherwise shows info)
+//   // Register (Real integration)
+// $("registerBtn") && ($("registerBtn").onclick = async () => {
+//   const email = ($("regEmail")?.value || "").trim();
+//   const pass = $("regPass")?.value || "";
+  
+//   if (!email || !pass) {
+//     showToast({ title: "Xəta", message: "Email və şifrə daxil edin.", type: "warn" });
+//     return;
+//   }
 
-  // reset password (demo UI only)
-  $("openResetBtn") && ($("openResetBtn").onclick = openResetPanel);
-  $("closeResetBtn") && ($("closeResetBtn").onclick = closeResetPanel);
-  $("resetPassBtn") &&
-    ($("resetPassBtn").onclick = () => {
-      showToast({
-        title: "Demo",
-        message: "Şifrə sıfırlama backend-də ayrıca yazılmalıdır.",
-        type: "info",
-      });
-    });
+//   try {
+//     // Backend-ə qeydiyyat sorğusu göndəririk
+//     await apiFetch("/api/auth/register", {
+//       method: "POST",
+//       body: { email, password: pass },
+//       auth: false
+//     });
+
+//     showToast({ 
+//       title: "Qeydiyyat uğurludur", 
+//       message: "Hesabınız yaradıldı. İndi giriş edə bilərsiniz.", 
+//       type: "success" 
+//     });
+
+//     // İstifadəçini avtomatik login panelinə yönləndirmək olar
+//     // Və ya birbaşa login etmək:
+//     await doLogin(email, pass);
+//     closeAuthModal();
+
+//   } catch (e) {
+//     showToast({
+//       title: "Qeydiyyat xətası",
+//       message: e.message || "Bu email artıq istifadə olunur.",
+//       type: "danger"
+//     });
+//   }
+// });
+
+//   // logout
+//   ["logoutBtn", "logoutBtn2"]
+//     .map($)
+//     .filter(Boolean)
+//     .forEach((b) => (b.onclick = doLogout));
+
+//   // reset password (demo UI only)
+//   $("openResetBtn") && ($("openResetBtn").onclick = openResetPanel);
+//   $("closeResetBtn") && ($("closeResetBtn").onclick = closeResetPanel);
+  // $("resetPassBtn") &&
+  //   ($("resetPassBtn").onclick = () => {
+  //     showToast({
+  //       title: "Demo",
+  //       message: "Şifrə sıfırlama backend-də ayrıca yazılmalıdır.",
+  //       type: "info",
+  //     });
+  //   });
 
   // filters
   [
@@ -973,13 +990,13 @@ $("registerBtn") && ($("registerBtn").onclick = async () => {
     }
     // İstifadəçinin daxil olub-olmadığını yoxlayırıq
     if (!state.sessionUser) {
-      showToast({
-        title: "Giriş lazımdır",
-        message: "Sifariş üçün daxil olun.",
-        type: "warn",
-      });
-      openAuthModal();
-      return;
+window.location.href = "/src/pages/auth/login.html";
+      // showToast({
+      //   title: "Giriş lazımdır",
+      //   message: "Sifariş üçün daxil olun.",
+      //   type: "warn",
+      // });
+          return;
     }
     try {
       // Backend-in gözlədiyi formatda data hazırlayırıq
