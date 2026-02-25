@@ -376,7 +376,7 @@ function productStock(p) {
 }
 
 function productCategory(p) {
-  return p.category ?? p.Category ?? "Digər";
+  return p.category ?? p.Category ?? p.CategoryName ?? "Digər";
 }
 
 function productBrand(p) {
@@ -1083,8 +1083,8 @@ if (addProductForm) {
           name: name,
           price: parseFloat(price),
           stock: parseInt(stock),
-          category: category,
-          image: [image]
+          categoryId: parseInt(category) || null,
+          images: [image]
         }
       });
 
