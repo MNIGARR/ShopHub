@@ -461,38 +461,32 @@ function productImages(p) {
   return ["https://via.placeholder.com/400x300?text=No+Image"];
 }
 
+// Replace existing initFiltersFromProducts with this code
 function initFiltersFromProducts() {
   const categorySelect = $("categorySelect");
-  const brandSelect = $("brandSelect");
-  const colorSelect = $("colorSelect");
+  const brandSelect = $("brandSelect"); // may not exist
+  const colorSelect = $("colorSelect"); // may not exist
 
-  if (!categorySelect || !brandSelect || !colorSelect) return;
+  if (!categorySelect) return; // at minimum we need categorySelect
 
-  const categories = [
-    "Hamısı",
-    ...new Set(state.products.map(productCategory)),
-  ];
-  const brands = ["Hamısı", ...new Set(state.products.map(productBrand))];
-  const colors = ["Hamısı", ...new Set(state.products.map(productColor))];
+  // Build sets from products (use product helpers)
+  const categories = ["Hamısı", ...new Set(state.products.map(productCategory).filter(Boolean))];
+  const brands = ["Hamısı", ...new Set(state.products.map(productBrand).filter(Boolean))];
+  const colors = ["Hamısı", ...new Set(state.products.map(productColor).filter(Boolean))];
 
-  categorySelect.innerHTML = categories
-    .map((x) => `<option value="${x}">${x}</option>`)
-    .join("");
-  brandSelect.innerHTML = brands
-    .map((x) => `<option value="${x}">${x}</option>`)
-    .join("");
-  colorSelect.innerHTML = colors
-    .map((x) => `<option value="${x}">${x}</option>`)
-    .join("");
+  // populate if element exists
+  categorySelect.innerHTML = categories.map((x) => `<option value="${x}">${x}</option>`).join("");
 
-  // admin filters (optional)
-  $("admProductCategory") &&
-    ($("admProductCategory").innerHTML = [
-      "Hamısı",
-      ...new Set(state.products.map(productCategory)),
-    ]
-      .map((x) => `<option value="${x}">${x}</option>`)
-      .join(""));
+  if (brandSelect) {
+    brandSelect.innerHTML = brands.map((x) => `<option value="${x}">${x}</option>`).join("");
+  }
+  if (colorSelect) {
+    colorSelect.innerHTML = colors.map((x) => `<option value="${x}">${x}</option>`).join("");
+  }
+
+  // Admin product category dropdown (if present)
+  $("admProductCategory") && ($("admProductCategory").innerHTML = ["Hamısı", ...new Set(state.products.map(productCategory))]
+    .map(x => `<option value="${x}">${x}</option>`).join(""));
 }
 
 function filteredProducts() {
@@ -1059,7 +1053,7 @@ window.location.href = "/src/pages/auth/login.html";
         totalAmount: cartTotals().total,
       };
       // Real API sorğusu
-      await apiFetch("/api/orders", {
+      await apiFetch("/api/orders/checkout", {
         method: "POST",
         body: orderData,
         auth: true,
