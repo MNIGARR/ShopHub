@@ -238,9 +238,39 @@
             <input type="text" id="admProdName" placeholder="Məhsulun adı" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">
             <input type="number" id="admProdPrice" placeholder="Qiymət (AZN)" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">
             <input type="number" id="admProdStock" placeholder="Stok sayı" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">
-            <input type="number" id="admProdCategory" placeholder="Kateqoriya ID (məs: 1)" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">            <input type="text" id="admProdImage" placeholder="Şəkil URL (Cloudinary)" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">
+            <select id="admProdCategory" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">
+              <option value="">Kateqoriya seçin...</option>
+            </select>
+            <input type="text" id="admProdImage" placeholder="Şəkil URL (Cloudinary)" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">
             <button type="submit" class="bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors">Yadda Saxla</button>
           </form>
+        </div>
+
+                <!-- ═══ KATEQORİYA İDARƏSİ ═══ -->
+        <div class="glass p-8 rounded-[32px] border border-white/5">
+          <h3 class="text-xl font-bold text-white mb-6">Kateqoriya İdarəsi</h3>
+          
+          <!-- Yeni kateqoriya əlavə et -->
+          <form id="addCategoryForm" class="flex gap-4 mb-6">
+            <input type="text" id="admCatName" placeholder="Yeni kateqoriya adı (məs: Elektronika)"
+              class="flex-1 bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">
+            <button type="submit"
+              class="bg-blue-600 text-white px-6 rounded-xl font-bold hover:bg-blue-700 transition-colors">
+              Əlavə Et
+            </button>
+          </form>
+
+          <!-- Kateqoriya siyahısı -->
+          <table class="w-full text-left text-sm">
+            <thead class="bg-white/5 text-slate-400 uppercase text-[10px] tracking-widest">
+              <tr>
+                <th class="px-6 py-3 font-bold">ID</th>
+                <th class="px-6 py-3 font-bold">Kateqoriya Adı</th>
+                <th class="px-6 py-3 font-bold">Əməliyyat</th>
+              </tr>
+            </thead>
+            <tbody id="adminCategoriesTable" class="divide-y divide-white/5"></tbody>
+          </table>
         </div>
 
         <div class="glass rounded-[32px] border border-white/5 overflow-hidden">

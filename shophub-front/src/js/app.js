@@ -308,6 +308,54 @@ async function loadProducts() {
   initFiltersFromProducts();
 }
 
+// ── Kateqoriyaları backend-dən yükləyirik ──
+async function loadCategories() {
+  try {
+    const data = await apiFetch("/api/categories", { method: "GET", auth: false });
+    const items = data?.items || [];
+    state.categories = items;
+
+    // 1. Admin form-dakı "Kateqoriya seçin" dropdown-unu doldururuq
+    const adminSelect = document.getElementById("admProdCategory");
+    if (adminSelect) {
+      adminSelect.innerHTML = `<option value="">Kateqoriya seçin...</option>` +
+        items.map(cat => `<option value="${cat.Id}">${cat.Name}</option>`).join("");
+    }
+
+    // 2. Admin paneldəki kateqoriya cədvəlini doldururuq
+    renderCategoriesTable();
+
+  } catch (e) {
+    console.error("Kateqoriyalar yüklənmədi:", e);
+  }
+}
+
+function renderCategoriesTable() {
+  const tableBody = document.getElementById("adminCategoriesTable");
+  if (!tableBody || !state.categories) return;
+
+  tableBody.innerHTML = state.categories.map(cat => `
+    <tr class="hover:bg-white/5 transition-colors" id="catRow-${cat.Id}">
+      <td class="px-6 py-4 text-slate-500">${cat.Id}</td>
+      <td class="px-6 py-4">
+        <span id="catName-${cat.Id}" class="text-white font-medium">${cat.Name}</span>
+        <input id="catEdit-${cat.Id}" type="text" value="${cat.Name}" 
+          class="hidden bg-black/20 border border-blue-500 rounded-lg px-3 py-1 text-sm outline-none w-full">
+      </td>
+      <td class="px-6 py-4 flex gap-2">
+        <button class="text-blue-400 hover:text-blue-300 font-medium text-sm" 
+          onclick="startEditCategory(${cat.Id})">Redaktə</button>
+        <button id="catSaveBtn-${cat.Id}" class="hidden text-green-400 hover:text-green-300 font-medium text-sm" 
+          onclick="saveCategory(${cat.Id})">Yadda Saxla</button>
+        <button id="catCancelBtn-${cat.Id}" class="hidden text-slate-400 hover:text-slate-300 font-medium text-sm" 
+          onclick="cancelEditCategory(${cat.Id})">Ləğv</button>
+        <button class="text-red-500 hover:text-red-400 font-bold text-sm" 
+          onclick="deleteCategory(${cat.Id})">Sil</button>
+      </td>
+    </tr>
+  `).join("");
+}
+
 function updateCategoryDropdown() {
     const select = $("categorySelect");
     if (!select) return;
@@ -791,6 +839,7 @@ function goAdmin() {
   }
   showView("admin");
   renderAdminTable();
+  loadCategories(); // load categories for admin form
 }
 
 // Bind UI events
@@ -1045,6 +1094,7 @@ async function init() {
   loadCart();
   await loadSessionFromToken(); // token varsa sessiyanı real yoxlayır
   await loadProducts(); // məhsulları çəkir (alınmasa demo)
+  await loadCategories(); // Kateqoriyaları çəkir
   showView("shop");
 }
 init().catch((e) => {
@@ -1083,7 +1133,7 @@ if (addProductForm) {
           name: name,
           price: parseFloat(price),
           stock: parseInt(stock),
-          categoryId: parseInt(category) || null,
+          categoryId: Number.isFinite(category) && category > 0 ? category : null,
           images: [image]
         }
       });
@@ -1105,6 +1155,144 @@ if (addProductForm) {
     }
   });
 }
+
+// ═══ KATEQORİYA CRUD ƏMƏLİYYATLARI ═══
+
+// Yeni kateqoriya yaratmaq
+const addCategoryForm = document.getElementById("addCategoryForm");
+if (addCategoryForm) {
+  addCategoryForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const nameInput = document.getElementById("admCatName");
+    const name = nameInput?.value?.trim();
+
+    if (!name) {
+      showToast({ title: "Xəta", message: "Kateqoriya adını daxil edin.", type: "danger" });
+      return;
+    }
+
+    try {
+      await apiFetch("/api/categories", {
+        method: "POST",
+        body: { name }
+      });
+
+      showToast({ title: "Uğurlu!", message: `"${name}" kateqoriyası yaradıldı.`, type: "success" });
+      nameInput.value = ""; // Input-u təmizləyirik
+      await loadCategories(); // Cədvəli və dropdown-u yeniləyirik
+
+    } catch (error) {
+      showToast({
+        title: "Xəta",
+        message: error.message || "Kateqoriya yaradıla bilmədi.",
+        type: "danger"
+      });
+    }
+  });
+}
+
+// Redaktə rejimini açmaq
+function startEditCategory(id) {
+  document.getElementById(`catName-${id}`)?.classList.add("hidden");
+  document.getElementById(`catEdit-${id}`)?.classList.remove("hidden");
+  document.getElementById(`catSaveBtn-${id}`)?.classList.remove("hidden");
+  document.getElementById(`catCancelBtn-${id}`)?.classList.remove("hidden");
+  document.getElementById(`catEdit-${id}`)?.focus();
+}
+
+// Redaktəni ləğv etmək
+function cancelEditCategory(id) {
+  const cat = state.categories.find(c => c.Id === id);
+  document.getElementById(`catEdit-${id}`).value = cat?.Name || "";
+  document.getElementById(`catName-${id}`)?.classList.remove("hidden");
+  document.getElementById(`catEdit-${id}`)?.classList.add("hidden");
+  document.getElementById(`catSaveBtn-${id}`)?.classList.add("hidden");
+  document.getElementById(`catCancelBtn-${id}`)?.classList.add("hidden");
+}
+
+// Kateqoriyanı yeniləmək (PUT)
+async function saveCategory(id) {
+  const input = document.getElementById(`catEdit-${id}`);
+  const newName = input?.value?.trim();
+
+  if (!newName) {
+    showToast({ title: "Xəta", message: "Ad boş ola bilməz.", type: "danger" });
+    return;
+  }
+
+  try {
+    await apiFetch(`/api/categories/${id}`, {
+      method: "PUT",
+      body: { name: newName }
+    });
+
+    showToast({ title: "Yeniləndi!", message: `Kateqoriya "${newName}" olaraq dəyişdirildi.`, type: "success" });
+    await loadCategories(); // Hər şeyi yeniləyirik
+
+  } catch (error) {
+    showToast({
+      title: "Xəta",
+      message: error.message || "Yeniləmə alınmadı.",
+      type: "danger"
+    });
+  }
+}
+
+// Kateqoriyanı silmək (DELETE)
+async function deleteCategory(id) {
+  const cat = state.categories.find(c => c.Id === id);
+  const catName = cat?.Name || `ID: ${id}`;
+
+  // Təsdiq dialoqundan istifadə edirik
+  const backdrop = document.getElementById("confirmBackdrop");
+  const okBtn = document.getElementById("confirmOk");
+  const cancelBtn = document.getElementById("confirmCancel");
+
+  // Dialog mətnini dəyişirik
+  backdrop.querySelector("h3").textContent = "Kateqoriya Silinsin?";
+  backdrop.querySelector("p").textContent = `"${catName}" kateqoriyası silinəcək. Davam etmək istəyirsiniz?`;
+  backdrop.classList.add("show");
+
+  const confirmed = await new Promise((resolve) => {
+    okBtn.onclick = () => { backdrop.classList.remove("show"); resolve(true); };
+    cancelBtn.onclick = () => { backdrop.classList.remove("show"); resolve(false); };
+    backdrop.onclick = (e) => {
+      if (e.target === backdrop) { backdrop.classList.remove("show"); resolve(false); }
+    };
+  });
+
+  if (!confirmed) {
+    // Mətni geri qaytarırıq
+    backdrop.querySelector("h3").textContent = "Məhsul Silinsin?";
+    backdrop.querySelector("p").textContent = "Bu əməliyyat geri qaytarıla bilməz. Davam etmək istəyirsiniz?";
+    return;
+  }
+
+  // Mətni geri qaytarırıq
+  backdrop.querySelector("h3").textContent = "Məhsul Silinsin?";
+  backdrop.querySelector("p").textContent = "Bu əməliyyat geri qaytarıla bilməz. Davam etmək istəyirsiniz?";
+
+  try {
+    await apiFetch(`/api/categories/${id}`, { method: "DELETE" });
+
+    showToast({ title: "Silindi!", message: `"${catName}" kateqoriyası silindi.`, type: "success" });
+    await loadCategories();
+
+  } catch (error) {
+    showToast({
+      title: "Xəta",
+      message: error.message || "Bu kateqoriyada məhsul var, silinə bilməz.",
+      type: "danger"
+    });
+  }
+}
+
+// Funksiyaları global edirik (HTML onclick üçün)
+window.startEditCategory = startEditCategory;
+window.cancelEditCategory = cancelEditCategory;
+window.saveCategory = saveCategory;
+window.deleteCategory = deleteCategory;
 
 async function deleteProduct(id) {
     const backdrop = document.getElementById("confirmBackdrop");
@@ -1152,5 +1340,8 @@ async function deleteProduct(id) {
         });
     }
 }
+
+
+
 // VACİB: HTML-dən (onclick) çağıra bilmək üçün funksiyanı qlobal edirik
 window.deleteProduct = deleteProduct;

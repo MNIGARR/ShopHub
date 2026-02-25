@@ -232,7 +232,7 @@ async function createProduct(req, res) {
   const st = Math.max(0, Number(stock) || 0);
 
   try {
-    const pool = await getPool();
+      const pool = await getPool();
     const tx = new sql.Transaction(pool);
 
     await tx.begin();
@@ -276,8 +276,15 @@ async function createProduct(req, res) {
 
     return res.status(201).json({ message: "Created", productId });
   } catch (err) {
+      try { if (tx) await tx.rollback(); } catch (_) {}
+    
     console.error("createProduct error:", err);
-    return res.status(500).json({ message: "Server error" });
+    
+    // ✅ Return a more descriptive error message
+    return res.status(500).json({ 
+      message: "Server error", 
+      detail: err.message 
+    });
   }
 }
 
