@@ -40,10 +40,12 @@ function showToast({ title, message, type = "success" }) {
   // Tipə görə rəng və ikon dəyişirik
   if (type === "success") {
     toastIcon.innerHTML = "✓"; // Uğur ikonu
-    toastIcon.className = "w-10 h-10 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center text-xl";
+    toastIcon.className =
+      "w-10 h-10 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center text-xl";
   } else {
     toastIcon.innerHTML = "✕"; // Xəta ikonu
-    toastIcon.className = "w-10 h-10 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center text-xl";
+    toastIcon.className =
+      "w-10 h-10 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center text-xl";
   }
 
   // Toast-u göstəririk
@@ -295,12 +297,12 @@ async function loadProducts() {
       : data?.items || data?.products || [];
     state.products = Array.isArray(items) ? items : [];
   } catch (e) {
-      state.products = [];
-      showToast({
-        title: "Xəta",
-        message: e.message || "Məhsullar yüklənmədi.",
-        type: "danger",
-      });
+    state.products = [];
+    showToast({
+      title: "Xəta",
+      message: e.message || "Məhsullar yüklənmədi.",
+      type: "danger",
+    });
   }
 
   renderKPIs();
@@ -309,24 +311,33 @@ async function loadProducts() {
 }
 
 // ── Kateqoriyaları backend-dən yükləyirik ──
+// shophub-front/src/js/app.js
 async function loadCategories() {
   try {
     const data = await apiFetch("/api/categories", { method: "GET", auth: false });
     const items = data?.items || [];
     state.categories = items;
 
-    // 1. Admin form-dakı "Kateqoriya seçin" dropdown-unu doldururuq
+    // populate left filter (categorySelect) with Names
+    const leftSelect = $("categorySelect");
+    if (leftSelect) {
+      leftSelect.innerHTML =
+        `<option value="">Bütün Kateqoriyalar</option>` +
+        items.map(c => `<option value="${c.Name}">${c.Name}</option>`).join("");
+    }
+
+    // populate admin form dropdown (admProdCategory) WITH ID values
     const adminSelect = document.getElementById("admProdCategory");
     if (adminSelect) {
-      adminSelect.innerHTML = `<option value="">Kateqoriya seçin...</option>` +
+      adminSelect.innerHTML =
+        `<option value="">Kateqoriya seçin...</option>` +
         items.map(cat => `<option value="${cat.Id}">${cat.Name}</option>`).join("");
     }
 
-    // 2. Admin paneldəki kateqoriya cədvəlini doldururuq
+    // render admin categories table (you already have this)
     renderCategoriesTable();
-
   } catch (e) {
-    console.error("Kateqoriyalar yüklənmədi:", e);
+    console.error("loadCategories failed:", e);
   }
 }
 
@@ -334,7 +345,9 @@ function renderCategoriesTable() {
   const tableBody = document.getElementById("adminCategoriesTable");
   if (!tableBody || !state.categories) return;
 
-  tableBody.innerHTML = state.categories.map(cat => `
+  tableBody.innerHTML = state.categories
+    .map(
+      (cat) => `
     <tr class="hover:bg-white/5 transition-colors" id="catRow-${cat.Id}">
       <td class="px-6 py-4 text-slate-500">${cat.Id}</td>
       <td class="px-6 py-4">
@@ -353,23 +366,26 @@ function renderCategoriesTable() {
           onclick="deleteCategory(${cat.Id})">Sil</button>
       </td>
     </tr>
-  `).join("");
+  `,
+    )
+    .join("");
 }
 
 function updateCategoryDropdown() {
-    const select = $("categorySelect");
-    if (!select) return;
-
-    // Mövcud məhsullardan unikal kateqoriyaları götürürük
-    const categories = ["Bütün Kateqoriyalar", ...new Set(state.products.map(p => p.category))];
-    
-    select.innerHTML = categories.map(cat => 
-        `<option value="${cat === "Bütün Kateqoriyalar" ? "" : cat}">${cat}</option>`
-    ).join("");
+  const select = $("categorySelect");
+  if (!select) return;
+  // prefer DB categories if we have them:
+  if (Array.isArray(state.categories) && state.categories.length) {
+    select.innerHTML = `<option value="">Bütün Kateqoriyalar</option>` +
+      state.categories.map(c => `<option value="${c.Name}">${c.Name}</option>`).join("");
+    return;
+  }
+  // fallback from products
+  const categories = ["Bütün Kateqoriyalar", ...new Set(state.products.map(productCategory).filter(Boolean))];
+  select.innerHTML = categories.map(cat => `<option value="${cat === 'Bütün Kateqoriyalar' ? '' : cat}">${cat}</option>`).join("");
 }
 
 // loadProducts funksiyasının sonuna updateCategoryDropdown(); sətrini əlavə et
-
 
 // KPIs
 function renderKPIs() {
@@ -387,15 +403,17 @@ function renderKPIs() {
 }
 
 function renderAdminTable() {
-    const tableBody = $("adminProductsTable");
-    if (!tableBody) return;
+  const tableBody = $("adminProductsTable");
+  if (!tableBody) return;
 
-    tableBody.innerHTML = state.products.map(p => `
+  tableBody.innerHTML = state.products
+    .map(
+      (p) => `
         <tr class="hover:bg-white/5 transition-colors">
             <td class="px-6 py-4 font-medium text-white">${productName(p)}</td>
             <td class="px-6 py-4">${formatMoneyAZN(productPrice(p))}</td>
             <td class="px-6 py-4">
-                <span class="chip ${productStock(p) > 0 ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}">
+                <span class="chip ${productStock(p) > 0 ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}">
                     ${productStock(p)} ədəd
                 </span>
             </td>
@@ -403,7 +421,9 @@ function renderAdminTable() {
                 <button class="text-red-500 hover:text-red-400 font-bold" onclick="deleteProduct(${getProductId(p)})">Sil</button>
             </td>
         </tr>
-    `).join("");
+    `,
+    )
+    .join("");
 }
 
 // Products UI + filters (simple)
@@ -442,7 +462,7 @@ function productRating(p) {
 function productImages(p) {
   // 1. Direct string field (from admin form or simple backends)
   const imgStr = p.image ?? p.Image ?? p.imageUrl;
-  if (imgStr && typeof imgStr === 'string' && imgStr.trim() !== '') {
+  if (imgStr && typeof imgStr === "string" && imgStr.trim() !== "") {
     return [imgStr];
   }
 
@@ -450,45 +470,43 @@ function productImages(p) {
   const imgs = p.images ?? p.Images ?? [];
   if (Array.isArray(imgs) && imgs.length > 0) {
     // Backend returns [{url:"...", sortOrder:0}] objects — extract the URL strings
-    return imgs.map(item => {
-      if (typeof item === 'string') return item;
-      // Handle {url: "..."} or {Url: "..."} objects
-      return item?.url ?? item?.Url ?? "";
-    }).filter(Boolean);
+    return imgs
+      .map((item) => {
+        if (typeof item === "string") return item;
+        // Handle {url: "..."} or {Url: "..."} objects
+        return item?.url ?? item?.Url ?? "";
+      })
+      .filter(Boolean);
   }
 
   // 3. Fallback — no image available
   return ["https://via.placeholder.com/400x300?text=No+Image"];
 }
 
-// Replace existing initFiltersFromProducts with this code
+/// More robust filters init — only require categorySelect
 function initFiltersFromProducts() {
   const categorySelect = $("categorySelect");
   const brandSelect = $("brandSelect"); // may not exist
   const colorSelect = $("colorSelect"); // may not exist
 
-  if (!categorySelect) return; // at minimum we need categorySelect
+  // If no category select, nothing to do
+  if (!categorySelect) return;
 
-  // Build sets from products (use product helpers)
-  const categories = ["Hamısı", ...new Set(state.products.map(productCategory).filter(Boolean))];
-  const brands = ["Hamısı", ...new Set(state.products.map(productBrand).filter(Boolean))];
-  const colors = ["Hamısı", ...new Set(state.products.map(productColor).filter(Boolean))];
+  // Build sets using product helpers
+  const categoriesFromProducts = [...new Set(state.products.map(productCategory).filter(Boolean))];
+  const brands = [...new Set(state.products.map(productBrand).filter(Boolean))];
+  const colors = [...new Set(state.products.map(productColor).filter(Boolean))];
 
-  // populate if element exists
-  categorySelect.innerHTML = categories.map((x) => `<option value="${x}">${x}</option>`).join("");
-
-  if (brandSelect) {
-    brandSelect.innerHTML = brands.map((x) => `<option value="${x}">${x}</option>`).join("");
-  }
-  if (colorSelect) {
-    colorSelect.innerHTML = colors.map((x) => `<option value="${x}">${x}</option>`).join("");
+  // If loadCategories() populated categorySelect from DB, don't overwrite it.
+  if (!categorySelect.options.length || categorySelect.options.length === 1) {
+    // only populate from products if no DB categories present
+    const categories = ["Hamısı", ...categoriesFromProducts];
+    categorySelect.innerHTML = categories.map(x => `<option value="${x}">${x}</option>`).join("");
   }
 
-  // Admin product category dropdown (if present)
-  $("admProductCategory") && ($("admProductCategory").innerHTML = ["Hamısı", ...new Set(state.products.map(productCategory))]
-    .map(x => `<option value="${x}">${x}</option>`).join(""));
+  if (brandSelect) brandSelect.innerHTML = ["Hamısı", ...brands].map(x => `<option value="${x}">${x}</option>`).join("");
+  if (colorSelect) colorSelect.innerHTML = ["Hamısı", ...colors].map(x => `<option value="${x}">${x}</option>`).join("");
 }
-
 function filteredProducts() {
   const q = ($("searchInput")?.value || "").trim().toLowerCase();
   const minP = Number($("minPrice")?.value || 0);
@@ -848,9 +866,6 @@ function bindEvents() {
   $("navAdminBtn") && ($("navAdminBtn").onclick = goAdmin);
   $("navAdminBtn2") && ($("navAdminBtn2").onclick = goAdmin);
 
- 
-
-
   $("ctaBrowse") &&
     ($("ctaBrowse").onclick = () => {
       showView("shop");
@@ -879,7 +894,7 @@ function bindEvents() {
 
   // login
 
-    // Auth — redirect to login page (modal was removed)
+  // Auth — redirect to login page (modal was removed)
   // authBtn is now an <a> link, so no onclick needed for opening modal.
   // But if user is logged in, clicking should log out instead:
   const authBtn = $("authBtn");
@@ -898,77 +913,77 @@ function bindEvents() {
     .map($)
     .filter(Boolean)
     .forEach((b) => (b.onclick = doLogout));
-//   $("loginBtn") &&
-//     ($("loginBtn").onclick = async () => {
-//       const email = ($("loginEmail")?.value || "").trim();
-//       const pass = $("loginPass")?.value || "";
-//       if (!email || !pass) {
-//         showToast({
-//           title: "Xəta",
-//           message: "Email və şifrə daxil edin.",
-//           type: "warn",
-//         });
-//         return;
-//       }
-//       try {
-//         await doLogin(email, pass);
-//         closeAuthModal();
-//       } catch (e) {
-//         showToast({
-//           title: "Login alınmadı",
-//           message: e.message || "Xəta",
-//           type: "danger",
-//         });
-//       }
-//     });
-//   // register (if backend has endpoint; otherwise shows info)
-//   // Register (Real integration)
-// $("registerBtn") && ($("registerBtn").onclick = async () => {
-//   const email = ($("regEmail")?.value || "").trim();
-//   const pass = $("regPass")?.value || "";
-  
-//   if (!email || !pass) {
-//     showToast({ title: "Xəta", message: "Email və şifrə daxil edin.", type: "warn" });
-//     return;
-//   }
+  //   $("loginBtn") &&
+  //     ($("loginBtn").onclick = async () => {
+  //       const email = ($("loginEmail")?.value || "").trim();
+  //       const pass = $("loginPass")?.value || "";
+  //       if (!email || !pass) {
+  //         showToast({
+  //           title: "Xəta",
+  //           message: "Email və şifrə daxil edin.",
+  //           type: "warn",
+  //         });
+  //         return;
+  //       }
+  //       try {
+  //         await doLogin(email, pass);
+  //         closeAuthModal();
+  //       } catch (e) {
+  //         showToast({
+  //           title: "Login alınmadı",
+  //           message: e.message || "Xəta",
+  //           type: "danger",
+  //         });
+  //       }
+  //     });
+  //   // register (if backend has endpoint; otherwise shows info)
+  //   // Register (Real integration)
+  // $("registerBtn") && ($("registerBtn").onclick = async () => {
+  //   const email = ($("regEmail")?.value || "").trim();
+  //   const pass = $("regPass")?.value || "";
 
-//   try {
-//     // Backend-ə qeydiyyat sorğusu göndəririk
-//     await apiFetch("/api/auth/register", {
-//       method: "POST",
-//       body: { email, password: pass },
-//       auth: false
-//     });
+  //   if (!email || !pass) {
+  //     showToast({ title: "Xəta", message: "Email və şifrə daxil edin.", type: "warn" });
+  //     return;
+  //   }
 
-//     showToast({ 
-//       title: "Qeydiyyat uğurludur", 
-//       message: "Hesabınız yaradıldı. İndi giriş edə bilərsiniz.", 
-//       type: "success" 
-//     });
+  //   try {
+  //     // Backend-ə qeydiyyat sorğusu göndəririk
+  //     await apiFetch("/api/auth/register", {
+  //       method: "POST",
+  //       body: { email, password: pass },
+  //       auth: false
+  //     });
 
-//     // İstifadəçini avtomatik login panelinə yönləndirmək olar
-//     // Və ya birbaşa login etmək:
-//     await doLogin(email, pass);
-//     closeAuthModal();
+  //     showToast({
+  //       title: "Qeydiyyat uğurludur",
+  //       message: "Hesabınız yaradıldı. İndi giriş edə bilərsiniz.",
+  //       type: "success"
+  //     });
 
-//   } catch (e) {
-//     showToast({
-//       title: "Qeydiyyat xətası",
-//       message: e.message || "Bu email artıq istifadə olunur.",
-//       type: "danger"
-//     });
-//   }
-// });
+  //     // İstifadəçini avtomatik login panelinə yönləndirmək olar
+  //     // Və ya birbaşa login etmək:
+  //     await doLogin(email, pass);
+  //     closeAuthModal();
 
-//   // logout
-//   ["logoutBtn", "logoutBtn2"]
-//     .map($)
-//     .filter(Boolean)
-//     .forEach((b) => (b.onclick = doLogout));
+  //   } catch (e) {
+  //     showToast({
+  //       title: "Qeydiyyat xətası",
+  //       message: e.message || "Bu email artıq istifadə olunur.",
+  //       type: "danger"
+  //     });
+  //   }
+  // });
 
-//   // reset password (demo UI only)
-//   $("openResetBtn") && ($("openResetBtn").onclick = openResetPanel);
-//   $("closeResetBtn") && ($("closeResetBtn").onclick = closeResetPanel);
+  //   // logout
+  //   ["logoutBtn", "logoutBtn2"]
+  //     .map($)
+  //     .filter(Boolean)
+  //     .forEach((b) => (b.onclick = doLogout));
+
+  //   // reset password (demo UI only)
+  //   $("openResetBtn") && ($("openResetBtn").onclick = openResetPanel);
+  //   $("closeResetBtn") && ($("closeResetBtn").onclick = closeResetPanel);
   // $("resetPassBtn") &&
   //   ($("resetPassBtn").onclick = () => {
   //     showToast({
@@ -1023,6 +1038,7 @@ function bindEvents() {
       showToast({ title: "Səbət", message: "Səbət təmizləndi.", type: "info" });
     });
   // checkout (demo for now)
+  // Replace the existing processCheckout() implementation with this code
   async function processCheckout() {
     if (state.cart.length === 0) {
       showToast({
@@ -1032,47 +1048,56 @@ function bindEvents() {
       });
       return;
     }
-    // İstifadəçinin daxil olub-olmadığını yoxlayırıq
+
+    // require login
     if (!state.sessionUser) {
-window.location.href = "/src/pages/auth/login.html";
-      // showToast({
-      //   title: "Giriş lazımdır",
-      //   message: "Sifariş üçün daxil olun.",
-      //   type: "warn",
-      // });
-          return;
+      window.location.href = "/src/pages/auth/login.html";
+      return;
     }
+
     try {
-      // Backend-in gözlədiyi formatda data hazırlayırıq
+      // Build items exactly as backend expects
+      const items = state.cart.map((item) => ({
+        productId: Number(item.productId),
+        qty: Number(item.qty),
+      }));
+
+      // basic validation client-side
+      if (!Array.isArray(items) || items.length === 0) {
+        showToast({
+          title: "Xəta",
+          message: "Səbət formatı yalnışdır.",
+          type: "danger",
+        });
+        return;
+      }
+
       const orderData = {
-        items: state.cart.map((item) => ({
-          productId: item.productId,
-          quantity: item.qty,
-          price: item.productSnapshot.price,
-        })),
-        totalAmount: cartTotals().total,
+        items,
+        shippingFee: 0, // or compute if you have shipping logic
       };
-      // Real API sorğusu
+
+      // Call the correct checkout endpoint
       await apiFetch("/api/orders/checkout", {
         method: "POST",
         body: orderData,
         auth: true,
       });
-      clearCart(); // Səbəti təmizləyirik
-      closeCart(); // Səbət panelini bağlayırıq
+
+      clearCart();
+      closeCart();
       showToast({
         title: "Sifariş uğurludur!",
         message: "Sifarişiniz qəbul edildi. Tezliklə əlaqə saxlanılacaq.",
         type: "success",
       });
     } catch (error) {
-      showToast({
-        title: "Sifariş alınmadı",
-        message: error.message || "Xəta baş verdi.",
-        type: "danger",
-      });
+      const serverMsg = error?.data?.message || error?.message || "Xəta baş verdi.";
+      showToast({ title: "Sifariş alınmadı", message: serverMsg, type: "danger" });
+      console.error("checkout error:", error);
     }
   }
+
   $("checkoutBtn").onclick = processCheckout;
   $("closeProductModal") &&
     ($("closeProductModal").onclick = closeProductModal);
@@ -1089,6 +1114,8 @@ async function init() {
   await loadSessionFromToken(); // token varsa sessiyanı real yoxlayır
   await loadProducts(); // məhsulları çəkir (alınmasa demo)
   await loadCategories(); // Kateqoriyaları çəkir
+  initFiltersFromProducts(); // re-run to ensure UI uses loaded categories if needed
+
   showView("shop");
 }
 init().catch((e) => {
@@ -1121,28 +1148,29 @@ if (addProductForm) {
 
     try {
       // Düzəliş 1: apiFetch istifadə edirik (Tokeni avtomatik qoyur)
+      // inside addProductForm submit handler
+      const catId = parseInt(category, 10);
       await apiFetch("/api/products", {
         method: "POST",
         body: {
           name: name,
           price: parseFloat(price),
-          stock: parseInt(stock),
-          categoryId: Number.isFinite(category) && category > 0 ? category : null,
-          images: [image]
-        }
+          stock: parseInt(stock, 10),
+          categoryId: Number.isFinite(catId) && catId > 0 ? catId : null,
+          images: [image],
+        },
       });
 
       // Uğurlu nəticə
-      showToast({ 
-        title: "Uğurlu!", 
-        message: "Məhsul bazaya əlavə edildi.", 
-        type: "success" 
+      showToast({
+        title: "Uğurlu!",
+        message: "Məhsul bazaya əlavə edildi.",
+        type: "success",
       });
-            
+
       // Düzəliş 2: Funksiya adını düzəltdik (fetchProducts -> loadProducts)
-      await loadProducts(); 
+      await loadProducts();
       renderAdminTable(); // Cədvəli yeniləyirik
-      
     } catch (error) {
       console.error("Xəta:", error);
       alert("Xəta baş verdi: " + error.message);
@@ -1162,25 +1190,32 @@ if (addCategoryForm) {
     const name = nameInput?.value?.trim();
 
     if (!name) {
-      showToast({ title: "Xəta", message: "Kateqoriya adını daxil edin.", type: "danger" });
+      showToast({
+        title: "Xəta",
+        message: "Kateqoriya adını daxil edin.",
+        type: "danger",
+      });
       return;
     }
 
     try {
       await apiFetch("/api/categories", {
         method: "POST",
-        body: { name }
+        body: { name },
       });
 
-      showToast({ title: "Uğurlu!", message: `"${name}" kateqoriyası yaradıldı.`, type: "success" });
+      showToast({
+        title: "Uğurlu!",
+        message: `"${name}" kateqoriyası yaradıldı.`,
+        type: "success",
+      });
       nameInput.value = ""; // Input-u təmizləyirik
       await loadCategories(); // Cədvəli və dropdown-u yeniləyirik
-
     } catch (error) {
       showToast({
         title: "Xəta",
         message: error.message || "Kateqoriya yaradıla bilmədi.",
-        type: "danger"
+        type: "danger",
       });
     }
   });
@@ -1197,7 +1232,7 @@ function startEditCategory(id) {
 
 // Redaktəni ləğv etmək
 function cancelEditCategory(id) {
-  const cat = state.categories.find(c => c.Id === id);
+  const cat = state.categories.find((c) => c.Id === id);
   document.getElementById(`catEdit-${id}`).value = cat?.Name || "";
   document.getElementById(`catName-${id}`)?.classList.remove("hidden");
   document.getElementById(`catEdit-${id}`)?.classList.add("hidden");
@@ -1218,24 +1253,27 @@ async function saveCategory(id) {
   try {
     await apiFetch(`/api/categories/${id}`, {
       method: "PUT",
-      body: { name: newName }
+      body: { name: newName },
     });
 
-    showToast({ title: "Yeniləndi!", message: `Kateqoriya "${newName}" olaraq dəyişdirildi.`, type: "success" });
+    showToast({
+      title: "Yeniləndi!",
+      message: `Kateqoriya "${newName}" olaraq dəyişdirildi.`,
+      type: "success",
+    });
     await loadCategories(); // Hər şeyi yeniləyirik
-
   } catch (error) {
     showToast({
       title: "Xəta",
       message: error.message || "Yeniləmə alınmadı.",
-      type: "danger"
+      type: "danger",
     });
   }
 }
 
 // Kateqoriyanı silmək (DELETE)
 async function deleteCategory(id) {
-  const cat = state.categories.find(c => c.Id === id);
+  const cat = state.categories.find((c) => c.Id === id);
   const catName = cat?.Name || `ID: ${id}`;
 
   // Təsdiq dialoqundan istifadə edirik
@@ -1245,39 +1283,54 @@ async function deleteCategory(id) {
 
   // Dialog mətnini dəyişirik
   backdrop.querySelector("h3").textContent = "Kateqoriya Silinsin?";
-  backdrop.querySelector("p").textContent = `"${catName}" kateqoriyası silinəcək. Davam etmək istəyirsiniz?`;
+  backdrop.querySelector("p").textContent =
+    `"${catName}" kateqoriyası silinəcək. Davam etmək istəyirsiniz?`;
   backdrop.classList.add("show");
 
   const confirmed = await new Promise((resolve) => {
-    okBtn.onclick = () => { backdrop.classList.remove("show"); resolve(true); };
-    cancelBtn.onclick = () => { backdrop.classList.remove("show"); resolve(false); };
+    okBtn.onclick = () => {
+      backdrop.classList.remove("show");
+      resolve(true);
+    };
+    cancelBtn.onclick = () => {
+      backdrop.classList.remove("show");
+      resolve(false);
+    };
     backdrop.onclick = (e) => {
-      if (e.target === backdrop) { backdrop.classList.remove("show"); resolve(false); }
+      if (e.target === backdrop) {
+        backdrop.classList.remove("show");
+        resolve(false);
+      }
     };
   });
 
   if (!confirmed) {
     // Mətni geri qaytarırıq
     backdrop.querySelector("h3").textContent = "Məhsul Silinsin?";
-    backdrop.querySelector("p").textContent = "Bu əməliyyat geri qaytarıla bilməz. Davam etmək istəyirsiniz?";
+    backdrop.querySelector("p").textContent =
+      "Bu əməliyyat geri qaytarıla bilməz. Davam etmək istəyirsiniz?";
     return;
   }
 
   // Mətni geri qaytarırıq
   backdrop.querySelector("h3").textContent = "Məhsul Silinsin?";
-  backdrop.querySelector("p").textContent = "Bu əməliyyat geri qaytarıla bilməz. Davam etmək istəyirsiniz?";
+  backdrop.querySelector("p").textContent =
+    "Bu əməliyyat geri qaytarıla bilməz. Davam etmək istəyirsiniz?";
 
   try {
     await apiFetch(`/api/categories/${id}`, { method: "DELETE" });
 
-    showToast({ title: "Silindi!", message: `"${catName}" kateqoriyası silindi.`, type: "success" });
+    showToast({
+      title: "Silindi!",
+      message: `"${catName}" kateqoriyası silindi.`,
+      type: "success",
+    });
     await loadCategories();
-
   } catch (error) {
     showToast({
       title: "Xəta",
       message: error.message || "Bu kateqoriyada məhsul var, silinə bilməz.",
-      type: "danger"
+      type: "danger",
     });
   }
 }
@@ -1289,53 +1342,51 @@ window.saveCategory = saveCategory;
 window.deleteCategory = deleteCategory;
 
 async function deleteProduct(id) {
-    const backdrop = document.getElementById("confirmBackdrop");
-    const okBtn = document.getElementById("confirmOk");
-    const cancelBtn = document.getElementById("confirmCancel");
+  const backdrop = document.getElementById("confirmBackdrop");
+  const okBtn = document.getElementById("confirmOk");
+  const cancelBtn = document.getElementById("confirmCancel");
 
-    backdrop.classList.add("show");
-    // Düymələrə kliklənməni gözləyən yeni bir Promise yaradırıq
-    const userConfirmed = await new Promise((resolve) => {
-        okBtn.onclick = () => {
-            backdrop.classList.remove("show");
-            resolve(true);
-        };
-        cancelBtn.onclick = () => {
-            backdrop.classList.remove("show");
-            resolve(false);
-        };
-        // Arxa fona klikləyəndə də bağlansın
-        backdrop.onclick = (e) => {
-            if (e.target === backdrop) {
-                backdrop.classList.remove("show");
-                resolve(false);
-            }
-        };
+  backdrop.classList.add("show");
+  // Düymələrə kliklənməni gözləyən yeni bir Promise yaradırıq
+  const userConfirmed = await new Promise((resolve) => {
+    okBtn.onclick = () => {
+      backdrop.classList.remove("show");
+      resolve(true);
+    };
+    cancelBtn.onclick = () => {
+      backdrop.classList.remove("show");
+      resolve(false);
+    };
+    // Arxa fona klikləyəndə də bağlansın
+    backdrop.onclick = (e) => {
+      if (e.target === backdrop) {
+        backdrop.classList.remove("show");
+        resolve(false);
+      }
+    };
+  });
+
+  if (!userConfirmed) return;
+  // SİLME PROSESİ BAŞLAYIR
+  try {
+    await apiFetch(`/api/products/${id}`, { method: "DELETE" });
+
+    showToast({
+      title: "Uğurla Silindi",
+      message: "Məhsul artıq siyahıda yoxdur.",
+      type: "success",
     });
 
-    if (!userConfirmed) return;
-    // SİLME PROSESİ BAŞLAYIR
-    try {
-        await apiFetch(`/api/products/${id}`, { method: "DELETE" });
-
-        showToast({ 
-            title: "Uğurla Silindi", 
-            message: "Məhsul artıq siyahıda yoxdur.", 
-            type: "success" 
-        });
-
-        await loadProducts(); 
-        renderAdminTable(); 
-    } catch (e) {
-        showToast({ 
-            title: "Xəta!", 
-            message: "Silinmə baş tutmadı.", 
-            type: "danger" 
-        });
-    }
+    await loadProducts();
+    renderAdminTable();
+  } catch (e) {
+    showToast({
+      title: "Xəta!",
+      message: "Silinmə baş tutmadı.",
+      type: "danger",
+    });
+  }
 }
-
-
 
 // VACİB: HTML-dən (onclick) çağıra bilmək üçün funksiyanı qlobal edirik
 window.deleteProduct = deleteProduct;
