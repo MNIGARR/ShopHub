@@ -1092,8 +1092,12 @@ function bindEvents() {
         type: "success",
       });
     } catch (error) {
-      const serverMsg = error?.data?.message || error?.message || "Xəta baş verdi.";
-      showToast({ title: "Sifariş alınmadı", message: serverMsg, type: "danger" });
+      // Show actual server message when possible
+      showToast({
+        title: "Sifariş alınmadı",
+        message: error && error.message ? error.message : "Xəta baş verdi.",
+        type: "danger",
+      });
       console.error("checkout error:", error);
     }
   }

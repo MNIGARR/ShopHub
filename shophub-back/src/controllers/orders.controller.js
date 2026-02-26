@@ -132,9 +132,11 @@ async function checkout(req, res) {
   const fee = Number(shippingFee || 0);
   if (fee < 0) return res.status(400).json({ message: "shippingFee yalnışdır" });
 
-  let pool;
-  const tx = new sql.Transaction();
-
+// Create the transaction with a pool and begin it
+const pool = await getPool();
+const tx = new sql.Transaction(pool);
+await tx.begin();
+const request = new sql.Request(tx);
   try {
     pool = await getPool();
 
