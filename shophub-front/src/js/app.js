@@ -137,42 +137,65 @@ function showView(name) {
 
 // UI: auth rendering
 // In updateAuthUI(), update the authBtn behavior:
+// --- Auth UI update (replace existing updateAuthUI implementation) ---
 function updateAuthUI() {
   const authBtn = $("authBtn");
-  const sessionInfo = $("sessionInfo");
-  const adminRoleChip = $("adminRoleChip");
-
+  const authBtnLabel = $("authBtnLabel");
+  const accountWrap = $("accountWrap");
+  const accountBtn = $("accountBtn");
+  const accountDropdown = $("accountDropdown");
+  const accountEmail = $("accountEmail");
+  const logoutBtnEl = $("logoutBtn");
   const user = state.sessionUser;
 
-  if (authBtn) {
-    const label = $("authBtnLabel");
-    if (user) {
-      // Logged in: show email, clicking logs out
-      if (label) label.textContent = user.email;
-      authBtn.href = "#";
-      authBtn.onclick = (e) => {
-        e.preventDefault();
-        doLogout();
+  // ensure dropdown closed by default
+  if (accountDropdown) accountDropdown.classList.add("hidden");
+
+  if (user) {
+    // hide login link, show account icon
+    if (authBtn) authBtn.classList.add("hidden");
+    if (accountWrap) accountWrap.classList.remove("hidden");
+    if (accountEmail) {
+      accountEmail.textContent = user.email || "";
+      accountEmail.title = user.email || "";
+    }
+    // wire logout button
+    if (logoutBtnEl) {
+      logoutBtnEl.onclick = async () => {
+        await doLogout();
+        // ensure dropdown hidden after logout
+        accountDropdown && accountDropdown.classList.add("hidden");
       };
-    } else {
-      // Not logged in: link to login page
-      if (label) label.textContent = "Giriş / Qeydiyyat";
+    }
+
+    // account button toggles dropdown
+    if (accountBtn) {
+      accountBtn.onclick = (e) => {
+        e.stopPropagation();
+        const isHidden = accountDropdown?.classList.contains("hidden");
+        if (isHidden) {
+          accountDropdown.classList.remove("hidden");
+          accountBtn.setAttribute("aria-expanded", "true");
+        } else {
+          accountDropdown.classList.add("hidden");
+          accountBtn.setAttribute("aria-expanded", "false");
+        }
+      };
+    }
+  } else {
+    // show login link, hide account icon + dropdown
+    if (authBtn) {
+      authBtn.classList.remove("hidden");
+      if (authBtnLabel) authBtnLabel.textContent = "Giriş / Qeydiyyat";
       authBtn.href = "/src/pages/auth/login.html";
-      authBtn.onclick = null;
+    }
+    if (accountWrap) {
+      accountWrap.classList.add("hidden");
+      accountDropdown && accountDropdown.classList.add("hidden");
     }
   }
 
-  if (sessionInfo) {
-    sessionInfo.textContent = user
-      ? `Daxil oldunuz: ${user.email} (${user.role || "user"})`
-      : "Daxil olmamısınız.";
-  }
-
-  if (adminRoleChip) {
-    adminRoleChip.textContent = user ? user.role || "user" : "guest";
-  }
-
-  // Admin button visibility
+  // admin button visibility (keep existing behavior)
   const adminBtn = document.getElementById("navAdminBtn");
   if (adminBtn) {
     if (isAdmin()) {
@@ -184,6 +207,21 @@ function updateAuthUI() {
     }
   }
 }
+
+// --- Close dropdown on outside click: add this once during bindEvents (or app init) ---
+document.addEventListener("click", (e) => {
+  const acctDropdown = document.getElementById("accountDropdown");
+  const acctBtn = document.getElementById("accountBtn");
+  if (!acctDropdown || !acctBtn) return;
+  const target = e.target;
+  if (!acctDropdown.classList.contains("hidden")) {
+    const isInside = acctDropdown.contains(target) || acctBtn.contains(target);
+    if (!isInside) {
+      acctDropdown.classList.add("hidden");
+      acctBtn.setAttribute("aria-expanded", "false");
+    }
+  }
+});
 
 function isAdmin() {
   // backend case-sensitive check: "admin"
@@ -571,7 +609,7 @@ function renderProducts() {
       return `
       <article class="glass p-4 hover:brightness-[1.03] transition">
         <div class="aspect-[4/3] rounded-2xl overflow-hidden border border-white/10 bg-black/20">
-          <img src="${img}" alt="${productName(p)}" class="w-full h-full object-cover"/>
+          <img src="${img}" alt="${productName(p)}" class="product-img w-full h-full object-cover"/>
         </div>
         <div class="mt-3">
           <div class="text-sm font-semibold line-clamp-2">${productName(p)}</div>

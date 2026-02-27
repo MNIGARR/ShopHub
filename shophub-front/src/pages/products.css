@@ -1,0 +1,44 @@
+/* Product image hover: change to 'fit' and subtle zoom */
+.product-img {
+  object-fit: cover;
+  transition: transform 220ms ease, object-fit 120ms ease;
+  will-change: transform;
+}
+
+.article:hover .product-img,
+article:hover .product-img,
+.product-card:hover .product-img {
+  object-fit: contain; /* switch to fit inside the area */
+  transform: scale(1.03); /* gentle zoom */
+}
+
+/* account dropdown styling (small visual improvements) */
+#accountDropdown {
+  min-width: 200px;
+  background: linear-gradient(180deg, rgba(8,12,20,0.96), rgba(4,7,12,0.96));
+  border-radius: 10px;
+  padding: 10px;
+}
+
+/* make native select elements look nicer and more consistent */
+.select-custom {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #dbeafe;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9' /></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  background-size: 0.9rem;
+}
+
+/* small responsive tweak for account dropdown on small screens */
+@media (max-width: 640px) {
+  #accountDropdown { right: 0; left: auto; width: 85vw; }
+}
