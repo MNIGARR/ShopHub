@@ -112,12 +112,10 @@ async function checkout(req, res) {
 
   if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-  // validate body
   if (!Array.isArray(items) || items.length < 1) {
     return res.status(400).json({ message: "items tələb olunur" });
   }
 
-  // normalize + validate each item
   const cleanItems = items
     .map((it) => ({
       productId: Number(it.productId),
@@ -132,26 +130,22 @@ async function checkout(req, res) {
   const fee = Number(shippingFee || 0);
   if (fee < 0) return res.status(400).json({ message: "shippingFee yalnışdır" });
 
-// Create the transaction with a pool and begin it
-const pool = await getPool();
-const tx = new sql.Transaction(pool);
-await tx.begin();
-const request = new sql.Request(tx);
+  let tx;
   try {
-    pool = await getPool();
-
-    // Transaction begin
-    await tx.begin(pool);
-    const request = new sql.Request(tx);
+    const pool = await getPool();
+    tx = new sql.Transaction(pool);
+    await tx.begin();
+    // const request = new sql.Request(tx);
 
     // 1) Məhsulları DB-dən oxu (price + stock)
     // IN list üçün parametrlər:
     const ids = [...new Set(cleanItems.map((x) => x.productId))];
+    const productsRequest = new sql.Request(tx);
     const inParams = ids.map((_, i) => `@p${i}`).join(", ");
-    ids.forEach((id, i) => request.input(`p${i}`, sql.Int, id));
+    ids.forEach((id, i) => productsRequest.input(`p${i}`, sql.Int, id));
 
     // UPDLOCK/HOLDLOCK: stock update zamanı yarışın qarşısını alır
-    const productsRes = await request.query(`
+    const productsRes = await productsRequest.query(`
       SELECT Id, Name, Price, Stock
       FROM Products WITH (UPDLOCK, HOLDLOCK)
       WHERE Id IN (${inParams});
@@ -163,34 +157,35 @@ const request = new sql.Request(tx);
       return res.status(400).json({ message: "Bəzi məhsullar tapılmadı" });
     }
 
-    const byId = new Map(products.map((p) => [Number(p.Id), p]));
+    const byId = new Map(products.map((prd) => [Number(prd.Id), prd]));
 
     // 2) Stock yoxla + subtotal hesabla
     let subtotal = 0;
+    
 
-    for (const it of cleanItems) {
-      const p = byId.get(it.productId);
-      if (!p) {
+     for (const item of cleanItems) {
+      const prd = byId.get(item.productId);
+      const stock = Number(prd?.Stock || 0);
+      if (!prd) {
         await tx.rollback();
-        return res.status(400).json({ message: `Məhsul tapılmadı: ${it.productId}` });
+        return res.status(400).json({ message: `Məhsul tapılmadı: ${item.productId}` });
       }
 
-      const stock = Number(p.Stock || 0);
-      if (stock < it.qty) {
+      if (stock < item.qty) {
         await tx.rollback();
         return res.status(409).json({
-          message: `Stok yetərsizdir: ${p.Name} (mövcud: ${stock}, istənən: ${it.qty})`,
+          message: `Stok yetərsizdir: ${prd.Name} (mövcud: ${stock}, istənən: ${item.qty})`,
         });
       }
 
-      const price = Number(p.Price || 0);
-      subtotal += price * it.qty;
+      subtotal += Number(prd.Price || 0) * item.qty;
     }
 
     const total = subtotal + fee;
 
     // 3) Orders insert (yalnız mövcud sütunlara yazırıq)
-    const orderRes = await request
+    const orderRequest = new sql.Request(tx);
+    const orderRes = await orderRequest
       .input("UserId", sql.Int, userId)
       .input("Status", sql.NVarChar(30), "pending")
       .input("ShippingFee", sql.Decimal(18, 2), fee)
@@ -209,16 +204,17 @@ const request = new sql.Request(tx);
     }
 
     // 4) OrderItems insert + stock decrement
-    for (const it of cleanItems) {
-      const p = byId.get(it.productId);
-      const unitPrice = Number(p.Price || 0);
-      const lineTotal = unitPrice * it.qty;
-
+    for (const item of cleanItems) {
+      const prd = byId.get(item.productId);
+      const unitPrice = Number(prd.Price || 0);
+      const lineTotal = unitPrice * item.qty;
+      
       // insert order item
-      await request
+      const itemRequest = new sql.Request(tx);
+      await itemRequest
         .input("OrderId", sql.Int, orderId)
-        .input("ProductId", sql.Int, it.productId)
-        .input("Qty", sql.Int, it.qty)
+        .input("ProductId", sql.Int, item.productId)
+        .input("Qty", sql.Int, item.qty)
         .input("UnitPrice", sql.Decimal(18, 2), unitPrice)
         .input("LineTotal", sql.Decimal(18, 2), lineTotal)
         .query(`
@@ -227,9 +223,10 @@ const request = new sql.Request(tx);
         `);
 
       // decrement stock
-      await request
-        .input("ProdId", sql.Int, it.productId)
-        .input("DecQty", sql.Int, it.qty)
+      const stockRequest = new sql.Request(tx);
+      await stockRequest
+        .input("ProdId", sql.Int, item.productId)
+        .input("DecQty", sql.Int, item.qty)
         .query(`
           UPDATE Products
           SET Stock = Stock - @DecQty
@@ -246,7 +243,12 @@ const request = new sql.Request(tx);
       totals: { subtotal, shippingFee: fee, total },
     });
   } catch (err) {
-    try { await tx.rollback(); } catch {}
+    try {
+      if (tx) await tx.rollback();
+    } catch (rollbackErr) {
+      console.error("Error rolling back transaction:", rollbackErr);
+    }
+
     console.error("checkout:", err);
     return res.status(500).json({ message: "Server error" });
   }

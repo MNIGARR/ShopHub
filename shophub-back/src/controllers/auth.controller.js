@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { getPool, sql } = require("../config/db");
+const sendEmail = require("../utils/sendEmail");
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -109,7 +110,8 @@ async function forgotPassword(req, res) {
       .query("SELECT Id FROM Users WHERE Email=@Email");
 
     if (!result.recordset.length) {
-      return res.status(404).json({ message: "Bu email ilə istifadəçi tapılmadı" });
+      // Security: email exists/exist-not məlumatını açıqlamırıq
+      return res.json({ message: "Əgər hesab mövcuddursa, sıfırlama kodu göndərildi" });
     }
 
     const userId = result.recordset[0].Id;
@@ -117,8 +119,9 @@ async function forgotPassword(req, res) {
     // Generate 6-digit code
     const resetCode = String(crypto.randomInt(100000, 999999));
 
-    // Expires in 15 minutes
-    const expiry = new Date(Date.now() + 15 * 60 * 1000);
+    // Default: 1:50 (110 sec), env ilə dəyişə bilərsiniz
+    const ttlSeconds = Number(process.env.RESET_CODE_TTL_SECONDS || 110);
+    const expiry = new Date(Date.now() + ttlSeconds * 1000);
 
     await pool.request()
       .input("Id", sql.Int, userId)
@@ -126,21 +129,22 @@ async function forgotPassword(req, res) {
       .input("ResetCodeExpiry", sql.DateTime, expiry)
       .query("UPDATE Users SET ResetCode=@ResetCode, ResetCodeExpiry=@ResetCodeExpiry WHERE Id=@Id");
 
-    // TODO: Send email with Nodemailer. For now, log it (development only).
+    const minutes = Math.floor(ttlSeconds / 60);
+    const seconds = String(ttlSeconds % 60).padStart(2, "0");
+
+    await sendEmail(
+      email,
+      "ShopHub - Şifrə sıfırlama kodu",
+      `Sizin kodunuz: ${resetCode}. Kod ${minutes}:${seconds} ərzində etibarlıdır.`,
+    );
     if (process.env.NODE_ENV === "development") {
-      console.log(`[DEV] Reset code for ${email}: ${resetCode}`);
+      console.log(`[DEV] Reset code for ${email}: ${resetCode} (ttl ${minutes}:${seconds})`);
     }
 
-    // NOTE: In production, integrate Nodemailer here:
-    // const nodemailer = require("nodemailer");
-    // const transporter = nodemailer.createTransport({ ... });
-    // await transporter.sendMail({
-    //   to: email,
-    //   subject: "ShopHub - Şifrə Sıfırlama Kodu",
-    //   text: `Sizin sıfırlama kodunuz: ${resetCode}. 15 dəqiqə ərzində etibarlıdır.`,
-    // });
-
-    return res.json({ message: "Sıfırlama kodu e-poçtunuza göndərildi" });
+   return res.json({
+      message: "Sıfırlama kodu e-poçtunuza göndərildi",
+      expiresInSeconds: ttlSeconds,
+    });
   } catch (err) {
     console.error("forgotPassword error:", err);
     return res.status(500).json({ message: "Server error" });
