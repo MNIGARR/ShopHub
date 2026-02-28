@@ -3,9 +3,7 @@ const { getPool, sql } = require("../config/db");
 async function myOrders(req, res) {
   try {
     const pool = await getPool();
-    const r = await pool.request()
-      .input("UserId", sql.Int, req.user.id)
-      .query(`
+    const r = await pool.request().input("UserId", sql.Int, req.user.id).query(`
         SELECT Id, Status, ShippingFee, Subtotal, Total, CreatedAt
         FROM Orders
         WHERE UserId=@UserId
@@ -25,11 +23,13 @@ async function getOrderById(req, res) {
   try {
     const pool = await getPool();
 
-    const o = await pool.request()
+    const o = await pool
+      .request()
       .input("Id", sql.Int, id)
       .query(`SELECT * FROM Orders WHERE Id=@Id;`);
 
-    if (!o.recordset.length) return res.status(404).json({ message: "Order not found" });
+    if (!o.recordset.length)
+      return res.status(404).json({ message: "Order not found" });
 
     const order = o.recordset[0];
 
@@ -38,9 +38,7 @@ async function getOrderById(req, res) {
       return res.status(403).json({ message: "Forbidden" });
     }
 
-    const items = await pool.request()
-      .input("OrderId", sql.Int, id)
-      .query(`
+    const items = await pool.request().input("OrderId", sql.Int, id).query(`
         SELECT oi.Id, oi.ProductId, oi.Qty, oi.UnitPrice, oi.LineTotal,
                p.Name AS ProductName
         FROM OrderItems oi
@@ -60,8 +58,7 @@ async function listOrders(req, res) {
 
   try {
     const pool = await getPool();
-    const r = await pool.request()
-      .input("Status", sql.NVarChar(30), status)
+    const r = await pool.request().input("Status", sql.NVarChar(30), status)
       .query(`
         SELECT o.Id, o.UserId, u.Email AS UserEmail, o.Status, o.Total, o.CreatedAt
         FROM Orders o
@@ -82,21 +79,26 @@ async function updateStatus(req, res) {
   const { status } = req.body;
 
   if (!id) return res.status(400).json({ message: "Invalid id" });
-  if (!["pending", "paid", "shipped", "delivered", "cancelled"].includes(String(status))) {
+  if (
+    !["pending", "paid", "shipped", "delivered", "cancelled"].includes(
+      String(status),
+    )
+  ) {
     return res.status(400).json({ message: "Invalid status" });
   }
 
   try {
     const pool = await getPool();
-    const r = await pool.request()
+    const r = await pool
+      .request()
       .input("Id", sql.Int, id)
-      .input("Status", sql.NVarChar(30), status)
-      .query(`
+      .input("Status", sql.NVarChar(30), status).query(`
         UPDATE Orders SET Status=@Status WHERE Id=@Id;
         SELECT @@ROWCOUNT AS Affected;
       `);
 
-    if (!Number(r.recordset?.[0]?.Affected || 0)) return res.status(404).json({ message: "Order not found" });
+    if (!Number(r.recordset?.[0]?.Affected || 0))
+      return res.status(404).json({ message: "Order not found" });
 
     return res.json({ message: "Updated" });
   } catch (err) {
@@ -128,13 +130,16 @@ async function checkout(req, res) {
   }
 
   const fee = Number(shippingFee || 0);
-  if (fee < 0) return res.status(400).json({ message: "shippingFee yalnışdır" });
+  if (fee < 0)
+    return res.status(400).json({ message: "shippingFee yalnışdır" });
 
   let tx;
+  let transactionStarted = false;
   try {
     const pool = await getPool();
     tx = new sql.Transaction(pool);
     await tx.begin();
+    transactionStarted = true;
     // const request = new sql.Request(tx);
 
     // 1) Məhsulları DB-dən oxu (price + stock)
@@ -153,29 +158,30 @@ async function checkout(req, res) {
 
     const products = productsRes.recordset || [];
     if (products.length !== ids.length) {
-      await tx.rollback();
-      return res.status(400).json({ message: "Bəzi məhsullar tapılmadı" });
+      const e = new Error("Bəzi məhsullar tapılmadı");
+      e.status = 400;
+      throw e;
     }
 
     const byId = new Map(products.map((prd) => [Number(prd.Id), prd]));
 
     // 2) Stock yoxla + subtotal hesabla
     let subtotal = 0;
-    
 
-     for (const item of cleanItems) {
+    for (const item of cleanItems) {
       const prd = byId.get(item.productId);
       const stock = Number(prd?.Stock || 0);
       if (!prd) {
         await tx.rollback();
-        return res.status(400).json({ message: `Məhsul tapılmadı: ${item.productId}` });
+        return res
+          .status(400)
+          .json({ message: `Məhsul tapılmadı: ${item.productId}` });
       }
 
       if (stock < item.qty) {
-        await tx.rollback();
-        return res.status(409).json({
-          message: `Stok yetərsizdir: ${prd.Name} (mövcud: ${stock}, istənən: ${item.qty})`,
-        });
+        const e = new Error(`Məhsul tapılmadı: ${item.productId}`);
+        e.status = 400;
+        throw e;
       }
 
       subtotal += Number(prd.Price || 0) * item.qty;
@@ -190,8 +196,7 @@ async function checkout(req, res) {
       .input("Status", sql.NVarChar(30), "pending")
       .input("ShippingFee", sql.Decimal(18, 2), fee)
       .input("Subtotal", sql.Decimal(18, 2), subtotal)
-      .input("Total", sql.Decimal(18, 2), total)
-      .query(`
+      .input("Total", sql.Decimal(18, 2), total).query(`
         INSERT INTO Orders (UserId, Status, ShippingFee, Subtotal, Total)
         OUTPUT INSERTED.Id
         VALUES (@UserId, @Status, @ShippingFee, @Subtotal, @Total);
@@ -199,8 +204,7 @@ async function checkout(req, res) {
 
     const orderId = Number(orderRes.recordset?.[0]?.Id);
     if (!orderId) {
-      await tx.rollback();
-      return res.status(500).json({ message: "Order yaradılmadı" });
+      throw new Error("Order yaradılmadı");
     }
 
     // 4) OrderItems insert + stock decrement
@@ -208,7 +212,7 @@ async function checkout(req, res) {
       const prd = byId.get(item.productId);
       const unitPrice = Number(prd.Price || 0);
       const lineTotal = unitPrice * item.qty;
-      
+
       // insert order item
       const itemRequest = new sql.Request(tx);
       await itemRequest
@@ -216,8 +220,7 @@ async function checkout(req, res) {
         .input("ProductId", sql.Int, item.productId)
         .input("Qty", sql.Int, item.qty)
         .input("UnitPrice", sql.Decimal(18, 2), unitPrice)
-        .input("LineTotal", sql.Decimal(18, 2), lineTotal)
-        .query(`
+        .input("LineTotal", sql.Decimal(18, 2), lineTotal).query(`
           INSERT INTO OrderItems (OrderId, ProductId, Qty, UnitPrice, LineTotal)
           VALUES (@OrderId, @ProductId, @Qty, @UnitPrice, @LineTotal);
         `);
@@ -226,8 +229,7 @@ async function checkout(req, res) {
       const stockRequest = new sql.Request(tx);
       await stockRequest
         .input("ProdId", sql.Int, item.productId)
-        .input("DecQty", sql.Int, item.qty)
-        .query(`
+        .input("DecQty", sql.Int, item.qty).query(`
           UPDATE Products
           SET Stock = Stock - @DecQty
           WHERE Id = @ProdId;
@@ -236,6 +238,7 @@ async function checkout(req, res) {
 
     // Commit
     await tx.commit();
+    transactionStarted = false;
 
     return res.status(201).json({
       message: "Order created",
@@ -244,15 +247,18 @@ async function checkout(req, res) {
     });
   } catch (err) {
     try {
-      if (tx) await tx.rollback();
+      if (tx && transactionStarted) await tx.rollback();
     } catch (rollbackErr) {
       console.error("Error rolling back transaction:", rollbackErr);
     }
 
     console.error("checkout:", err);
-    return res.status(500).json({ message: "Server error" });
+    if (err.status) {
+      return res.status(err.status).json({ message: err.message });
+    }
+    const rawDbMessage = err?.originalError?.info?.message || err?.message;
+    return res.status(500).json({ message: rawDbMessage || "Server error" });
   }
 }
-
 
 module.exports = { myOrders, getOrderById, listOrders, updateStatus, checkout };
