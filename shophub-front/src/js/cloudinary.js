@@ -1,6 +1,10 @@
 export async function uploadImage(file) {
-    const cloudName = "dnzhbbnqw"; // Bura öz cloud name-ini yaz
-    const uploadPreset = "shophub_preset";
+   const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || "shophub_preset";
+
+    if (!cloudName) {
+        throw new Error("Cloudinary cloud name konfiqurasiya edilməyib");
+    }
 
     const formData = new FormData();
     formData.append("file", file);
@@ -12,6 +16,7 @@ export async function uploadImage(file) {
             body: formData
         });
         const data = await res.json();
+        if (!res.ok) throw new Error(data?.error?.message || "Cloudinary upload xətası");
         return data.secure_url; // Şəklin internet linki
     } catch (err) {
         console.error("Cloudinary error:", err);

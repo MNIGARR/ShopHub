@@ -6,7 +6,7 @@
 // Products (optional for now):
 // GET    /api/products
 // GET    /api/products/:id
-const API_BASE = "http://localhost:5000"; // <-- backend portunu burda düzəlt
+const API_BASE = (import.meta.env.VITE_API_BASE || "http://localhost:5000/api").replace(/\/$/, "").replace(/\/api$/, "");
 // Small helpers
 const $ = (id) => document.getElementById(id);
 
@@ -1184,7 +1184,7 @@ if (addProductForm) {
 
     // Validasiya
     if (!name || !price || !stock || !category || !image) {
-      alert("Zəhmət olmasa bütün xanaları doldurun!");
+      showToast({ title: "Xəta", message: "Bütün xanaları doldurun.", type: "danger" });
       return;
     }
 
@@ -1215,7 +1215,7 @@ if (addProductForm) {
       renderAdminTable(); // Cədvəli yeniləyirik
     } catch (error) {
       console.error("Xəta:", error);
-      alert("Xəta baş verdi: " + error.message);
+      showToast({ title: "Xəta", message: error.message, type: "danger" });
     }
   });
 }

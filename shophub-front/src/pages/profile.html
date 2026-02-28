@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="az">
+<head><meta charset="UTF-8"><title>Profil</title></head>
+<body>
+  <h1>Profil</h1>
+  <nav>
+    <a href="/">Ana səhifə</a> |
+    <a href="/products">Məhsullar</a> |
+    <a href="/orders">Sifarişlərim</a>
+  </nav>
+  <div id="profileBox">Yüklənir...</div>
+
+  <script type="module">
+    import { me } from "../js/services/auth.service.js";
+    const box = document.getElementById("profileBox");
+    me().then((u) => {
+      box.innerHTML = `<p><strong>ID:</strong> ${u.id}</p><p><strong>Email:</strong> ${u.email}</p><p><strong>Rol:</strong> ${u.role}</p>`;
+    }).catch((e) => {
+      box.textContent = e.message;
+    });
+  </script>
+</body>
+</html>

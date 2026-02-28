@@ -25,7 +25,7 @@
       try {
         const res = await apiFetch("/api/auth/reset-password", { method: "POST", body: { token, password: pass }, auth: false });
         document.getElementById("msg").textContent = res.message || "Şifrə sıfırlandı";
-        setTimeout(() => window.location.href = "/src/pages/auth/login.html", 1500);
+        setTimeout(() => window.location.href = "/login", 1500);
       } catch (err) {
         document.getElementById("msg").textContent = err?.data?.message || err.message || "Xəta";
       }

@@ -8,6 +8,7 @@ async function initCheckout() {
   const container = $("#checkoutItems");
   const user = getUser();
   const checkoutBtn = $("#btnCheckout");
+  const msg = $("#msg");
 
   if (!container || !checkoutBtn) return;
 
@@ -30,8 +31,8 @@ async function initCheckout() {
   // Sifarişi tamamla düyməsi
   checkoutBtn.onclick = async () => {
     if (!user) {
-      alert("Zəhmət olmasa giriş edin!");
-      window.location.href = "/src/pages/auth/login.html";
+      if (msg) msg.textContent = "Sifarişi tamamlamaq üçün giriş edin.";
+      window.location.href = "/login";
       return;
     }
 
@@ -43,10 +44,11 @@ async function initCheckout() {
 
       await checkoutOrder(payload);
       clearCart();
-      alert("Sifarişiniz uğurla tamamlandı!");
-      window.location.href = "/src/pages/orders.html";
+      if (msg) msg.textContent = "Sifarişiniz uğurla tamamlandı.";
+      window.location.href = "/orders";
     } catch (err) {
-      alert("Xəta: " + err.message); //
+      if (msg) msg.textContent = err.message;
+      console.error("Checkout error:", err);
     }
   };
 }
