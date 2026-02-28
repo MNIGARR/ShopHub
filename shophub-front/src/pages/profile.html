@@ -1,23 +1,108 @@
 <!doctype html>
 <html lang="az">
-<head><meta charset="UTF-8"><title>Profil</title></head>
-<body>
-  <h1>Profil</h1>
-  <nav>
-    <a href="/">Ana səhifə</a> |
-    <a href="/products">Məhsullar</a> |
-    <a href="/orders">Sifarişlərim</a>
-  </nav>
-  <div id="profileBox">Yüklənir...</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShopHub | Profil</title>
+    <style>
+      :root {
+        --bg: #0b1220;
+        --card: #111b30;
+        --line: #223252;
+        --text: #e5edff;
+        --muted: #9fb2d8;
+        --accent: #4f8cff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: radial-gradient(1200px 500px at 80% -100px, #1d3d7a 0%, var(--bg) 55%);
+        color: var(--text);
+        min-height: 100vh;
+      }
+      .wrap { max-width: 960px; margin: 0 auto; padding: 32px 20px; }
+      .nav {
+        display: inline-flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 26px;
+      }
+      .nav a {
+        color: var(--muted);
+        text-decoration: none;
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,.02);
+        padding: 8px 14px;
+        border-radius: 999px;
+      }
+      .nav a:hover { color: var(--text); border-color: #32599d; }
+      .hero {
+        background: linear-gradient(180deg, rgba(79,140,255,.15), rgba(79,140,255,.03));
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 16px;
+      }
+      h1 { margin: 0 0 8px; font-size: 32px; }
+      .sub { margin: 0; color: var(--muted); }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 20px;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+        padding: 13px 0;
+      }
+      .row:last-child { border-bottom: 0; }
+      .k { color: var(--muted); }
+      .role {
+        background: rgba(79,140,255,.15);
+        color: #b9d1ff;
+        border: 1px solid #3d65aa;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+      .err { color: #ff9f9f; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="nav">
+        <a href="/">Ana səhifə</a>
+        <a href="/products">Məhsullar</a>
+        <a href="/orders">Sifarişlərim</a>
+      </nav>
 
-  <script type="module">
-    import { me } from "../js/services/auth.service.js";
-    const box = document.getElementById("profileBox");
-    me().then((u) => {
-      box.innerHTML = `<p><strong>ID:</strong> ${u.id}</p><p><strong>Email:</strong> ${u.email}</p><p><strong>Rol:</strong> ${u.role}</p>`;
-    }).catch((e) => {
-      box.textContent = e.message;
-    });
-  </script>
-</body>
+      <section class="hero">
+        <h1>Profil</h1>
+        <p class="sub">Hesab məlumatlarınızı buradan görə bilərsiniz.</p>
+      </section>
+
+      <section id="profileBox" class="card">Yüklənir...</section>
+    </div>
+
+    <script type="module">
+      import { me } from "/src/js/services/auth.service.js";
+      const box = document.getElementById("profileBox");
+
+      me()
+        .then((u) => {
+          box.innerHTML = `
+            <div class="row"><span class="k">İstifadəçi ID</span><strong>${u.id}</strong></div>
+            <div class="row"><span class="k">Email</span><strong>${u.email}</strong></div>
+            <div class="row"><span class="k">Rol</span><span class="role">${u.role}</span></div>
+          `;
+        })
+        .catch((e) => {
+          box.innerHTML = `<p class="err">${e.message}</p>`;
+        });
+    </script>
+  </body>
 </html>

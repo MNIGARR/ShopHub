@@ -273,6 +273,7 @@
               <option value="">Kateqoriya seçin...</option>
             </select>
             <input type="text" id="admProdImage" placeholder="Şəkil URL (Cloudinary)" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">
+            <input type="file" id="admProdImageFile" accept="image/*" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none">
             <button type="submit" class="bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors">Yadda Saxla</button>
           </form>
         </div>
@@ -316,6 +317,43 @@
             </thead>
             <tbody id="adminProductsTable" class="divide-y divide-white/5">
               </tbody>
+          </table>
+        </div>
+
+        
+        <div class="glass rounded-[32px] border border-white/5 overflow-hidden">
+          <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+            <h3 class="text-lg font-bold text-white">Sifarişlər</h3>
+          </div>
+          <table class="w-full text-left text-sm">
+            <thead class="bg-white/5 text-slate-400 uppercase text-[10px] tracking-widest">
+              <tr>
+                <th class="px-6 py-4 font-bold">ID</th>
+                <th class="px-6 py-4 font-bold">İstifadəçi</th>
+                <th class="px-6 py-4 font-bold">Status</th>
+                <th class="px-6 py-4 font-bold">Total</th>
+                <th class="px-6 py-4 font-bold">Dəyiş</th>
+              </tr>
+            </thead>
+            <tbody id="adminOrdersTable" class="divide-y divide-white/5"></tbody>
+          </table>
+        </div>
+
+        <div class="glass rounded-[32px] border border-white/5 overflow-hidden">
+          <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+            <h3 class="text-lg font-bold text-white">İstifadəçilər</h3>
+          </div>
+          <table class="w-full text-left text-sm">
+            <thead class="bg-white/5 text-slate-400 uppercase text-[10px] tracking-widest">
+              <tr>
+                <th class="px-6 py-4 font-bold">ID</th>
+                <th class="px-6 py-4 font-bold">Email</th>
+                <th class="px-6 py-4 font-bold">Rol</th>
+                <th class="px-6 py-4 font-bold">Status</th>
+                <th class="px-6 py-4 font-bold">Əməliyyat</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersTable" class="divide-y divide-white/5"></tbody>
           </table>
         </div>
       </section>
@@ -413,6 +451,22 @@
           <button id="confirmCancel" class="flex-1 px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium transition-colors">Ləğv et</button>
           <button id="confirmOk" class="flex-1 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg shadow-red-600/20 transition-all">Bəli, Sil</button>
         </div>
+      </div>
+    </div>
+
+    <div id="editProductBackdrop" class="backdrop">
+      <div class="glass p-8 rounded-[32px] border border-white/10 max-w-xl w-full text-left">
+        <h3 class="text-xl font-bold text-white mb-6">Məhsulu redaktə et</h3>
+        <form id="editProductForm" class="grid grid-cols-1 gap-4">
+          <input type="hidden" id="editProdId">
+          <input type="text" id="editProdName" placeholder="Məhsul adı" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none" required>
+          <input type="number" id="editProdPrice" placeholder="Qiymət" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none" required>
+          <input type="number" id="editProdStock" placeholder="Stok" class="bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none" required>
+          <div class="flex justify-end gap-3">
+            <button type="button" id="editProductCancel" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10">Ləğv</button>
+            <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold">Yadda saxla</button>
+          </div>
+        </form>
       </div>
     </div>
 

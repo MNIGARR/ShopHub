@@ -7,6 +7,7 @@
 // GET    /api/products
 // GET    /api/products/:id
 const API_BASE = (import.meta.env.VITE_API_BASE || "http://localhost:5000/api").replace(/\/$/, "").replace(/\/api$/, "");
+const ORDER_STATUSES = ["pending", "paid", "shipped", "delivered", "cancelled"];
 // Small helpers
 const $ = (id) => document.getElementById(id);
 
@@ -118,6 +119,8 @@ const state = {
   sessionUser: null, // normalized { id, email, role }
   products: [],
   cart: [], // [{ productId, qty, productSnapshot }]
+  adminOrders: [],
+  adminUsers: [],
 };
 
 // UI: view switch
@@ -187,7 +190,7 @@ function updateAuthUI() {
     if (authBtn) {
       authBtn.classList.remove("hidden");
       if (authBtnLabel) authBtnLabel.textContent = "Giriş / Qeydiyyat";
-      authBtn.href = "/src/pages/auth/login.html";
+      authBtn.href = "/login";
     }
     if (accountWrap) {
       accountWrap.classList.add("hidden");
@@ -231,11 +234,8 @@ function isAdmin() {
 // Auth modal open/close
 function openAuthModal() {
   // Redirect to login page instead of opening modal
-  window.location.href = "/src/pages/auth/login.html";
+  window.location.href = "/login";
 }
-// function closeAuthModal() {
-//   // No longer needed — kept as empty for backward compatibility
-// }
 
 function openResetPanel() {
   $("resetPanel")?.classList.remove("hidden");
@@ -428,16 +428,13 @@ function updateCategoryDropdown() {
 // KPIs
 function renderKPIs() {
   const products = state.products;
-
   const categories = new Set(products.map((p) => p.category).filter(Boolean));
-  const users = []; // backend users endpoint varsa sonra edərik
-  const orders = []; // cart->checkout hissəsində dolduracağıq
 
   $("kpiProducts") && ($("kpiProducts").textContent = String(products.length));
   $("kpiCategories") &&
     ($("kpiCategories").textContent = String(categories.size));
-  $("kpiOrders") && ($("kpiOrders").textContent = String(orders.length));
-  $("kpiUsers") && ($("kpiUsers").textContent = String(users.length));
+  $("kpiOrders") && ($("kpiOrders").textContent = String(state.adminOrders.length));
+  $("kpiUsers") && ($("kpiUsers").textContent = String(state.adminUsers.length));
 }
 
 function renderAdminTable() {
@@ -455,13 +452,125 @@ function renderAdminTable() {
                     ${productStock(p)} ədəd
                 </span>
             </td>
-            <td class="px-6 py-4">
+            <td class="px-6 py-4 space-x-3">
+                <button class="text-blue-400 hover:text-blue-300 font-bold" onclick="openEditProduct(${getProductId(p)})">Redaktə</button>
                 <button class="text-red-500 hover:text-red-400 font-bold" onclick="deleteProduct(${getProductId(p)})">Sil</button>
             </td>
         </tr>
     `,
     )
     .join("");
+}
+
+function renderAdminOrdersTable() {
+  const tableBody = $("adminOrdersTable");
+  if (!tableBody) return;
+
+  if (!state.adminOrders.length) {
+    tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-slate-400">Sifariş tapılmadı.</td></tr>`;
+    return;
+  }
+
+  tableBody.innerHTML = state.adminOrders
+    .map((order) => `
+      <tr class="hover:bg-white/5 transition-colors">
+        <td class="px-6 py-4">#${order.Id}</td>
+        <td class="px-6 py-4">${order.UserEmail || "-"}</td>
+        <td class="px-6 py-4">${order.Status}</td>
+        <td class="px-6 py-4">${formatMoneyAZN(order.Total)}</td>
+        <td class="px-6 py-4">
+          <select data-order-status-id="${order.Id}" class="bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-xs">
+            ${ORDER_STATUSES.map((status) => `<option value="${status}" ${status === order.Status ? "selected" : ""}>${status}</option>`).join("")}
+          </select>
+        </td>
+      </tr>
+    `)
+    .join("");
+
+  tableBody.querySelectorAll("[data-order-status-id]").forEach((select) => {
+    select.addEventListener("change", async () => {
+      const id = Number(select.getAttribute("data-order-status-id"));
+      try {
+        await apiFetch(`/api/orders/${id}/status`, {
+          method: "PATCH",
+          body: { status: select.value },
+        });
+        await loadAdminData();
+      } catch (error) {
+        showToast({ title: "Xəta", message: error.message || "Status yenilənmədi.", type: "danger" });
+      }
+    });
+  });
+}
+
+function renderAdminUsersTable() {
+  const tableBody = $("adminUsersTable");
+  if (!tableBody) return;
+
+  if (!state.adminUsers.length) {
+    tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-slate-400">İstifadəçi tapılmadı.</td></tr>`;
+    return;
+  }
+
+  tableBody.innerHTML = state.adminUsers
+    .map((user) => `
+      <tr class="hover:bg-white/5 transition-colors">
+        <td class="px-6 py-4">#${user.Id}</td>
+        <td class="px-6 py-4">${user.Email}</td>
+        <td class="px-6 py-4">${user.Role}</td>
+        <td class="px-6 py-4">${user.IsActive ? "Aktiv" : "Deaktiv"}</td>
+        <td class="px-6 py-4 space-x-3">
+          <button class="text-blue-400 hover:text-blue-300" data-user-role-id="${user.Id}" data-role="${user.Role === "admin" ? "user" : "admin"}">${user.Role === "admin" ? "user et" : "admin et"}</button>
+          <button class="text-amber-400 hover:text-amber-300" data-user-active-id="${user.Id}" data-active="${user.IsActive ? "false" : "true"}">${user.IsActive ? "deaktiv et" : "aktiv et"}</button>
+        </td>
+      </tr>
+    `)
+    .join("");
+
+  tableBody.querySelectorAll("[data-user-role-id]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = Number(btn.getAttribute("data-user-role-id"));
+      const role = btn.getAttribute("data-role");
+      try {
+        await apiFetch(`/api/users/${id}/role`, { method: "PATCH", body: { role } });
+        await loadAdminData();
+      } catch (error) {
+        showToast({ title: "Xəta", message: error.message || "Rol yenilənmədi.", type: "danger" });
+      }
+    });
+  });
+
+  tableBody.querySelectorAll("[data-user-active-id]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = Number(btn.getAttribute("data-user-active-id"));
+      const isActive = btn.getAttribute("data-active") === "true";
+      try {
+        await apiFetch(`/api/users/${id}/active`, { method: "PATCH", body: { isActive } });
+        await loadAdminData();
+      } catch (error) {
+        showToast({ title: "Xəta", message: error.message || "Status yenilənmədi.", type: "danger" });
+      }
+    });
+  });
+}
+
+async function loadAdminData() {
+  if (!isAdmin()) return;
+  try {
+    const [ordersPayload, usersPayload] = await Promise.all([
+      apiFetch("/api/orders", { method: "GET", auth: true }),
+      apiFetch("/api/users", { method: "GET", auth: true }),
+    ]);
+
+    state.adminOrders = Array.isArray(ordersPayload?.items) ? ordersPayload.items : [];
+    state.adminUsers = Array.isArray(usersPayload?.items) ? usersPayload.items : [];
+
+    renderAdminOrdersTable();
+    renderAdminUsersTable();
+    renderKPIs();
+  } catch (error) {
+    showToast({ title: "Xəta", message: error.message || "Admin məlumatları alınmadı.", type: "danger" });
+  }
 }
 
 // Products UI + filters (simple)
@@ -714,7 +823,7 @@ function cartTotals() {
       );
     return s + productPrice(p) * Number(x.qty || 0);
   }, 0);
-  const shipping = subtotal > 0 ? 0 : 0; // demo
+  const shipping = 0;
   return { subtotal, shipping, total: subtotal + shipping };
 }
 
@@ -854,8 +963,8 @@ function openProductModal(productId) {
 
   $("pmRatingChip") &&
     ($("pmRatingChip").textContent = `${productRating(p).toFixed(1)}/5`);
-  $("pmReviews") && ($("pmReviews").textContent = "Rəylər hələlik yoxdur");
-
+  $("pmReviews") && ($("pmReviews").textContent = "Rəylər backend-də hələ yoxdur.");
+  
   // add button
   const addBtn = $("pmAddBtn");
   if (addBtn) addBtn.onclick = () => addToCart(id);
@@ -876,7 +985,7 @@ function goAdmin() {
       message: "Admin üçün əvvəlcə daxil olun.",
       type: "warn",
     });
-    window.location.href = "/src/pages/auth/login.html"; // redirect instead of modal
+    window.location.href = "/login"; // redirect instead of modal
     return;
   }
   if (!isAdmin()) {
@@ -889,7 +998,8 @@ function goAdmin() {
   }
   showView("admin");
   renderAdminTable();
-  loadCategories(); // load categories for admin form
+  loadCategories();
+  loadAdminData();
 }
 
 // Bind UI events
@@ -1019,8 +1129,8 @@ function bindEvents() {
   //     .filter(Boolean)
   //     .forEach((b) => (b.onclick = doLogout));
 
-  //   // reset password (demo UI only)
-  //   $("openResetBtn") && ($("openResetBtn").onclick = openResetPanel);
+  //   // reset password (legacy example)
+  //   //   $("openResetBtn") && ($("openResetBtn").onclick = openResetPanel);
   //   $("closeResetBtn") && ($("closeResetBtn").onclick = closeResetPanel);
   // $("resetPassBtn") &&
   //   ($("resetPassBtn").onclick = () => {
@@ -1075,8 +1185,8 @@ function bindEvents() {
       clearCart();
       showToast({ title: "Səbət", message: "Səbət təmizləndi.", type: "info" });
     });
-  // checkout (demo for now)
-  // Replace the existing processCheckout() implementation with this code
+  
+    
   async function processCheckout() {
     if (state.cart.length === 0) {
       showToast({
@@ -1089,7 +1199,7 @@ function bindEvents() {
 
     // require login
     if (!state.sessionUser) {
-      window.location.href = "/src/pages/auth/login.html";
+      window.location.href = "/login";
       return;
     }
 
@@ -1126,7 +1236,7 @@ function bindEvents() {
       closeCart();
       showToast({
         title: "Sifariş uğurludur!",
-        message: "Sifarişiniz qəbul edildi. Tezliklə əlaqə saxlanılacaq.",
+        message: "Sifarişiniz qəbul edildi.",
         type: "success",
       });
     } catch (error) {
@@ -1154,7 +1264,7 @@ async function init() {
   bindEvents();
   loadCart();
   await loadSessionFromToken(); // token varsa sessiyanı real yoxlayır
-  await loadProducts(); // məhsulları çəkir (alınmasa demo)
+  await loadProducts(); // məhsulları çəkir
   await loadCategories(); // Kateqoriyaları çəkir
   initFiltersFromProducts(); // re-run to ensure UI uses loaded categories if needed
 
@@ -1168,54 +1278,77 @@ init().catch((e) => {
     type: "danger",
   });
 });
-// Admin Panel: Yeni Məhsul Əlavə Etmə Funksiyası (DÜZƏLDİLMİŞ VERSİYA)
+
+async function uploadToCloudinary(file) {
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || "shophub_preset";
+  if (!cloudName) throw new Error("Cloudinary cloud name təyin edilməyib.");
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", uploadPreset);
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data?.error?.message || "Şəkil yükləmə alınmadı.");
+  }
+  return data.secure_url;
+}
+
 const addProductForm = document.getElementById("addProductForm");
 
 if (addProductForm) {
   addProductForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Dəyərləri götürürük
-    const name = document.getElementById("admProdName").value;
+    const name = document.getElementById("admProdName").value.trim();
     const price = document.getElementById("admProdPrice").value;
     const stock = document.getElementById("admProdStock").value;
     const category = document.getElementById("admProdCategory").value;
     const image = document.getElementById("admProdImage").value;
 
     // Validasiya
-    if (!name || !price || !stock || !category || !image) {
-      showToast({ title: "Xəta", message: "Bütün xanaları doldurun.", type: "danger" });
+    if (!name || !price || !stock || !category) {
+      showToast({ title: "Xəta", message: "Ad, qiymət, stok və kateqoriya mütləqdir.", type: "danger" });
       return;
     }
 
     try {
-      // Düzəliş 1: apiFetch istifadə edirik (Tokeni avtomatik qoyur)
-      // inside addProductForm submit handler
+      let image = imageInput?.value?.trim() || "";
+      const imageFile = imageFileInput?.files?.[0];
+      if (!image && imageFile) {
+        image = await uploadToCloudinary(imageFile);
+      }
+
       const catId = parseInt(category, 10);
       await apiFetch("/api/products", {
         method: "POST",
         body: {
-          name: name,
+          name,
           price: parseFloat(price),
           stock: parseInt(stock, 10),
           categoryId: Number.isFinite(catId) && catId > 0 ? catId : null,
-          images: [image],
+          images: image ? [image] : [],
         },
       });
 
-      // Uğurlu nəticə
       showToast({
         title: "Uğurlu!",
         message: "Məhsul bazaya əlavə edildi.",
         type: "success",
       });
 
-      // Düzəliş 2: Funksiya adını düzəltdik (fetchProducts -> loadProducts)
+      addProductForm.reset();
       await loadProducts();
-      renderAdminTable(); // Cədvəli yeniləyirik
+      renderAdminTable();
     } catch (error) {
       console.error("Xəta:", error);
-      showToast({ title: "Xəta", message: error.message, type: "danger" });
+      showToast({ title: "Xəta", message: error.message || "Məhsul əlavə olunmadı.", type: "danger" });
     }
   });
 }
@@ -1383,6 +1516,59 @@ window.cancelEditCategory = cancelEditCategory;
 window.saveCategory = saveCategory;
 window.deleteCategory = deleteCategory;
 
+function closeEditProductModal() {
+  $("editProductBackdrop")?.classList.remove("show");
+}
+
+function openEditProduct(id) {
+  const product = state.products.find((p) => Number(getProductId(p)) === Number(id));
+  if (!product) return;
+
+  $("editProdId").value = getProductId(product);
+  $("editProdName").value = productName(product);
+  $("editProdPrice").value = productPrice(product);
+  $("editProdStock").value = productStock(product);
+  $("editProductBackdrop")?.classList.add("show");
+}
+
+const editProductForm = document.getElementById("editProductForm");
+if (editProductForm) {
+  editProductForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const id = Number($("editProdId")?.value);
+    const name = $("editProdName")?.value?.trim();
+    const price = Number($("editProdPrice")?.value);
+    const stock = Number($("editProdStock")?.value);
+
+    if (!id || !name) {
+      showToast({ title: "Xəta", message: "Məhsul məlumatı natamamdır.", type: "danger" });
+      return;
+    }
+
+    try {
+      await apiFetch(`/api/products/${id}`, {
+        method: "PUT",
+        body: { name, price, stock },
+      });
+
+      closeEditProductModal();
+      await loadProducts();
+      renderAdminTable();
+      showToast({ title: "Uğurlu", message: "Məhsul yeniləndi.", type: "success" });
+    } catch (error) {
+      showToast({ title: "Xəta", message: error.message || "Məhsul yenilənmədi.", type: "danger" });
+    }
+  });
+}
+
+$("editProductCancel") && ($("editProductCancel").onclick = closeEditProductModal);
+$("editProductBackdrop") &&
+  ($("editProductBackdrop").onclick = (e) => {
+    if (e.target?.id === "editProductBackdrop") closeEditProductModal();
+  });
+
+
 async function deleteProduct(id) {
   const backdrop = document.getElementById("confirmBackdrop");
   const okBtn = document.getElementById("confirmOk");
@@ -1431,4 +1617,5 @@ async function deleteProduct(id) {
 }
 
 // VACİB: HTML-dən (onclick) çağıra bilmək üçün funksiyanı qlobal edirik
+window.openEditProduct = openEditProduct;
 window.deleteProduct = deleteProduct;
