@@ -219,10 +219,9 @@ async function checkout(req, res) {
         .input("OrderId", sql.Int, orderId)
         .input("ProductId", sql.Int, item.productId)
         .input("Qty", sql.Int, item.qty)
-        .input("UnitPrice", sql.Decimal(18, 2), unitPrice)
-        .input("LineTotal", sql.Decimal(18, 2), lineTotal).query(`
-          INSERT INTO OrderItems (OrderId, ProductId, Qty, UnitPrice, LineTotal)
-          VALUES (@OrderId, @ProductId, @Qty, @UnitPrice, @LineTotal);
+        .input("UnitPrice", sql.Decimal(18, 2), unitPrice).query(`
+          INSERT INTO OrderItems (OrderId, ProductId, Qty, UnitPrice)
+          VALUES (@OrderId, @ProductId, @Qty, @UnitPrice);
         `);
 
       // decrement stock
