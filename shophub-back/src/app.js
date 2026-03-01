@@ -8,6 +8,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get("/", (req, res) =>
+  res.json({ service: "ShopHub API", api: "/api", health: "/health" })
+);
 app.get("/health", (req, res) => res.json({ ok: true, service: "ShopHub API" }));
 
 // Route-lar

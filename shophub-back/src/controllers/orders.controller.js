@@ -140,14 +140,12 @@ async function checkout(req, res) {
     tx = new sql.Transaction(pool);
     await tx.begin();
     transactionStarted = true;
-    // const request = new sql.Request(tx);
 
     // 1) Məhsulları DB-dən oxu (price + stock)
-    // IN list üçün parametrlər:
     const ids = [...new Set(cleanItems.map((x) => x.productId))];
     const productsRequest = new sql.Request(tx);
-    const inParams = ids.map((_, i) => `@p${i}`).join(", ");
-    ids.forEach((id, i) => productsRequest.input(`p${i}`, sql.Int, id));
+    const inParams = ids.map((_, i) => `@pid${i}`).join(", ");
+    ids.forEach((id, i) => productsRequest.input(`pid${i}`, sql.Int, id));
 
     // UPDLOCK/HOLDLOCK: stock update zamanı yarışın qarşısını alır
     const productsRes = await productsRequest.query(`
@@ -213,15 +211,15 @@ async function checkout(req, res) {
       const unitPrice = Number(prd.Price || 0);
       const lineTotal = unitPrice * item.qty;
 
-      // insert order item
       const itemRequest = new sql.Request(tx);
       await itemRequest
         .input("OrderId", sql.Int, orderId)
         .input("ProductId", sql.Int, item.productId)
         .input("Qty", sql.Int, item.qty)
-        .input("UnitPrice", sql.Decimal(18, 2), unitPrice).query(`
-          INSERT INTO OrderItems (OrderId, ProductId, Qty, UnitPrice)
-          VALUES (@OrderId, @ProductId, @Qty, @UnitPrice);
+        .input("UnitPrice", sql.Decimal(18, 2), unitPrice)
+        .input("LineTotal", sql.Decimal(18, 2), lineTotal).query(`
+          INSERT INTO OrderItems (OrderId, ProductId, Qty, UnitPrice, LineTotal)
+          VALUES (@OrderId, @ProductId, @Qty, @UnitPrice, @LineTotal);
         `);
 
       // decrement stock
