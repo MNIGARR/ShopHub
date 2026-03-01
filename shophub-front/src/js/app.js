@@ -190,7 +190,7 @@ function updateAuthUI() {
     if (authBtn) {
       authBtn.classList.remove("hidden");
       if (authBtnLabel) authBtnLabel.textContent = "Giriş / Qeydiyyat";
-      authBtn.href = "/login";
+      authBtn.href = "/src/pages/auth/login.html";
     }
     if (accountWrap) {
       accountWrap.classList.add("hidden");
@@ -234,7 +234,7 @@ function isAdmin() {
 // Auth modal open/close
 function openAuthModal() {
   // Redirect to login page instead of opening modal
-  window.location.href = "/login";
+  window.location.href = "/src/pages/auth/login.html";
 }
 
 function openResetPanel() {
@@ -985,7 +985,7 @@ function goAdmin() {
       message: "Admin üçün əvvəlcə daxil olun.",
       type: "warn",
     });
-    window.location.href = "/login"; // redirect instead of modal
+    window.location.href = "/src/pages/auth/login.html"; // redirect instead of modal
     return;
   }
   if (!isAdmin()) {
@@ -1199,7 +1199,7 @@ function bindEvents() {
 
     // require login
     if (!state.sessionUser) {
-      window.location.href = "/login";
+      window.location.href = "/src/pages/auth/login.html";
       return;
     }
 

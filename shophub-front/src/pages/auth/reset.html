@@ -10,7 +10,7 @@
   </div>
 
   <script type="module">
-    import { apiFetch } from "../../src/js/api/http.js";
+    import { apiFetch } from "/src/js/api/http.js"; // or use your apiFetch if module paths differ
 
     function getQuery(name) {
       return new URLSearchParams(window.location.search).get(name);

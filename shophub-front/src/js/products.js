@@ -10,10 +10,10 @@ const state = {
 };
 
 function renderPagination() {
-  const prevBtn = $("prevPage");
-  const nextBtn = $("nextPage");
-  const pageNumbers = $("pageNumbers");
-  const totalInfo = $("totalInfo");
+  const prevBtn = $("#prevPage");
+  const nextBtn = $("#nextPage");
+  const pageNumbers = $("#pageNumbers");
+  const totalInfo = $("#totalInfo");
 
   if (prevBtn) prevBtn.disabled = state.page <= 1;
   if (nextBtn) nextBtn.disabled = state.page >= state.totalPages;
@@ -40,7 +40,7 @@ function renderPagination() {
 }
 
 async function loadPage(page) {
-  const grid = $("productsGrid");
+  const grid = $("#productsGrid");
   if (!grid) return;
 
   try {
@@ -76,7 +76,7 @@ async function loadPage(page) {
   }
 }
 
-$("prevPage")?.addEventListener("click", () => loadPage(state.page - 1));
-$("nextPage")?.addEventListener("click", () => loadPage(state.page + 1));
+$("#prevPage")?.addEventListener("click", () => loadPage(state.page - 1));
+$("#nextPage")?.addEventListener("click", () => loadPage(state.page + 1));
 
 loadPage(1);

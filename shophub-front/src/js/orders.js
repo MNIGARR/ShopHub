@@ -1,5 +1,20 @@
 import { $ } from "./utils/dom.js";
 import { myOrders, getOrderById } from "./services/order.service.js";
+import { getToken } from "./services/auth.service.js";
+
+
+// function redirectToLogin() {
+//   window.location.href = "/login";
+// }
+
+function isAuthError(err) {
+  const message = String(err?.message || "").toLowerCase();
+  return (
+    message.includes("unauthorized") ||
+    message.includes("invalid token") ||
+    message.includes("sessiya bitib")
+  );
+}
 
 function normalizeOrdersPayload(payload) {
   if (Array.isArray(payload)) return payload;
@@ -7,8 +22,12 @@ function normalizeOrdersPayload(payload) {
 }
 
 async function loadOrders() {
-  const table = $("ordersTableBody");
-  if (!table) return;
+  if (!getToken()) {
+    redirectToLogin();
+    return;
+  }
+
+  const table = $("#ordersTableBody");  if (!table) return;
 
   try {
     const payload = await myOrders();
@@ -35,17 +54,22 @@ async function loadOrders() {
       );
     });
   } catch (err) {
+    if (isAuthError(err)) {
+      redirectToLogin();
+      return;
+    }
+
     table.innerHTML = `<tr><td colspan="5" class="text-red-500 p-4">${err.message}</td></tr>`;
   }
 }
 
 function closeModal() {
-  $("orderDetailModal")?.classList.add("hidden");
+  $("#orderDetailModal")?.classList.add("hidden");
 }
 
 async function showDetails(id) {
-  const modal = $("orderDetailModal");
-  const content = $("modalContent");
+  const modal = $("#orderDetailModal");
+  const content = $("#modalContent");
   if (!modal || !content) return;
 
   try {
@@ -70,6 +94,10 @@ async function showDetails(id) {
     `;
     modal.classList.remove("hidden");
   } catch (err) {
+    if (isAuthError(err)) {
+      redirectToLogin();
+      return;
+    }
     content.innerHTML = `<p class="text-red-500">${err.message}</p>`;
     modal.classList.remove("hidden");
   }

@@ -78,6 +78,7 @@
         <a href="/">Ana səhifə</a>
         <a href="/products">Məhsullar</a>
         <a href="/orders">Sifarişlərim</a>
+        
       </nav>
 
       <section class="hero">
@@ -97,9 +98,10 @@
           box.innerHTML = `
             <div class="row"><span class="k">İstifadəçi ID</span><strong>${u.id}</strong></div>
             <div class="row"><span class="k">Email</span><strong>${u.email}</strong></div>
-            <div class="row"><span class="k">Rol</span><span class="role">${u.role}</span></div>
+            
           `;
         })
+        // <div class="row"><span class="k">Rol</span><span class="role">${u.role}</span></div>
         .catch((e) => {
           box.innerHTML = `<p class="err">${e.message}</p>`;
         });

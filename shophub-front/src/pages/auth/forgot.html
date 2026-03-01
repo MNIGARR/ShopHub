@@ -10,7 +10,7 @@
   </div>
 
   <script type="module">
-    import { apiFetch } from "../../src/js/api/http.js"; // or use your apiFetch if module paths differ
+    import { apiFetch } from "/src/js/api/http.js"; // or use your apiFetch if module paths differ
 
     document.getElementById("fpSend").onclick = async () => {
       const email = (document.getElementById("fpEmail").value || "").trim();
