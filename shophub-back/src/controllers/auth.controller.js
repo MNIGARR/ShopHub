@@ -200,4 +200,46 @@ async function resetPassword(req, res) {
   }
 }
 
-module.exports = { register, login, me, forgotPassword, resetPassword };
+
+// >>> əlavə et: resetPasswordSimple funksiyası (auth.controller.js içərisinə)
+async function resetPasswordSimple(req, res) {
+  const { email, newPassword } = req.body;
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ message: "Düzgün email formatı tələb olunur" });
+  }
+  if (!newPassword || String(newPassword).length < 6) {
+    return res.status(400).json({ message: "Yeni şifrə minimum 6 simvol olmalıdır" });
+  }
+
+  // TƏHLÜKƏSİZLİK: bu endpoint təhlükəlidir; yalnız development və ya xüsusi env ilə icazə ver
+  const allow = (process.env.ALLOW_SIMPLE_RESET === "true") || (process.env.NODE_ENV === "development");
+  if (!allow) {
+    return res.status(403).json({ message: "Bu əməliyyat icazəsizdir" });
+  }
+
+  try {
+    const pool = await getPool();
+    const r = await pool.request()
+      .input("Email", sql.NVarChar(255), email)
+      .query("SELECT Id FROM Users WHERE Email=@Email");
+
+    const user = r.recordset?.[0];
+    if (!user) return res.status(404).json({ message: "İstifadəçi tapılmadı" });
+
+    const hash = await bcrypt.hash(String(newPassword), 10);
+    await pool.request()
+      .input("Id", sql.Int, user.Id)
+      .input("PasswordHash", sql.NVarChar(sql.MAX), hash)
+      .query("UPDATE Users SET PasswordHash=@PasswordHash WHERE Id=@Id");
+
+    return res.json({ message: "Şifrə uğurla yeniləndi" });
+  } catch (err) {
+    console.error("resetPasswordSimple error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+}
+
+// --- sonra module.exports-a resetPasswordSimple əlavə et ---
+// module.exports = { register, login, me, forgotPassword, resetPassword, resetPasswordSimple };
+module.exports = { register, login, me, forgotPassword, resetPassword, resetPasswordSimple };
