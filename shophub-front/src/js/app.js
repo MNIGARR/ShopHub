@@ -606,22 +606,25 @@ function productRating(p) {
   return Number(p.rating ?? p.Rating ?? 0);
 }
 
+// Gücləndirilmiş productImages funksiyası (p yoxlaması + optional chaining)
 function productImages(p) {
+  // If product is falsy, return placeholder immediately
+  if (!p) return ["https://via.placeholder.com/400x300?text=No+Image"];
+
   // 1. Direct string field (from admin form or simple backends)
-  const imgStr = p.image ?? p.Image ?? p.imageUrl;
+  const imgStr = p?.image ?? p?.Image ?? p?.imageUrl ?? p?.ImageUrl ?? p?.Url ?? p?.url;
   if (imgStr && typeof imgStr === "string" && imgStr.trim() !== "") {
     return [imgStr];
   }
 
   // 2. Array field: p.images or p.Images
-  const imgs = p.images ?? p.Images ?? [];
+  const imgs = p?.images ?? p?.Images ?? [];
   if (Array.isArray(imgs) && imgs.length > 0) {
-    // Backend returns [{url:"...", sortOrder:0}] objects — extract the URL strings
     return imgs
       .map((item) => {
         if (typeof item === "string") return item;
-        // Handle {url: "..."} or {Url: "..."} objects
-        return item?.url ?? item?.Url ?? "";
+        // Handle {url: "..."} or {Url: "..."} or {Url, Id, SortOrder}
+        return item?.url ?? item?.Url ?? item?.UrlString ?? "";
       })
       .filter(Boolean);
   }
