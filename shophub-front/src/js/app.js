@@ -1282,9 +1282,13 @@ init().catch((e) => {
   });
 });
 
+// təkmilləşdirilmiş uploadToCloudinary (debug ilə)
 async function uploadToCloudinary(file) {
   const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || "shophub_preset";
+
+  console.log("Cloudinary upload attempt", { cloudName, uploadPreset, fileName: file?.name });
+
   if (!cloudName) throw new Error("Cloudinary cloud name təyin edilməyib.");
 
   const formData = new FormData();
@@ -1298,11 +1302,14 @@ async function uploadToCloudinary(file) {
 
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(data?.error?.message || "Şəkil yükləmə alınmadı.");
+    console.error("Cloudinary response error:", res.status, data);
+    // Burada daha informativ error ver
+    throw new Error(data?.error?.message || `Cloudinary upload failed (${res.status})`);
   }
   return data.secure_url;
 }
 
+// --- submit handler (ən azı biri: URL və ya fayl) ---
 const addProductForm = document.getElementById("addProductForm");
 
 if (addProductForm) {
@@ -1313,21 +1320,28 @@ if (addProductForm) {
     const price = document.getElementById("admProdPrice").value;
     const stock = document.getElementById("admProdStock").value;
     const category = document.getElementById("admProdCategory").value;
-    const image = document.getElementById("admProdImage").value;
+    const imageUrlValue = document.getElementById("admProdImage").value.trim();
 
-    // Validasiya
+    // Validasiya: əsas sahələr
     if (!name || !price || !stock || !category) {
       showToast({ title: "Xəta", message: "Ad, qiymət, stok və kateqoriya mütləqdir.", type: "danger" });
       return;
     }
 
-    try {
-      let image = imageInput?.value?.trim() || "";
-      const imageFile = imageFileInput?.files?.[0];
-      if (!image && imageFile) {
-        image = await uploadToCloudinary(imageFile);
-      }
+    // Yeni: şəkil URL'i məcburi etmək istəyirsinizsə bu yoxlamanı saxlayın,
+    // əks halda burada boş buraxa bilərsiniz.
+    if (!imageUrlValue) {
+      showToast({ title: "Xəta", message: "Şəkil URL daxil edin.", type: "danger" });
+      return;
+    }
 
+    // Sadə URL yoxlaması (lazım olsa daha sərt regex istifadə edin)
+    if (!/^https?:\/\/.+/.test(imageUrlValue)) {
+      showToast({ title: "Xəta", message: "Etibarlı şəkil URL daxil edin.", type: "danger" });
+      return;
+    }
+
+    try {
       const catId = parseInt(category, 10);
       await apiFetch("/api/products", {
         method: "POST",
@@ -1336,7 +1350,7 @@ if (addProductForm) {
           price: parseFloat(price),
           stock: parseInt(stock, 10),
           categoryId: Number.isFinite(catId) && catId > 0 ? catId : null,
-          images: image ? [image] : [],
+          images: imageUrlValue ? [imageUrlValue] : [],
         },
       });
 
