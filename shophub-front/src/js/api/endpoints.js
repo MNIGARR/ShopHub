@@ -8,6 +8,7 @@ export const endpoints = {
     me: () => `${API_BASE}/auth/me`,
     forgotPassword: () => `${API_BASE}/auth/forgot-password`,
     resetPassword: () => `${API_BASE}/auth/reset-password`,
+    resetPasswordSimple: () => `${API_BASE}/auth/reset-password-simple`, // <-- əlavə olundu
   },
   products: {
     list: (query = "") => `${API_BASE}/products${query ? `?${query}` : ""}`,

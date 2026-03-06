@@ -1,30 +1,173 @@
 <!doctype html>
-<html>
-<head><meta charset="utf-8"><title>Şifrə sıfırla</title></head>
+<html lang="az">
+<head>
+  <meta charset="utf-8" />
+  <title>Şifrə sıfırla</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    /* Sadə stil - mövcud layihənə uyğunlaşdır */
+    .hidden { display: none !important; }
+    .glass { /* yalnız nümunə, səninki fərqli ola bilər */ }
+    .error { color: #f87171; }
+    .success { color: #34d399; }
+  </style>
+</head>
 <body>
-  <div>
-    <h2>Şifrə sıfırlama</h2>
-    <input id="fpEmail" type="email" placeholder="E-poçt" />
-    <button id="fpSend">Reset link göndər</button>
-    <div id="msg"></div>
+  <!-- STEP 1: Email göndər -->
+  <div id="stepSendCode" class="glass p-10 rounded-[32px] border border-white/5">
+    <h2>Şifrə Sıfırlama</h2>
+    <p>E-poçt ünvanınızı daxil edin, sizə sıfırlama kodu göndərəcəyik</p>
+
+    <div id="errorMsg1" class="hidden error"></div>
+    <div id="successMsg1" class="hidden success"></div>
+
+    <form id="sendCodeForm" class="space-y-4">
+      <div>
+        <label for="fpEmail">E-poçt</label>
+        <input id="fpEmail" type="email" placeholder="nümunə@email.com" />
+      </div>
+      <button id="fpSend" type="submit">Sıfırlama Kodu Göndər</button>
+    </form>
+  </div>
+
+  <!-- STEP 2: Kod və yeni şifrə -->
+  <div id="stepResetPassword" class="hidden glass p-10 rounded-[32px] border border-white/5">
+    <h2>Yeni Şifrə</h2>
+    <p>E-poçtunuza gələn kodu və yeni şifrənizi daxil edin</p>
+
+    <div id="errorMsg2" class="hidden error"></div>
+    <div id="successMsg2" class="hidden success"></div>
+
+    <form id="resetForm" class="space-y-4">
+      
+      <div>
+        <label>Yeni Şifrə</label>
+        <input id="newPassword" type="password" placeholder="Minimum 6 simvol" />
+      </div>
+      <div>
+        <label>Yeni Şifrənin Təkrarı</label>
+        <input id="confirmPassword" type="password" placeholder="Yeni şifrəni təkrar daxil edin" />
+      </div>
+      <button id="resetBtn" type="submit">Şifrəni Yenilə</button>
+    </form>
   </div>
 
   <script type="module">
-    import { apiFetch } from "/src/js/api/http.js"; // or use your apiFetch if module paths differ
+    import { endpoints } from "../js/api/endpoints.js";
+    import { apiFetch } from "../js/api/http.js";
 
-    document.getElementById("fpSend").onclick = async () => {
-      const email = (document.getElementById("fpEmail").value || "").trim();
+    let savedEmail = null; // burada saxlanacaq
+
+    // STEP1: send code
+    const sendForm = document.getElementById("sendCodeForm");
+    const fpEmail = document.getElementById("fpEmail");
+    const error1 = document.getElementById("errorMsg1");
+    const success1 = document.getElementById("successMsg1");
+
+    sendForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      error1.classList.add("hidden");
+      success1.classList.add("hidden");
+
+      const email = (fpEmail.value || "").trim();
       if (!/^\S+@\S+\.\S+$/.test(email)) {
-        document.getElementById("msg").textContent = "Düzgün email daxil edin";
+        error1.textContent = "Düzgün email daxil edin";
+        error1.classList.remove("hidden");
         return;
       }
+
       try {
-        const res = await apiFetch("/api/auth/forgot-password", { method: "POST", body: { email }, auth: false });
-        document.getElementById("msg").textContent = res.message || "If account exists, email sent";
+        // endpoints.auth.forgotPassword() layihə strukturu ilə uyğunlaşdır
+        await apiFetch(endpoints.auth.forgotPassword(), {
+          method: "POST",
+          body: { email },
+          auth: false,
+        });
+
+        savedEmail = email; // Uğurlu olduqda email-i saxla
+        success1.textContent = "Kod göndərildi. Emailinizi yoxlayın.";
+        success1.classList.remove("hidden");
+
+        // göstərin step2-ni, gizlədin step1-i
+        document.getElementById("stepSendCode").classList.add("hidden");
+        document.getElementById("stepResetPassword").classList.remove("hidden");
       } catch (err) {
-        document.getElementById("msg").textContent = err?.data?.message || err.message || "Xəta";
+        error1.textContent = err?.data?.message || err.message || "Xəta baş verdi";
+        error1.classList.remove("hidden");
       }
-    };
+    });
+
+    // STEP2: reset submit (istifadəçi kod və parol daxil edir)
+    const resetForm = document.getElementById("resetForm");
+    const error2 = document.getElementById("errorMsg2");
+    const success2 = document.getElementById("successMsg2");
+    const resetBtn = document.getElementById("resetBtn");
+
+    resetForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      error2.classList.add("hidden");
+      success2.classList.add("hidden");
+
+      const code = (document.getElementById("resetCode").value || "").trim();
+      const newPassword = (document.getElementById("newPassword").value || "");
+      const confirm = (document.getElementById("confirmPassword").value || "");
+
+      if (!/^\d{6}$/.test(code)) {
+        error2.textContent = "Kod yalnız 6 rəqəm olmalıdır";
+        error2.classList.remove("hidden");
+        return;
+      }
+      if (newPassword.length < 6) {
+        error2.textContent = "Şifrə minimum 6 simvol olmalıdır";
+        error2.classList.remove("hidden");
+        return;
+      }
+      if (newPassword !== confirm) {
+        error2.textContent = "Yeni şifrə və təkrarı üst-üstə düşmür";
+        error2.classList.remove("hidden");
+        return;
+      }
+
+      if (!savedEmail) {
+        // savedEmail yoxdursa bəlkə user səhifəni birbaşa açıb kodu yapışdırıb — bura bir xəbərdarlıq ver
+        error2.textContent = "Email məlum deyil. Yenidən email göndərin və ya link vasitəsilə sıfırlayın.";
+        error2.classList.remove("hidden");
+        return;
+      }
+
+      try {
+        resetBtn.disabled = true;
+        resetBtn.textContent = "Yenilənir...";
+
+        await apiFetch(endpoints.auth.resetPassword(), {
+          method: "POST",
+          body: { email: savedEmail, code, newPassword },
+        });
+
+        success2.textContent = "Şifrə uğurla yeniləndi";
+        success2.classList.remove("hidden");
+
+        setTimeout(() => {
+          window.location.href = "/src/pages/auth/login.html";
+        }, 1200);
+      } catch (err) {
+        error2.textContent = err?.data?.message || err.message || "Xəta";
+        error2.classList.remove("hidden");
+      } finally {
+        resetBtn.disabled = false;
+        resetBtn.textContent = "Şifrəni Yenilə";
+      }
+    });
+
+    // Əlavə: əgər səhifə token ilə açılıbsa (link-dən gələnlər üçün),
+    // burda token varsa redirect edərək token-based reset səhifəsinə yönlendirə bilərik.
+    const q = new URLSearchParams(window.location.search);
+    const token = q.get("token");
+    if (token) {
+      // Token varsa birbaşa ayrı reset.html-ə yönləndir
+      // (və ya burada token-based reset üçün UI göstərmək olar)
+      window.location.href = `/src/pages/auth/reset.html?token=${encodeURIComponent(token)}`;
+    }
   </script>
 </body>
 </html>

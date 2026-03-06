@@ -1,35 +1,85 @@
-<!doctype html>
+<!-- <!doctype html>
 <html>
-<head><meta charset="utf-8"><title>Yeni şifrə</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Yeni şifrə</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{font-family: Arial, sans-serif;padding:32px}
+    .field{margin-bottom:12px}
+    input{padding:8px;width:100%;box-sizing:border-box}
+    button{padding:10px 16px}
+    .error{color:#b91c1c;margin-top:8px}
+    .success{color:#15803d;margin-top:8px}
+  </style>
+</head>
 <body>
-  <div>
+  <div style="max-width:420px;margin:0 auto">
     <h2>Yeni şifrə təyin et</h2>
-    <input id="newPass" type="password" placeholder="Yeni şifrə (min 6 simvol)" />
+
+    <div class="field">
+      <label for="newPass">Yeni şifrə (min 6 simvol)</label>
+      <input id="newPass" type="password" placeholder="Yeni şifrə (min 6 simvol)" />
+    </div>
+
+    <div class="field">
+      <label for="confirmPass">Yeni şifrənin təkrarı</label>
+      <input id="confirmPass" type="password" placeholder="Yeni şifrəni təkrar daxil edin" />
+    </div>
+
     <button id="resetBtn">Təsdiq et</button>
-    <div id="msg"></div>
+    <div id="msg" class=""></div>
   </div>
 
   <script type="module">
-    import { apiFetch } from "/src/js/api/http.js"; // or use your apiFetch if module paths differ
+    import { apiFetch } from "/src/js/api/http.js";
 
     function getQuery(name) {
       return new URLSearchParams(window.location.search).get(name);
     }
 
     document.getElementById("resetBtn").onclick = async () => {
-      const pass = (document.getElementById("newPass").value || "").trim();
-      if (pass.length < 6) { document.getElementById("msg").textContent = "Şifrə min 6 simvol olmalıdır"; return; }
+      const passEl = document.getElementById("newPass");
+      const confirmEl = document.getElementById("confirmPass");
+      const msg = document.getElementById("msg");
+      msg.textContent = "";
+      msg.className = "";
+
+      const pass = (passEl.value || "").trim();
+      const confirm = (confirmEl.value || "").trim();
+
+      if (pass.length < 6) {
+        msg.textContent = "Şifrə min 6 simvol olmalıdır";
+        msg.className = "error";
+        return;
+      }
+
+      if (pass !== confirm) {
+        msg.textContent = "Yeni şifrə və təkrarı üst-üstə düşmür";
+        msg.className = "error";
+        return;
+      }
+
       const token = getQuery("token");
-      if (!token) { document.getElementById("msg").textContent = "Token yoxdur"; return; }
+      if (!token) {
+        msg.textContent = "Token yoxdur";
+        msg.className = "error";
+        return;
+      }
 
       try {
+        document.getElementById("resetBtn").disabled = true;
         const res = await apiFetch("/api/auth/reset-password", { method: "POST", body: { token, password: pass }, auth: false });
-        document.getElementById("msg").textContent = res.message || "Şifrə sıfırlandı";
-        setTimeout(() => window.location.href = "/login", 1500);
+        msg.textContent = res.message || "Şifrə sıfırlandı";
+        msg.className = "success";
+        setTimeout(() => window.location.href = "/src/pages/auth/login.html", 1500);
       } catch (err) {
-        document.getElementById("msg").textContent = err?.data?.message || err.message || "Xəta";
+        msg.textContent = err?.data?.message || err.message || "Xəta";
+        msg.className = "error";
+      } finally {
+        document.getElementById("resetBtn").disabled = false;
       }
     };
   </script>
 </body>
-</html>
+</html> -->

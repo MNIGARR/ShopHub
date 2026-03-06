@@ -5,60 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ShopHub | Premium Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="./src/css/style.css" />
     <style>
-      /* Sənin app.js-dəki .show klaslarını aktivləşdirmək üçün */
-      .backdrop {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.8);
-        backdrop-filter: blur(8px);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
+      :root {
+        --bg: #f6f5f2;
+        --surface: #ffffff;
+        --muted: #6a6a6a;
+        --text: #1f1f22;
+        --accent: #d86f00;
+        --line: #e6e4df;
       }
-      .backdrop.show {
-        display: flex !important;
+       * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
       }
-      #cartDrawer {
-        position: fixed;
-        top: 0;
-        right: 0;
-        height: 100%;
-        width: 400px;
-        max-width: 90%;
-        background: #111827;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-        z-index: 2000;
-        padding: 2rem;
-        border-left: 1px solid #374151;
+      .brand-serif { 
+        font-family: "Times New Roman", Georgia, serif; letter-spacing: .04em; 
       }
-      #cartDrawer.show {
-        transform: translateX(0);
+      .site-header { 
+        position: sticky; top: 0; z-index: 100; background: #faf9f6e8; backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); 
       }
-      .glass {
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+      .container { 
+        width: min(1180px, calc(100% - 48px)); margin: 0 auto; 
       }
-      .hidden {
-        display: none !important;
+      .hero { 
+        display: grid; grid-template-columns: 1fr 1fr; min-height: 500px; border-bottom: 1px solid var(--line); 
       }
+      .hero-copy { 
+        padding: 92px 54px; background: #f5f4f0; 
+      }
+      .hero-art { 
+        background: linear-gradient(#f0eee8 1px, transparent 1px), linear-gradient(90deg, #f0eee8 1px, transparent 1px); background-size: 36px 36px; 
+      }
+      .pill-btn { 
+        border: none; border-radius: 999px; padding: 13px 28px; font-weight: 600; cursor: pointer; transition: .2s; 
+      }
+      .pill-btn.dark { 
+        background: #121317; color: #fff; 
+      }
+      .pill-btn.dark:hover { 
+        transform: translateY(-1px); 
+      }
+      .pill-btn.light { 
+        background: #fff; color: var(--accent); 
+      }
+      .feature-row { 
+        display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; padding: 38px 0; 
+      }
+      .feature-card { 
+        text-align: center; padding: 10px 14px; 
+      }
+      .feature-icon { 
+        width: 58px; height: 58px; border-radius: 999px; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; background:#ffe8bf; color:#cf7600; font-size:24px; 
+      }
+      .shop-layout { 
+        display: grid; grid-template-columns: 260px 1fr; gap: 24px; margin-top: 38px; 
+      }
+      .filters, .collection-box, .product-card { 
+        background: var(--surface); border: 1px solid var(--line); border-radius: 14px; 
+      }
+      .filters { 
+        padding: 22px; height: fit-content; 
+      }
+      .filters input, .filters select { 
+        width:100%; border:1px solid #ddd9d1; background:#fff; border-radius:10px; padding:10px 12px; margin-bottom:10px; 
+      }
+      #productsGrid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 16px; }
+      .product-card { overflow: hidden; }
+      .product-thumb { aspect-ratio: 4/3; background: #f0efe9; }
+      .product-thumb img { width:100%; height:100%; object-fit: cover; }
+      .product-content { padding: 12px; }
+      .muted2 { color: var(--muted); }
+      .chip { border: 1px solid #ddd8ce; border-radius: 999px; padding: 5px 10px; font-size: 12px; color: var(--muted); }
+      .btn { border:1px solid #ddd8ce; background:#fff; color:#333; border-radius:999px; padding:8px 12px; cursor:pointer; }
+      .btn-primary { background:#121317; border-color:#121317; color:#fff; }
+      .promo { margin-top: 58px; background: var(--accent); color: #fff; text-align: center; padding: 72px 24px; }
+      .site-footer { background:#121317; color:#e4e4e4; margin-top:0; }
+      .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:28px; padding:50px 0 24px; }
+      .footer-grid a { color:#cfcfcf; text-decoration:none; display:block; margin:8px 0; font-size:14px; }
+      .hidden { display:none !important; }
+      .backdrop { position:fixed; inset:0; background:rgba(0,0,0,.62); display:none; align-items:center; justify-content:center; z-index:1000; }
+      .backdrop.show { display:flex !important; }
+      #cartDrawer { position:fixed; top:0; right:0; height:100%; width:400px; max-width:90%; background:#fff; transform:translateX(100%); transition:transform .3s ease; z-index:2000; padding:2rem; border-left:1px solid var(--line); color: var(--text); }
+      #cartDrawer.show { transform: translateX(0); }
+      .glass { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+      @media (max-width: 900px){ .hero{grid-template-columns:1fr}.shop-layout{grid-template-columns:1fr}.feature-row{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}.hero-copy{padding:62px 26px}.container{width:min(1180px,calc(100% - 28px));} }
+      
     </style>
   </head>
-  <body class="bg-[#0f172a] text-slate-200 min-h-screen font-sans">
-    <header
-      class="glass sticky top-0 z-[100] border-b border-white/5 backdrop-blur-xl bg-[#0f172a]/80"
-    >
+   <body>
+    <header class="site-header">
       <div
-        class="container mx-auto px-4 h-20 flex justify-between items-center"
-      >
+        class="container" style="height:78px;display:flex;justify-content:space-between;align-items:center;"      >
         <div
           id="navShopBtn"
-          class="flex items-center gap-2 cursor-pointer group"
-        >
+            class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:#15161a;color:#fff"        >
           <div
             class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20"
           >
@@ -79,18 +122,18 @@
               <path d="M16 10a4 4 0 0 1-8 0" />
             </svg>
           </div>
-          <span class="text-xl font-bold tracking-tight text-white uppercase"
-            >Shop<span class="text-blue-500">Hub</span></span
+          <span class="brand-serif" style="font-size:30px;font-weight:500;color:#222;"
+            >Shop<span style="color:#d86f00">Hub</span></span
           >
         </div>
 
         <nav
-          class="md:flex items-center gap-8 text-sm font-medium text-slate-400"
+          class="md:flex items-center gap-8 text-sm" style="color:#666;"
         >
-          <button id="navShopBtn2" class="hover:text-white transition-colors">
+          <button id="navShopBtn2" class="transition-colors" style="color:#555;">
             Mağaza
           </button>
-          <button id="navAdminBtn" class="hover:text-white transition-colors">
+          <button id="navAdminBtn" class="transition-colors" style="color:#555;">
             Admin Panel
           </button>
         </nav>
@@ -102,7 +145,7 @@
             <a
               id="authBtn"
               href="./src/pages/auth/login.html"
-              class="btn btn-sm bg-white/5 border border-white/10 px-4 py-2 rounded-lg text-xs hover:bg-white/10"
+              class="btn" style="font-size:12px;"
             >
               <span id="authBtnLabel">Giriş / Qeydiyyat</span>
             </a>
@@ -169,7 +212,7 @@
           </div>
           <button
             id="cartBtn"
-            class="relative p-2 hover:bg-white/5 rounded-full transition-colors"
+            class="relative p-2 rounded-full transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -199,95 +242,68 @@
     </header>
 
     <main class="container mx-auto px-4 py-10">
-      <section id="viewShop" class="space-y-10">
-        <div
-          class="glass p-12 rounded-[32px] text-center border border-white/5"
-        >
-          <h1 class="text-4xl md:text-5xl font-black text-white mb-4">
-            Müasir Onlayn Alış-veriş
-          </h1>
-          <p class="text-slate-400 max-w-2xl mx-auto mb-8">
-            ShopHub ilə ən son texnoloji məhsulları kəşf edin, səbətə əlavə edin
-            və sürətli sifariş yaradın.
-          </p>
-          <button
-            id="ctaBrowse"
-            class="bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-blue-600/30 hover:scale-105 transition-transform"
-          >
-            Məhsullara Bax
-          </button>
+      <section id="viewShop">
+        <div class="hero">
+          <div class="hero-copy">
+            <h1 class="brand-serif" style="font-size:74px;line-height:.95;margin:0 0 24px;">Timeless<br>Elegance</h1>
+            <p class="muted2" style="max-width:520px;font-size:31px;margin:0 0 30px;">
+              Discover curated premium pieces from ShopHub, crafted for everyday elegance.
+            </p>
+            <button id="ctaBrowse" class="pill-btn dark">Shop Collection →</button>
+          </div>
+          <div class="hero-art"></div>
         </div>
 
-        <div class="flex flex-col lg:flex-row gap-10">
-          <aside class="w-full lg:w-64 space-y-6 shrink-0">
-            <div class="glass p-6 rounded-2xl border border-white/5">
-              <h3 class="font-bold text-white mb-4">Axtarış</h3>
-              <input
-                id="searchInput"
-                class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500"
-                placeholder="Axtar..."
-              />
+         <div class="container feature-row">
+          <article class="feature-card"><div class="feature-icon">✧</div><h3>Premium Quality</h3><p class="muted2">Only the finest materials and product quality checks.</p></article>
+          <article class="feature-card"><div class="feature-icon">🛡</div><h3>Warranty</h3><p class="muted2">Support and confidence for your purchases.</p></article>
+          <article class="feature-card"><div class="feature-icon">🚚</div><h3>Fast Shipping</h3><p class="muted2">Quick and secure delivery on every order.</p></article>
+        </div>
 
-              <h3 class="font-bold text-white mt-8 mb-4">Kateqoriya</h3>
-              <select
-                id="categorySelect"
-                class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none"
-              ></select>
+             <div class="container collection-box" style="padding:34px;">
+          <div style="text-align:center;margin-bottom:22px;">
+            <h2 class="brand-serif" style="font-size:50px;margin:0 0 8px;">Featured Collection</h2>
+            <p class="muted2" style="margin:0;">Explore products handpicked to match modern style.</p>
+          </div>
 
-              <h3 class="font-bold text-white mt-8 mb-4">Qiymət</h3>
-              <div class="flex gap-2">
-                <input
-                  id="minPrice"
-                  type="number"
-                  class="w-1/2 bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs"
-                  placeholder="Min"
-                />
-                <input
-                  id="maxPrice"
-                  type="number"
-                  class="w-1/2 bg-black/20 border border-white/10 rounded-xl px-3 py-2 text-xs"
-                  placeholder="Max"
-                />
+               <div class="shop-layout">
+            <aside class="filters">
+              <h3>Axtarış</h3>
+              <input id="searchInput" placeholder="Axtar..." />
+              <h3>Kateqoriya</h3>
+              <select id="categorySelect"></select>
+              <h3>Qiymət</h3>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <input id="minPrice" type="number" placeholder="Min" />
+                <input id="maxPrice" type="number" placeholder="Max" />
               </div>
             </div>
           </aside>
 
-          <div class="flex-1">
-            <div class="flex justify-between items-center mb-8">
-              <span
-                id="resultCount"
-                class="text-sm text-slate-500 uppercase tracking-widest font-semibold"
-                >0 məhsul tapıldı</span
-              >
-              <select
-                id="sortSelect"
-                class="bg-transparent border-none text-sm text-slate-400 outline-none"
-              >
+                       <select id="sortSelect" style="margin-top:10px;">
                 <option value="featured">Sıralama</option>
                 <option value="price_asc">Ucuzdan bahaya</option>
                 <option value="price_desc">Bahadan ucuza</option>
               </select>
-            </div>
-
-            <div
-              id="productsGrid"
-              class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
-            ></div>
-
-            <div
-              id="emptyState"
-              class="hidden glass p-20 text-center rounded-3xl border border-dashed border-white/10"
-            >
-              <p class="text-slate-500">Heç bir məhsul tapılmadı.</p>
-              <button
-                id="resetFiltersBtn"
-                class="text-blue-500 text-sm mt-4 underline"
-              >
-                Filtrləri təmizlə
-              </button>
+            <button id="resetFiltersBtn" class="btn" style="width:100%;">Filtrləri təmizlə</button>
+            </aside>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <span id="resultCount" class="muted2">0 nəticə</span>
+              </div>
+              <div id="productsGrid"></div>
+              <div id="emptyState" class="hidden" style="padding:32px;text-align:center;">
+                <p class="muted2">Heç bir məhsul tapılmadı.</p>
+              </div>
             </div>
           </div>
         </div>
+      </section>
+
+      <section class="promo">
+        <h2 class="brand-serif" style="font-size:52px;margin:0 0 14px;">Find Your Perfect Piece</h2>
+        <p style="margin:0 0 24px;opacity:.92;">From essentials to statement products, discover your next favorite.</p>
+        <button class="pill-btn light">Explore Collection →</button>
       </section>
 
       <section id="viewAdmin" class="hidden space-y-10">
@@ -688,13 +704,19 @@
       </div>
     </div>
 
-    <footer
-      class="container mx-auto px-4 py-20 text-center border-t border-white/5 mt-20"
-    >
-      <p class="text-slate-500 text-sm">
-        © <span id="year">2026</span> ShopHub E-Commerce Platform. Müəllif
-        hüquqları qorunur.
-      </p>
+     <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <div class="brand-serif" style="font-size:30px;margin-bottom:8px;color:#fff;">SHOPHUB</div>
+          <p style="color:#a7a7a7;max-width:320px;">Premium shopping experience crafted for modern customers.</p>
+        </div>
+        <div><h4>Shop</h4><a href="#">Rings</a><a href="#">Necklaces</a><a href="#">Earrings</a></div>
+        <div><h4>Customer Service</h4><a href="#">Contact</a><a href="#">Shipping</a><a href="#">Returns</a></div>
+        <div><h4>Connect</h4><a href="#">Instagram</a><a href="#">Twitter</a><a href="#">Facebook</a></div>
+      </div>
+      <div class="container" style="border-top:1px solid #26272c;padding:16px 0 26px;color:#888;text-align:center;">
+        y© <span id="year">2026</span> ShopHub. All rights reserved.
+      </div>
     </footer>
 
     <script type="module" src="./src/js/app.js"></script>
