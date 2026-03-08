@@ -11,10 +11,12 @@ const routeMap = {
   "/register": "src/pages/auth/register.html",
   "/profile": "src/pages/profile.html",
   "/orders": "src/pages/orders.html",
-  "/admin": "src/pages/admin/products.html",
+  "/admin": "src/pages/admin/dashboard.html",
+  "/admin/dashboard": "src/pages/admin/dashboard.html",
   "/admin/products": "src/pages/admin/products.html",
   "/admin/orders": "src/pages/admin/orders.html",
   "/admin/users": "src/pages/admin/users.html",
+  "/admin/categories": "src/pages/admin/categories.html",
 };
 
 function routePlugin() {

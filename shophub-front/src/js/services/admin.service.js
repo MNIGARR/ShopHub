@@ -45,3 +45,25 @@ export const deleteProduct = async (id) =>
   apiFetch(endpoints.products.remove(id), {
     method: "DELETE",
   });
+
+export const listCategories = async () => {
+  const data = await apiFetch(endpoints.categories.list());
+  return data.items || [];
+};
+
+export const createCategory = async (name) =>
+  apiFetch(endpoints.categories.create(), {
+    method: "POST",
+    body: { name },
+  });
+
+export const updateCategory = async (id, name) =>
+  apiFetch(endpoints.categories.update(id), {
+    method: "PUT",
+    body: { name },
+  });
+
+export const deleteCategory = async (id) =>
+  apiFetch(endpoints.categories.remove(id), {
+    method: "DELETE",
+  });

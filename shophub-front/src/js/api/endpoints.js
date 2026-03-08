@@ -29,4 +29,10 @@ export const endpoints = {
     setActive: (id) => `${API_BASE}/users/${id}/active`,
     setRole: (id) => `${API_BASE}/users/${id}/role`,
   },
+  categories: {
+    list: () => `${API_BASE}/categories`,
+    create: () => `${API_BASE}/categories`,
+    update: (id) => `${API_BASE}/categories/${id}`,
+    remove: (id) => `${API_BASE}/categories/${id}`,
+  },
 };
