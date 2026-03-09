@@ -126,14 +126,10 @@ const state = {
 // UI: view switch
 function showView(name) {
   const shop = $("viewShop");
-  const admin = $("viewAdmin");
-  if (!shop || !admin) return;
+  if (!shop) return;
 
-  if (name === "admin") {
-    shop.classList.add("hidden");
-    admin.classList.remove("hidden");
-  } else {
-    admin.classList.add("hidden");
+
+  if (name === "shop") {
     shop.classList.remove("hidden");
   }
 }
@@ -999,10 +995,7 @@ function goAdmin() {
     });
     return;
   }
-  showView("admin");
-  renderAdminTable();
-  loadCategories();
-  loadAdminData();
+  window.location.href = "/admin/dashboard";
 }
 
 // Bind UI events
