@@ -1,3 +1,4 @@
+import { requireAdminAccess } from "../guard.js";
 import { renderAdminLayout, showPageError } from "../layout.js";
 import { listCategories, createCategory, updateCategory, deleteCategory } from "../../services/admin.service.js";
 
