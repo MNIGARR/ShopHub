@@ -62,6 +62,24 @@ function showToast({ title, message, type = "success" }) {
 
 // Auth storage
 const AUTH_KEY = "shophub_auth_v1";
+const THEME_KEY = "shophub_theme";
+
+function applyTheme(theme) {
+  const next = theme === "dark" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem(THEME_KEY, next);
+  const themeBtn = document.getElementById("themeToggle");
+  if (themeBtn) {
+    themeBtn.textContent = next === "dark" ? "☀" : "☾";
+    themeBtn.setAttribute("aria-label", next === "dark" ? "Switch to light mode" : "Switch to dark mode");
+  }
+}
+
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  applyTheme(saved || (prefersDark ? "dark" : "light"));
+}
 
 function getAuth() {
   return safeJsonParse(localStorage.getItem(AUTH_KEY), null);
@@ -1000,6 +1018,13 @@ function goAdmin() {
 
 // Bind UI events
 function bindEvents() {
+
+  $("themeToggle") &&
+    ($("themeToggle").onclick = () => {
+      const current = document.documentElement.getAttribute("data-theme") || "light";
+      applyTheme(current === "dark" ? "light" : "dark");
+    });
+
   // footer year
   $("year") && ($("year").textContent = String(new Date().getFullYear()));
 
@@ -1257,6 +1282,7 @@ function bindEvents() {
 
 // Boot
 async function init() {
+  initTheme();
   bindEvents();
   loadCart();
   await loadSessionFromToken(); // token varsa sessiyanı real yoxlayır

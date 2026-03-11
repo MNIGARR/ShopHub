@@ -13,102 +13,371 @@
         --text: #1f1f22;
         --accent: #d86f00;
         --line: #e6e4df;
+        --header-bg: #faf9f6e8;
+        --input-bg: #fff;
       }
-       * { box-sizing: border-box; }
+      [data-theme="dark"] {
+        --bg: #101010;
+        --surface: #161616;
+        --muted: #a3a3a3;
+        --text: #f5f5f5;
+        --accent: #e07a12;
+        --line: #2a2a2a;
+        --header-bg: #131313e6;
+        --input-bg: #1b1b1b;
+      }
+      * {
+        box-sizing: border-box;
+      }
       body {
         margin: 0;
-        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          sans-serif;
         background: var(--bg);
         color: var(--text);
       }
-      .brand-serif { 
-        font-family: "Times New Roman", Georgia, serif; letter-spacing: .04em; 
+      .brand-serif {
+        font-family: "Times New Roman", Georgia, serif;
+        letter-spacing: 0.04em;
       }
-      .site-header { 
-        position: sticky; top: 0; z-index: 100; background: #faf9f6e8; backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); 
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--header-bg);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--line);
       }
-      .container { 
-        width: min(1180px, calc(100% - 48px)); margin: 0 auto; 
+      .brand-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text);
+        text-decoration: none;
+        cursor: pointer;
       }
-      .hero { 
-        display: grid; grid-template-columns: 1fr 1fr; min-height: 500px; border-bottom: 1px solid var(--line); 
+      .brand-mark {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: #1e1e1e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #f6f6f6;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        border: 1px solid #2b2b2b;
       }
-      .hero-copy { 
-        padding: 92px 54px; background: #f5f4f0; 
+      .brand-word {
+        font-size: 48px;
+        line-height: 1;
       }
-      .hero-art { 
-        background: linear-gradient(#f0eee8 1px, transparent 1px), linear-gradient(90deg, #f0eee8 1px, transparent 1px); background-size: 36px 36px; 
+      .theme-toggle {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--text);
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
       }
-      .pill-btn { 
-        border: none; border-radius: 999px; padding: 13px 28px; font-weight: 600; cursor: pointer; transition: .2s; 
+      .container {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
       }
-      .pill-btn.dark { 
-        background: #121317; color: #fff; 
+      .hero {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 500px;
+        border-bottom: 1px solid var(--line);
       }
-      .pill-btn.dark:hover { 
-        transform: translateY(-1px); 
+      .hero-copy {
+        padding: 92px 54px;
+        background: color-mix(in srgb, var(--bg) 85%, #fff 15%);
       }
-      .pill-btn.light { 
-        background: #fff; color: var(--accent); 
+      .hero-art {
+        background:
+          linear-gradient(
+            color-mix(in srgb, var(--line) 70%, transparent) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--line) 70%, transparent) 1px,
+            transparent 1px
+          );
+        background-size: 36px 36px;
       }
-      .feature-row { 
-        display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; padding: 38px 0; 
+      .pill-btn {
+        border: none;
+        border-radius: 999px;
+        padding: 13px 28px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
       }
-      .feature-card { 
-        text-align: center; padding: 10px 14px; 
+      .pill-btn.dark {
+        background: #1a1a1a;
+        color: #fff;
+        border: 1px solid #2e2e2e;
       }
-      .feature-icon { 
-        width: 58px; height: 58px; border-radius: 999px; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; background:#ffe8bf; color:#cf7600; font-size:24px; 
+      .pill-btn.dark:hover {
+        transform: translateY(-1px);
       }
-      .shop-layout { 
-        display: grid; grid-template-columns: 260px 1fr; gap: 24px; margin-top: 38px; 
+      .pill-btn.light {
+        background: #fff;
+        color: var(--accent);
       }
-      .filters, .collection-box, .product-card { 
-        background: var(--surface); border: 1px solid var(--line); border-radius: 14px; 
+      .feature-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        padding: 38px 0;
       }
-      .filters { 
-        padding: 22px; height: fit-content; 
+      .feature-card {
+        text-align: center;
+        padding: 10px 14px;
       }
-      .filters input, .filters select { 
-        width:100%; border:1px solid #ddd9d1; background:#fff; border-radius:10px; padding:10px 12px; margin-bottom:10px; 
+      .feature-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 14px;
+        background: #3a1f0c;
+        color: #ffb347;
+        font-size: 24px;
       }
-      #productsGrid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 16px; }
-      .product-card { overflow: hidden; }
-      .product-thumb { aspect-ratio: 4/3; background: #f0efe9; }
-      .product-thumb img { width:100%; height:100%; object-fit: cover; }
-      .product-content { padding: 12px; }
-      .muted2 { color: var(--muted); }
-      .chip { border: 1px solid #ddd8ce; border-radius: 999px; padding: 5px 10px; font-size: 12px; color: var(--muted); }
-      .btn { border:1px solid #ddd8ce; background:#fff; color:#333; border-radius:999px; padding:8px 12px; cursor:pointer; }
-      .btn-primary { background:#121317; border-color:#121317; color:#fff; }
-      .promo { margin-top: 58px; background: var(--accent); color: #fff; text-align: center; padding: 72px 24px; }
-      .site-footer { background:#121317; color:#e4e4e4; margin-top:0; }
-      .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:28px; padding:50px 0 24px; }
-      .footer-grid a { color:#cfcfcf; text-decoration:none; display:block; margin:8px 0; font-size:14px; }
-      .hidden { display:none !important; }
-      .backdrop { position:fixed; inset:0; background:rgba(0,0,0,.62); display:none; align-items:center; justify-content:center; z-index:1000; }
-      .backdrop.show { display:flex !important; }
-      #cartDrawer { position:fixed; top:0; right:0; height:100%; width:400px; max-width:90%; background:#fff; transform:translateX(100%); transition:transform .3s ease; z-index:2000; padding:2rem; border-left:1px solid var(--line); color: var(--text); }
-      #cartDrawer.show { transform: translateX(0); }
-      .glass { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
-      @media (max-width: 900px){ .hero{grid-template-columns:1fr}.shop-layout{grid-template-columns:1fr}.feature-row{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}.hero-copy{padding:62px 26px}.container{width:min(1180px,calc(100% - 28px));} }
-      
+      .shop-layout {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 24px;
+        margin-top: 38px;
+      }
+      .filters,
+      .collection-box,
+      .product-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+      }
+      .filters {
+        padding: 22px;
+        height: fit-content;
+      }
+      .filters input,
+      .filters select {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--input-bg);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+      }
+      .filters h3 {
+        margin: 0 0 8px;
+        font-size: 31px;
+      }
+      .search-wrap {
+        position: relative;
+        margin-bottom: 12px;
+      }
+      .search-wrap input {
+        padding-left: 42px;
+        margin: 0;
+      }
+      .search-ico {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+      }
+      .filter-actions {
+        margin-top: 8px;
+        display: grid;
+        gap: 10px;
+      }
+      .sort-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 10px;
+      }
+      #productsGrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 16px;
+      }
+      .product-card {
+        overflow: hidden;
+      }
+      .product-thumb {
+        aspect-ratio: 4/3;
+        background: #f0efe9;
+      }
+      .product-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .product-content {
+        padding: 12px;
+      }
+      .muted2 {
+        color: var(--muted);
+      }
+      .chip {
+        border: 1px solid #ddd8ce;
+        border-radius: 999px;
+        padding: 5px 10px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .btn {
+        border: 1px solid #ddd8ce;
+        background: #fff;
+        color: #333;
+        border-radius: 999px;
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+
+      [data-theme="dark"] .btn {
+        border-color: var(--line);
+        background: var(--input-bg);
+        color: var(--text);
+      }
+      [data-theme="dark"] .hero-copy {
+        background: #121212;
+      }
+      [data-theme="dark"] .hero-art {
+        opacity: 0.35;
+      }
+      [data-theme="dark"] .collection-box {
+        background: #0f0f0f;
+      }
+      .btn-primary {
+        background: #1a1a1a;
+        border-color: #2e2e2e;
+        color: #fff;
+      }
+      .promo {
+        margin-top: 58px;
+        background: var(--accent);
+        color: #fff;
+        text-align: center;
+        padding: 72px 24px;
+      }
+      .site-footer {
+        background: #121317;
+        color: #e4e4e4;
+        margin-top: 0;
+      }
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 28px;
+        padding: 50px 0 24px;
+      }
+      .footer-grid a {
+        color: #cfcfcf;
+        text-decoration: none;
+        display: block;
+        margin: 8px 0;
+        font-size: 14px;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.62);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+      .backdrop.show {
+        display: flex !important;
+      }
+      #cartDrawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 400px;
+        max-width: 90%;
+        background: var(--surface);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        z-index: 2000;
+        padding: 2rem;
+        border-left: 1px solid var(--line);
+        color: var(--text);
+      }
+      #cartDrawer.show {
+        transform: translateX(0);
+      }
+      .glass {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+      }
+      @media (max-width: 900px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+        .shop-layout {
+          grid-template-columns: 1fr;
+        }
+        .feature-row {
+          grid-template-columns: 1fr;
+        }
+        .footer-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .hero-copy {
+          padding: 62px 26px;
+        }
+        .container {
+          width: min(1180px, calc(100% - 28px));
+        }
+        .brand-word {
+          font-size: 40px;
+        }
+      }
     </style>
   </head>
-   <body>
+  <body>
     <header class="site-header">
       <div
-        class="container" style="height:78px;display:flex;justify-content:space-between;align-items:center;"      >
-        <div
-          id="navShopBtn"
-            class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:#15161a;color:#fff"        >
-          <div
-            class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20"
-          >
+        class="container"
+        style="
+          height: 78px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <a id="navShopBtn" class="brand-link">
+          <div class="brand-mark">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
+              width="22"
+              height="22"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -117,35 +386,38 @@
               stroke-linejoin="round"
               class="text-white"
             >
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-              <path d="M3 6h18" />
-              <path d="M16 10a4 4 0 0 1-8 0" />
+              <path
+                d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"
+                stroke="#f5f5f5"
+              />
+              <path d="M3 6h18" stroke="#f5f5f5" />
+              <path d="M16 10a4 4 0 0 1-8 0" stroke="#e07a12" />
             </svg>
           </div>
-          <span class="brand-serif" style="font-size:30px;font-weight:500;color:#222;"
-            >Shop<span style="color:#d86f00">Hub</span></span
-          >
-        </div>
+          <span class="brand-serif brand-word"
+            >Shop<span style="color: #e07a12">Hub</span>
+          </span>
+        </a>
 
-        <nav
-          class="md:flex items-center gap-8 text-sm" style="color:#666;"
-        >
-          <button id="navShopBtn2" class="transition-colors" style="color:#555;">
+        <nav class="md:flex items-center gap-8 text-sm muted2">
+          <button id="navShopBtn2" class="transition-colors muted2">
             Mağaza
           </button>
-          <button id="navAdminBtn" class="transition-colors" style="color:#555;">
+          <button id="navAdminBtn" class="transition-colors muted2">
             Admin Panel
           </button>
         </nav>
 
         <div class="flex items-center gap-4">
+          <button id="navAdminBtn" class="transition-colors muted2"></button>
           <!-- replace the current authBtn anchor with this block -->
           <div class="relative">
             <!-- Login link (shown when not logged in) -->
             <a
               id="authBtn"
               href="./src/pages/auth/login.html"
-              class="btn" style="font-size:12px;"
+              class="btn"
+              style="font-size: 12px"
             >
               <span id="authBtnLabel">Giriş / Qeydiyyat</span>
             </a>
@@ -245,54 +517,93 @@
       <section id="viewShop">
         <div class="hero">
           <div class="hero-copy">
-            <h1 class="brand-serif" style="font-size:74px;line-height:.95;margin:0 0 24px;">Timeless<br>Elegance</h1>
-            <p class="muted2" style="max-width:520px;font-size:31px;margin:0 0 30px;">
-              Discover curated premium pieces from ShopHub, crafted for everyday elegance.
+            <h1
+              class="brand-serif"
+              style="font-size: 74px; line-height: 0.95; margin: 0 0 24px"
+            >
+              Timeless<br />Elegance
+            </h1>
+            <p
+              class="muted2"
+              style="max-width: 520px; font-size: 31px; margin: 0 0 30px"
+            >
+              Discover curated premium pieces from ShopHub, crafted for everyday
+              elegance.
             </p>
-            <button id="ctaBrowse" class="pill-btn dark">Shop Collection →</button>
+            <button id="ctaBrowse" class="pill-btn dark">
+              Shop Collection →
+            </button>
           </div>
           <div class="hero-art"></div>
         </div>
 
-         <div class="container feature-row">
-          <article class="feature-card"><div class="feature-icon">✧</div><h3>Premium Quality</h3><p class="muted2">Only the finest materials and product quality checks.</p></article>
-          <article class="feature-card"><div class="feature-icon">🛡</div><h3>Warranty</h3><p class="muted2">Support and confidence for your purchases.</p></article>
-          <article class="feature-card"><div class="feature-icon">🚚</div><h3>Fast Shipping</h3><p class="muted2">Quick and secure delivery on every order.</p></article>
+        <div class="container feature-row">
+          <article class="feature-card">
+            <div class="feature-icon">✧</div>
+            <h3>Premium Quality</h3>
+            <p class="muted2">
+              Only the finest materials and product quality checks.
+            </p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">🛡</div>
+            <h3>Warranty</h3>
+            <p class="muted2">Support and confidence for your purchases.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">🚚</div>
+            <h3>Fast Shipping</h3>
+            <p class="muted2">Quick and secure delivery on every order.</p>
+          </article>
         </div>
 
-             <div class="container collection-box" style="padding:34px;">
-          <div style="text-align:center;margin-bottom:22px;">
-            <h2 class="brand-serif" style="font-size:50px;margin:0 0 8px;">Featured Collection</h2>
-            <p class="muted2" style="margin:0;">Explore products handpicked to match modern style.</p>
+        <div class="container collection-box" style="padding: 34px">
+          <div style="text-align: center; margin-bottom: 22px">
+            <h2 class="brand-serif" style="font-size: 50px; margin: 0 0 8px">
+              Featured Collection
+            </h2>
+            <p class="muted2" style="margin: 0">
+              Explore products handpicked to match modern style.
+            </p>
           </div>
 
-               <div class="shop-layout">
+          <div class="shop-layout">
             <aside class="filters">
               <h3>Axtarış</h3>
-              <input id="searchInput" placeholder="Axtar..." />
+              <div class="search-wrap">
+                <span class="search-ico">⌕</span>
+                <input id="searchInput" placeholder="Məhsul axtar..." />
+              </div>
               <h3>Kateqoriya</h3>
               <select id="categorySelect"></select>
               <h3>Qiymət</h3>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px"
+              >
                 <input id="minPrice" type="number" placeholder="Min" />
                 <input id="maxPrice" type="number" placeholder="Max" />
               </div>
-            </div>
-          </aside>
-
-                       <select id="sortSelect" style="margin-top:10px;">
-                <option value="featured">Sıralama</option>
-                <option value="price_asc">Ucuzdan bahaya</option>
-                <option value="price_desc">Bahadan ucuza</option>
-              </select>
-            <button id="resetFiltersBtn" class="btn" style="width:100%;">Filtrləri təmizlə</button>
+              <div class="filter-actions">
+                <select id="sortSelect">
+                  <option value="featured">Sıralama</option>
+                  <option value="price_asc">Ucuzdan bahaya</option>
+                  <option value="price_desc">Bahadan ucuza</option>
+                </select>
+                <button id="resetFiltersBtn" class="btn" style="width: 100%">
+                  Filtrləri təmizlə
+                </button>
+              </div>
             </aside>
             <div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <div class="sort-bar">
                 <span id="resultCount" class="muted2">0 nəticə</span>
               </div>
               <div id="productsGrid"></div>
-              <div id="emptyState" class="hidden" style="padding:32px;text-align:center;">
+              <div
+                id="emptyState"
+                class="hidden"
+                style="padding: 32px; text-align: center"
+              >
                 <p class="muted2">Heç bir məhsul tapılmadı.</p>
               </div>
             </div>
@@ -301,12 +612,14 @@
       </section>
 
       <section class="promo">
-        <h2 class="brand-serif" style="font-size:52px;margin:0 0 14px;">Find Your Perfect Piece</h2>
-        <p style="margin:0 0 24px;opacity:.92;">From essentials to statement products, discover your next favorite.</p>
+        <h2 class="brand-serif" style="font-size: 52px; margin: 0 0 14px">
+          Find Your Perfect Piece
+        </h2>
+        <p style="margin: 0 0 24px; opacity: 0.92">
+          From essentials to statement products, discover your next favorite.
+        </p>
         <button class="pill-btn light">Explore Collection →</button>
       </section>
-
-      
     </main>
 
     <div id="drawerBackdrop" class="backdrop z-[1500]"></div>
@@ -525,17 +838,42 @@
       </div>
     </div>
 
-     <footer class="site-footer">
+    <footer class="site-footer">
       <div class="container footer-grid">
         <div>
-          <div class="brand-serif" style="font-size:30px;margin-bottom:8px;color:#fff;">SHOPHUB</div>
-          <p style="color:#a7a7a7;max-width:320px;">Premium shopping experience crafted for modern customers.</p>
+          <div
+            class="brand-serif"
+            style="font-size: 30px; margin-bottom: 8px; color: #fff"
+          >
+            SHOPHUB
+          </div>
+          <p style="color: #a7a7a7; max-width: 320px">
+            Premium shopping experience crafted for modern customers.
+          </p>
         </div>
-        <div><h4>Shop</h4><a href="#">Rings</a><a href="#">Necklaces</a><a href="#">Earrings</a></div>
-        <div><h4>Customer Service</h4><a href="#">Contact</a><a href="#">Shipping</a><a href="#">Returns</a></div>
-        <div><h4>Connect</h4><a href="#">Instagram</a><a href="#">Twitter</a><a href="#">Facebook</a></div>
+        <div>
+          <h4>Shop</h4>
+          <a href="#">Rings</a><a href="#">Necklaces</a><a href="#">Earrings</a>
+        </div>
+        <div>
+          <h4>Customer Service</h4>
+          <a href="#">Contact</a><a href="#">Shipping</a><a href="#">Returns</a>
+        </div>
+        <div>
+          <h4>Connect</h4>
+          <a href="#">Instagram</a><a href="#">Twitter</a
+          ><a href="#">Facebook</a>
+        </div>
       </div>
-      <div class="container" style="border-top:1px solid #26272c;padding:16px 0 26px;color:#888;text-align:center;">
+      <div
+        class="container"
+        style="
+          border-top: 1px solid #26272c;
+          padding: 16px 0 26px;
+          color: #888;
+          text-align: center;
+        "
+      >
         y© <span id="year">2026</span> ShopHub. All rights reserved.
       </div>
     </footer>

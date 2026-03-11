@@ -1,42 +1,14 @@
+
 <!doctype html>
 <html lang="az">
-<head><meta charset="UTF-8"><title>Admin | Sifarişlər</title></head>
-<body>
-  <h1>Admin — Sifarişlər</h1>
-  <a href="/admin/products">Məhsullar</a> | <a href="/admin/users">İstifadəçilər</a>
-  <table border="1" cellpadding="8">
-    <thead><tr><th>ID</th><th>İstifadəçi</th><th>Status</th><th>Total</th><th>Dəyiş</th></tr></thead>
-    <tbody id="rows"></tbody>
-  </table>
-  <script type="module">
-    import { listAdminOrders, updateOrderStatus } from "../../js/services/admin.service.js";
-    const tbody = document.getElementById("rows");
-    const statuses = ["pending", "paid", "shipped", "delivered", "cancelled"];
-
-    async function load() {
-      const items = await listAdminOrders();
-      tbody.innerHTML = items.map(o => `
-        <tr>
-          <td>#${o.Id}</td>
-          <td>${o.UserEmail}</td>
-          <td>${o.Status}</td>
-          <td>${o.Total}</td>
-          <td>
-            <select data-id="${o.Id}">
-              ${statuses.map(s => `<option ${s===o.Status?"selected":""} value="${s}">${s}</option>`).join("")}
-            </select>
-          </td>
-        </tr>`).join("");
-
-      tbody.querySelectorAll("select").forEach((el) => {
-        el.addEventListener("change", async () => {
-          await updateOrderStatus(Number(el.dataset.id), el.value);
-          await load();
-        });
-      });
-    }
-
-    load().catch((e) => (tbody.innerHTML = `<tr><td colspan="5">${e.message}</td></tr>`));
-  </script>
-</body>
+ <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin | Sifarişlər</title>
+    <link rel="stylesheet" href="/src/css/pages/admin.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/js/admin/pages/orders.js"></script>
+  </body>
 </html>
