@@ -7,6 +7,15 @@
   --line: #e6e4df;
 }
 
+[data-theme="dark"] {
+  --bg: #0b1220;
+  --surface: #101a2b;
+  --muted: #93a4bf;
+  --text: #e7edf7;
+  --accent: #ff9f3d;
+  --line: #243246;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -31,8 +40,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: #faf9f6e8;
-  backdrop-filter: blur(8px);
+  background: color-mix(in srgb, var(--bg) 92%, #ffffff 8%);  backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
 }
 
@@ -248,4 +256,83 @@ th {
   .admin-brand {
     font-size: 24px;
   }
+
+  .admin-global-nav {
+    display: none;
+  }
+
+  .admin-global-actions .btn {
+    display: none;
+  }
+}
+
+.admin-global-nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.admin-global-link {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.admin-global-link:hover,
+.admin-global-link.active {
+  color: var(--text);
+}
+
+.admin-global-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-toggle {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.account-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.account-btn:hover {
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+}
+
+.admin-link:hover {
+  background: color-mix(in srgb, var(--surface) 85%, #fff 15%);
+  border-color: var(--line);
+}
+
+.admin-link.active {
+  background: var(--text);
+  color: var(--surface);
+}
+
+.stat-card {
+  background: color-mix(in srgb, var(--surface) 88%, #fff 12%);
+}
+
+th {
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface) 90%, #fff 10%);
 }

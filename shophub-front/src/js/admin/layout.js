@@ -8,11 +8,33 @@ const links = [
   ["/admin/users", "İstifadəçilər"],
 ];
 
+const THEME_KEY = "shophub_theme";
+
+function applyTheme(theme) {
+  const next = theme === "dark" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem(THEME_KEY, next);
+
+  const themeBtn = document.getElementById("themeToggle");
+  if (themeBtn) {
+    themeBtn.textContent = next === "dark" ? "☀" : "☾";
+    themeBtn.setAttribute("aria-label", next === "dark" ? "Switch to light mode" : "Switch to dark mode");
+  }
+}
+
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  applyTheme(saved || (prefersDark ? "dark" : "light"));
+}
+
+
 export function renderAdminLayout({ pageTitle, contentHtml }) {
   const app = document.getElementById("app");
   const currentPath = window.location.pathname;
   const user = getUser();
 
+  initTheme();
   app.innerHTML = `
     <header class="admin-header">
       <div class="admin-container admin-header-row">
@@ -20,7 +42,21 @@ export function renderAdminLayout({ pageTitle, contentHtml }) {
           <span class="brand-mark">🛍️</span>
           <span class="brand-serif">Shop<span class="brand-accent">Hub</span></span>
         </a>
-        <a href="/" class="btn btn-light">Mağazaya qayıt</a>
+
+        <nav class="admin-global-nav" aria-label="Global navigation">
+          <a href="/" class="admin-global-link">Mağaza</a>
+          <a href="/admin" class="admin-global-link ${currentPath.startsWith("/admin") ? "active" : ""}">Admin Panel</a>
+        </nav>
+
+        <div class="admin-global-actions">
+          <button id="themeToggle" type="button" class="theme-toggle" aria-label="Switch to dark mode" title="Toggle theme">☾</button>
+          <button class="account-btn" type="button" aria-label="Hesab" title="${user?.email || "Admin"}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -49,6 +85,14 @@ export function renderAdminLayout({ pageTitle, contentHtml }) {
       </main>
     </div>
   `;
+
+  applyTheme(document.documentElement.getAttribute("data-theme") || "light");
+
+  document.getElementById("themeToggle")?.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme") || "light";
+    applyTheme(current === "dark" ? "light" : "dark");
+  });
+
 
   document.getElementById("logoutBtn")?.addEventListener("click", () => {
     logout();
