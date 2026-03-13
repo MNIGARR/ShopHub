@@ -1,7 +1,7 @@
 import { requireAdminAccess } from "../guard.js";
 import { renderAdminLayout, showPageError } from "../layout.js";
 import { getProductsPaginated, getProductById } from "../../services/product.service.js";
-import { createProduct, updateProduct, deleteProduct } from "../../services/admin.service.js";
+import * as adminService from "../../services/admin.service.js";
 import { uploadImage } from "../../cloudinary.js";
 
 if (requireAdminAccess()) {
@@ -13,8 +13,10 @@ if (requireAdminAccess()) {
           <input id="name" placeholder="Ad" required />
           <input id="price" placeholder="Qiymət" type="number" required />
           <input id="stock" placeholder="Stok" type="number" required />
-          <input id="imageUrl" placeholder="Şəkil URL" />
-          <input id="imageFile" type="file" accept="image/*" />
+          <select id="categoryId" required>
+            <option value="">Kateqoriya seçin</option>
+          </select>
+          <input id="imageFile" type="file" accept="image/*" required />
           <button>Əlavə et</button>
         </form>
         <h3>Redaktə</h3>
@@ -31,7 +33,7 @@ if (requireAdminAccess()) {
   });
 
   bindForms();
-  load().catch((e) => showPageError(e.message));
+  hydratePage().catch((e) => showPageError(e.message));
 }
 
 function bindForms() {
@@ -40,7 +42,7 @@ function bindForms() {
   const nameEl = document.getElementById("name");
   const priceEl = document.getElementById("price");
   const stockEl = document.getElementById("stock");
-  const imageUrlEl = document.getElementById("imageUrl");
+  const categoryIdEl = document.getElementById("categoryId");
   const imageFileEl = document.getElementById("imageFile");
   const editIdEl = document.getElementById("editId");
   const editNameEl = document.getElementById("editName");
@@ -49,31 +51,67 @@ function bindForms() {
 
   createFormEl.onsubmit = async (e) => {
     e.preventDefault();
-    let image = imageUrlEl.value.trim();
-    if (!image && imageFileEl.files[0]) image = await uploadImage(imageFileEl.files[0]);
-    await createProduct({
-      name: nameEl.value,
-      price: Number(priceEl.value),
-      stock: Number(stockEl.value),
-      images: image ? [image] : [],
-    });
-    createFormEl.reset();
-    await load();
+    
+    try {
+      const file = imageFileEl.files[0];
+      if (!file) {
+        throw new Error("Məhsul üçün şəkil faylı seçilməlidir.");
+      }
+
+      const categoryId = Number(categoryIdEl.value);
+      if (!Number.isFinite(categoryId) || categoryId <= 0) {
+        throw new Error("Məhsul üçün kateqoriya seçilməlidir.");
+      }
+
+      const image = await uploadImage(file);
+
+      await createProduct({
+        name: nameEl.value,
+        price: Number(priceEl.value),
+        stock: Number(stockEl.value),
+        categoryId,
+        images: image ? [image] : [],
+      });
+
+      createFormEl.reset();
+      await hydratePage();
+    } catch (err) {
+      const baseMessage = err?.message || "Məhsul əlavə edilərkən xəta baş verdi.";
+      const message = /unknown api key|401/i.test(baseMessage)
+        ? "Şəkil yükləmə alınmadı (Cloudinary 401 / Unknown API key). .env-də Cloudinary cloud name və upload preset dəyərlərini yoxlayın."
+        : baseMessage;
+      alert(message);
+    }
   };
 
   editFormEl.onsubmit = async (e) => {
     e.preventDefault();
-    await updateProduct(Number(editIdEl.value), {
+    await adminService.updateProduct(Number(editIdEl.value), {
       name: editNameEl.value,
       price: Number(editPriceEl.value),
       stock: Number(editStockEl.value),
     });
     editFormEl.hidden = true;
-    await load();
+    await loadProducts();
   };
 }
 
-async function load() {
+async function hydratePage() {
+  await Promise.all([loadCategories(), loadProducts()]);
+}
+
+async function loadCategories() {
+  const categorySelect = document.getElementById("categoryId");
+  if (!categorySelect) return;
+
+  const categories = await listCategories();
+  categorySelect.innerHTML = [
+    '<option value="">Kateqoriya seçin</option>',
+    ...categories.map((c) => `<option value="${c.Id}">${c.Name}</option>`),
+  ].join("");
+}
+
+async function loadProducts() {
   const tbody = document.getElementById("rows");
   const { items } = await getProductsPaginated({ page: 1, pageSize: 24 });
   tbody.innerHTML = items
@@ -84,8 +122,8 @@ async function load() {
 
   tbody.querySelectorAll("button[data-del]").forEach((b) => {
     b.onclick = async () => {
-      await deleteProduct(Number(b.dataset.del));
-      await load();
+      await adminService.deleteProduct(Number(b.dataset.del));
+      await loadProducts();
     };
   });
 
