@@ -231,9 +231,11 @@ async function createProduct(req, res) {
   const disc = Math.max(0, Math.min(100, Number(discountPercent) || 0));
   const st = Math.max(0, Number(stock) || 0);
 
+  let tx;
+
   try {
-      const pool = await getPool();
-    const tx = new sql.Transaction(pool);
+    const pool = await getPool();
+    tx = new sql.Transaction(pool);
 
     await tx.begin();
 

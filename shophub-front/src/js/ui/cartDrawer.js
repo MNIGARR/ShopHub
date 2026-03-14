@@ -1,8 +1,6 @@
 import { $ } from "../utils/dom.js";
 import { toast } from "./toast.js";
-import { getCart, clearCart, cartCount } from "../services/cart.service.js";
-import { getUser } from "../services/auth.service.js";
-import { checkoutOrder } from "../services/order.service.js";
+import { getCart, clearCart } from "../services/cart.service.js";
 import { renderCartBadge } from "./navbar.js";
 
 function openCart() {

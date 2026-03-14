@@ -53,33 +53,34 @@ function bindForms() {
     e.preventDefault();
     
     try {
-      const file = imageFileEl.files[0];
-      if (!file) {
-        throw new Error("Məhsul üçün şəkil faylı seçilməlidir.");
-      }
-
       const categoryId = Number(categoryIdEl.value);
       if (!Number.isFinite(categoryId) || categoryId <= 0) {
         throw new Error("Məhsul üçün kateqoriya seçilməlidir.");
       }
 
-      const image = await uploadImage(file);
-
-      await createProduct({
+let images = [];
+      const file = imageFileEl.files[0];
+      if (file) {
+        try {
+          const image = await uploadImage(file);
+          if (image) images = [image];
+        } catch (uploadErr) {
+          const uploadMessage = uploadErr?.message || "Şəkil yüklənmədi";
+          alert(`${uploadMessage}. Məhsul şəkilsiz yaradılacaq.`);
+        }
+      }
+      await adminService.createProduct({
         name: nameEl.value,
         price: Number(priceEl.value),
         stock: Number(stockEl.value),
         categoryId,
-        images: image ? [image] : [],
+        images,
       });
 
       createFormEl.reset();
       await hydratePage();
     } catch (err) {
-      const baseMessage = err?.message || "Məhsul əlavə edilərkən xəta baş verdi.";
-      const message = /unknown api key|401/i.test(baseMessage)
-        ? "Şəkil yükləmə alınmadı (Cloudinary 401 / Unknown API key). .env-də Cloudinary cloud name və upload preset dəyərlərini yoxlayın."
-        : baseMessage;
+      const message = err?.message || "Məhsul əlavə edilərkən xəta baş verdi.";
       alert(message);
     }
   };
@@ -104,7 +105,7 @@ async function loadCategories() {
   const categorySelect = document.getElementById("categoryId");
   if (!categorySelect) return;
 
-  const categories = await listCategories();
+  const categories = await adminService.listCategories();
   categorySelect.innerHTML = [
     '<option value="">Kateqoriya seçin</option>',
     ...categories.map((c) => `<option value="${c.Id}">${c.Name}</option>`),

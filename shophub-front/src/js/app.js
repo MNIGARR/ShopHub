@@ -1271,7 +1271,13 @@ function bindEvents() {
     }
   }
 
-  $("checkoutBtn").onclick = processCheckout;
+  $("checkoutBtn") && ($("checkoutBtn").onclick = () => {
+    if (!state.cart.length) {
+      showToast({ title: "Səbət boşdur", message: "Sifariş üçün məhsul əlavə edin.", type: "warn" });
+      return;
+    }
+    window.location.href = "/src/pages/checkout.html";
+  });
   $("closeProductModal") &&
     ($("closeProductModal").onclick = closeProductModal);
   $("productBackdrop") &&
