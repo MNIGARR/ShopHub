@@ -1013,7 +1013,7 @@ function goAdmin() {
     });
     return;
   }
-  window.location.href = "/admin/dashboard";
+  window.location.href = "/src/pages/admin/dashboard.html";
 }
 
 // Bind UI events

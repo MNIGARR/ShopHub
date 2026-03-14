@@ -1,11 +1,11 @@
 import { getUser, logout } from "../services/auth.service.js";
 
 const links = [
-  ["/admin", "Dashboard"],
-  ["/admin/products", "Məhsullar"],
-  ["/admin/orders", "Sifarişlər"],
-  ["/admin/categories", "Kateqoriyalar"],
-  ["/admin/users", "İstifadəçilər"],
+  ["/src/pages/admin/dashboard.html", "Dashboard"],
+  ["/src/pages/admin/products.html", "Məhsullar"],
+  ["/src/pages/admin/orders.html", "Sifarişlər"],
+  ["/src/pages/admin/categories.html", "Kateqoriyalar"],
+  ["/src/pages/admin/users.html", "İstifadəçilər"],
 ];
 
 const THEME_KEY = "shophub_theme";
@@ -45,7 +45,7 @@ export function renderAdminLayout({ pageTitle, contentHtml }) {
 
         <nav class="admin-global-nav" aria-label="Global navigation">
           <a href="/" class="admin-global-link">Mağaza</a>
-          <a href="/admin" class="admin-global-link ${currentPath.startsWith("/admin") ? "active" : ""}">Admin Panel</a>
+          <a href="/src/pages/admin/dashboard.html" class="admin-global-link ${currentPath.includes("/src/pages/admin") ? "active" : ""}">Admin Panel</a>
         </nav>
 
         <div class="admin-global-actions">
@@ -96,7 +96,7 @@ export function renderAdminLayout({ pageTitle, contentHtml }) {
 
   document.getElementById("logoutBtn")?.addEventListener("click", () => {
     logout();
-    window.location.href = "/login";
+    window.location.href = "/src/pages/auth/login.html";
   });
 }
 
