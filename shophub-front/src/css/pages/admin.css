@@ -395,3 +395,35 @@ th {
   color: var(--muted);
   background: color-mix(in srgb, var(--surface) 90%, #fff 10%);
 }
+
+/* Brand - main page style parity */
+.brand-serif {
+  font-family: "Times New Roman", Georgia, serif;
+  letter-spacing: 0.04em;
+}
+
+.brand-accent {
+  color: var(--accent);
+}
+
+.brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #1e1e1e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f6f6f6;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid #2b2b2b;
+}
+
+/* optional: brand hover polish */
+.admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  text-decoration: none;
+}

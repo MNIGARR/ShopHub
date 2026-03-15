@@ -39,8 +39,15 @@ export function renderAdminLayout({ pageTitle, contentHtml }) {
     <header class="admin-header">
       <div class="admin-container admin-header-row">
         <a href="/" class="admin-brand" aria-label="ShopHub home">
-          <span class="brand-mark">🛍️</span>
-          <span class="brand-serif">Shop<span class="brand-accent">Hub</span></span>
+          <span class="brand-mark" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+              <path d="M3 6h18" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+          </span>
+          <span class="brand-serif">İShine<span class="brand-accent">Accessories</span></span>
         </a>
 
         <nav class="admin-global-nav" aria-label="Global navigation">

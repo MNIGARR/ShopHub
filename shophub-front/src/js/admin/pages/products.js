@@ -107,16 +107,43 @@ function bindForms() {
     }
   };
 
-  editFormEl.onsubmit = async (e) => {
-    e.preventDefault();
-    await adminService.updateProduct(Number(editIdEl.value), {
-      name: editNameEl.value,
-      price: Number(editPriceEl.value),
-      stock: Number(editStockEl.value),
+  createFormEl.onsubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    setFormMessage("");
+
+    const file = imageFileEl?.files?.[0];
+    if (!file) {
+      setFormMessage("Şəkil seçin.", "error");
+      return;
+    }
+
+    const categoryId = Number(categoryIdEl.value);
+    if (!Number.isFinite(categoryId) || categoryId <= 0) {
+      setFormMessage("Kateqoriya seçin.", "error");
+      return;
+    }
+
+    setFormMessage("Şəkil yüklənir...", "info");
+    const imageUrl = await uploadImage(file);
+
+    await adminService.createProduct({
+      name: nameEl.value.trim(),
+      price: Number(priceEl.value),
+      stock: Number(stockEl.value),
+      categoryId,
+      images: [imageUrl],
     });
-    editFormEl.hidden = true;
-    await loadProducts();
-  };
+
+    createFormEl.reset();
+    setFormMessage("Məhsul əlavə edildi.", "success");
+    await hydratePage();
+  } catch (err) {
+    setFormMessage(err?.message || "Xəta baş verdi.", "error");
+    alert(err?.message || "Xəta baş verdi.");
+  }
+};
 }
 
 async function hydratePage() {
