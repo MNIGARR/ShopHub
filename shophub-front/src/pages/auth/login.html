@@ -148,8 +148,15 @@
           localStorage.setItem("shophub_auth_v1", JSON.stringify({ token: data.token, user }));
 
           // Redirect to home
-window.location.href = "/";
-        } catch (err) {
+localStorage.setItem("shophub_token_v1", data.token);
+          localStorage.setItem("shophub_user_v1", JSON.stringify(user));
+
+          // Redirect admin directly to admin dashboard
+          if (user.role === "admin") {
+            window.location.href = "/admin/dashboard";
+          } else {
+            window.location.href = "/";
+          }        } catch (err) {
           errorMsg.textContent = err.message || "Giriş uğursuz oldu";
           errorMsg.classList.remove("hidden");
         } finally {

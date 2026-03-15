@@ -315,14 +315,21 @@ async function loadSessionFromToken() {
     setAuth({ token, user: normalized });
     state.sessionUser = normalized;
   } catch (e) {
-    // token invalid / expired
-    clearAuth();
-    state.sessionUser = null;
-    showToast({
-      title: "Sessiya bitdi",
-      message: "Yenidən giriş edin.",
-      type: "warn",
-    });
+    // Clear session only when backend explicitly rejects token.
+    const status = Number(e?.status || 0);
+    if (status === 401 || status === 403) {
+      clearAuth();
+      state.sessionUser = null;
+      showToast({
+        title: "Sessiya bitdi",
+        message: "Yenidən giriş edin.",
+        type: "warn",
+      });
+    } else {
+      // Network/server problems should not log user out immediately.
+      state.sessionUser = getUserFromAuth();
+      console.warn("/auth/me check failed, cached session is used", e);
+    }
   } finally {
     updateAuthUI();
   }
