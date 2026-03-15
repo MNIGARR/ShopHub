@@ -5,95 +5,134 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ShopHub | Qeydiyyat</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- <link rel="stylesheet" href="../css/style.css" /> -->
     <style>
-      .glass {
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+      :root {
+        color-scheme: light;
+      }
+
+      body {
+        background: radial-gradient(circle at top right, #f9f9f7 0%, #f2f2ef 50%, #ecece9 100%);
+      }
+
+      .auth-shell {
+        position: relative;
+        isolation: isolate;
+      }
+
+      .auth-shell::before,
+      .auth-shell::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        width: 17rem;
+        height: 17rem;
+        border-radius: 999px;
+        background: rgba(16, 17, 19, 0.05);
+        animation: floatBlob 9s ease-in-out infinite;
+      }
+
+      .auth-shell::before {
+        top: -5rem;
+        right: -2rem;
+      }
+
+      .auth-shell::after {
+        bottom: -5rem;
+        left: -2rem;
+        animation-delay: 1.2s;
+      }
+
+      .card-enter {
+        animation: fadeUp 0.6s ease;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes floatBlob {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-12px);
+        }
       }
     </style>
   </head>
-  <body class="bg-[#0f172a] text-slate-200 min-h-screen font-sans flex items-center justify-center">
-
-    <div class="w-full max-w-md px-4">
-      <!-- Logo -->
-      <div class="text-center mb-10">
-        <a href="../../index.html" class="inline-flex items-center gap-2">
-          <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" class="text-white">
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-              <path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" />
-            </svg>
-          </div>
-          <span class="text-xl font-bold tracking-tight text-white uppercase">
-            Shop<span class="text-blue-500">Hub</span>
-          </span>
+  <body class="text-[#1f2125] min-h-screen font-sans flex items-center justify-center p-6">
+    <div class="auth-shell w-full max-w-md">
+      <div class="card-enter rounded-[36px] border border-[#d9d9d6] bg-[#f8f7f4]/95 p-8 sm:p-10 shadow-[0_20px_60px_rgba(18,18,22,0.08)]">
+        <a href="/" class="inline-flex items-center gap-3 mb-8">
+          <img src="/src/assets/ishine-icon-transparent.png" alt="iShine" class="h-12 w-auto object-contain" />
+          <span class="text-xs uppercase tracking-[0.28em] text-[#5b6068]">Aksesuarlar</span>
         </a>
-      </div>
 
-      <!-- Register Card -->
-      <div class="glass p-10 rounded-[32px] border border-white/5">
-        <h2 class="text-2xl font-bold text-white mb-2">Qeydiyyat</h2>
-        <p class="text-slate-500 text-sm mb-8">Yeni hesab yaradın</p>
+        <h2 class="text-4xl font-semibold leading-tight tracking-tight text-[#191b20]">Qeydiyyat</h2>
+        <p class="mt-2 text-[#5b6068]">Yeni hesab yaradıb alış-verişə başlayın.</p>
 
-        <div id="errorMsg" class="hidden bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 rounded-xl mb-6"></div>
-        <div id="successMsg" class="hidden bg-green-500/10 border border-green-500/20 text-green-400 text-sm p-4 rounded-xl mb-6"></div>
+        <div id="errorMsg" class="hidden mt-6 rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+        <div id="successMsg" class="hidden mt-6 rounded-2xl border border-green-300 bg-green-50 px-4 py-3 text-sm text-green-700"></div>
 
-        <form id="registerForm" class="space-y-5">
+        <form id="registerForm" class="mt-6 space-y-5">
           <div>
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 block">E-poçt</label>
-            <input
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[#70757e]">E-poçt</label>            <input
               id="regEmail"
               type="email"
               required
-              class="w-full bg-black/20 border border-white/10 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-green-500 transition-colors"
-              placeholder="nümunə@email.com"
+              class="w-full rounded-2xl border border-[#d0d2d7] bg-white px-5 py-3.5 text-sm text-[#1f2125] outline-none transition focus:border-[#1f2125] focus:shadow-[0_0_0_3px_rgba(31,33,37,0.08)]"
+              placeholder="numune@email.com"
             />
-            <p id="emailError" class="hidden text-red-400 text-xs mt-1"></p>
+            <p id="emailError" class="hidden mt-1 text-xs text-red-600"></p>
           </div>
 
           <div>
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 block">Şifrə</label>
-            <input
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[#70757e]">Şifrə</label>            <input
               id="regPass"
               type="password"
               required
               minlength="6"
-              class="w-full bg-black/20 border border-white/10 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-green-500 transition-colors"
+              class="w-full rounded-2xl border border-[#d0d2d7] bg-white px-5 py-3.5 text-sm text-[#1f2125] outline-none transition focus:border-[#1f2125] focus:shadow-[0_0_0_3px_rgba(31,33,37,0.08)]"
               placeholder="Minimum 6 simvol"
             />
-            <p id="passError" class="hidden text-red-400 text-xs mt-1"></p>
+            <p id="passError" class="hidden mt-1 text-xs text-red-600"></p>
           </div>
 
           <div>
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 block">Şifrə Təkrarı</label>
-            <input
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[#70757e]">Şifrə təkrarı</label>            <input
               id="regPassConfirm"
               type="password"
               required
               minlength="6"
-              class="w-full bg-black/20 border border-white/10 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-green-500 transition-colors"
+              class="w-full rounded-2xl border border-[#d0d2d7] bg-white px-5 py-3.5 text-sm text-[#1f2125] outline-none transition focus:border-[#1f2125] focus:shadow-[0_0_0_3px_rgba(31,33,37,0.08)]"
               placeholder="Şifrəni təkrar daxil edin"
             />
-            <p id="confirmError" class="hidden text-red-400 text-xs mt-1"></p>
+            <p id="confirmError" class="hidden mt-1 text-xs text-red-600"></p>
           </div>
 
           <button
             id="registerBtn"
             type="submit"
-            class="w-full bg-green-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-green-600/20 hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Qeydiyyatı Tamamla
+            class="w-full rounded-2xl bg-[#14171b] px-5 py-4 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+            >
+            Qeydiyyatı tamamla
           </button>
         </form>
 
         <div class="mt-6 text-center">
-          <p class="text-sm text-slate-500">
-            Artıq hesabınız var?
-            <a href="login.html" class="text-blue-500 hover:text-blue-400 font-semibold">Daxil Ol</a>
+          <p class="text-sm text-[#5b6068]">
+              Artıq hesabınız var?
+            <a href="/src/pages/auth/login.html" class="font-semibold text-[#1f2125] underline-offset-4 hover:underline">
+              Daxil ol
+            </a>
           </p>
         </div>
       </div>
@@ -118,7 +157,6 @@
         const confirmError = document.getElementById("confirmError");
         const btn = document.getElementById("registerBtn");
 
-        // Reset
         errorMsg.classList.add("hidden");
         successMsg.classList.add("hidden");
         emailError.classList.add("hidden");
@@ -129,7 +167,6 @@
         const password = passEl.value;
         const confirm = confirmEl.value;
 
-        // Frontend validation
         let valid = true;
 
         if (!emailRegex.test(email)) {
@@ -161,7 +198,6 @@
             body: { email, password },
           });
 
-          // Save session
           const user = {
             id: data.user.id ?? data.user.Id,
             email: data.user.email ?? data.user.Email,
@@ -174,14 +210,14 @@
           successMsg.classList.remove("hidden");
 
           setTimeout(() => {
-            window.location.href = "../../index.html";
+            window.location.href = "/";
           }, 1500);
         } catch (err) {
           errorMsg.textContent = err.message || "Qeydiyyat uğursuz oldu";
           errorMsg.classList.remove("hidden");
         } finally {
           btn.disabled = false;
-          btn.textContent = "Qeydiyyatı Tamamla";
+          btn.textContent = "Qeydiyyatı tamamla";
         }
       });
     </script>
