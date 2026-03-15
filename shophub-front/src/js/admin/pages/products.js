@@ -16,7 +16,8 @@ if (requireAdminAccess()) {
           <select id="categoryId" required>
             <option value="">Kateqoriya seçin</option>
           </select>
-          <input id="imageFile" type="file" accept="image/*" required />
+          <input id="imageFile" type="file" accept="image/*" />
+          <p id="formMessage" class="muted" aria-live="polite"></p>
           <button>Əlavə et</button>
         </form>
         <h3>Redaktə</h3>
@@ -36,6 +37,13 @@ if (requireAdminAccess()) {
   hydratePage().catch((e) => showPageError(e.message));
 }
 
+function setFormMessage(message, type = "info") {
+  const messageEl = document.getElementById("formMessage");
+  if (!messageEl) return;
+  messageEl.textContent = message || "";
+  messageEl.style.color = type === "error" ? "#dc2626" : type === "success" ? "#059669" : "#475569";
+}
+
 function bindForms() {
   const createFormEl = document.getElementById("createForm");
   const editFormEl = document.getElementById("editForm");
@@ -53,15 +61,29 @@ function bindForms() {
     e.preventDefault();
     
     try {
+      if (file) {
+        try {
+          const image = await uploadImage(file);
+          if (image) images = [image];
+        } catch (uploadErr) {
+          const uploadMessage = uploadErr?.message || "Şəkil yüklənmədi";
+          setFormMessage(`${uploadMessage}. Məhsul şəkilsiz yaradılacaq.`, "info");
+        }
+      }
       const file = imageFileEl.files[0];
       if (!file) {
         throw new Error("Məhsul üçün şəkil faylı seçilməlidir.");
       }
+      setFormMessage("");
+
+      let images = [];
 
       const categoryId = Number(categoryIdEl.value);
       if (!Number.isFinite(categoryId) || categoryId <= 0) {
         throw new Error("Məhsul üçün kateqoriya seçilməlidir.");
       }
+
+
 
       const image = await uploadImage(file);
 
@@ -74,6 +96,7 @@ function bindForms() {
       });
 
       createFormEl.reset();
+      setFormMessage("Məhsul uğurla əlavə edildi.", "success");
       await hydratePage();
     } catch (err) {
       const baseMessage = err?.message || "Məhsul əlavə edilərkən xəta baş verdi.";
