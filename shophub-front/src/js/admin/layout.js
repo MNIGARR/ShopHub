@@ -8,46 +8,16 @@ const links = [
   ["/src/pages/admin/users.html", "İstifadəçilər"],
 ];
 
-const THEME_KEY = "shophub_theme";
-
-function applyTheme(theme) {
-  const next = theme === "dark" ? "dark" : "light";
-  document.documentElement.setAttribute("data-theme", next);
-  localStorage.setItem(THEME_KEY, next);
-
-  const themeBtn = document.getElementById("themeToggle");
-  if (themeBtn) {
-    themeBtn.textContent = next === "dark" ? "☀" : "☾";
-    themeBtn.setAttribute("aria-label", next === "dark" ? "Switch to light mode" : "Switch to dark mode");
-  }
-}
-
-function initTheme() {
-  const saved = localStorage.getItem(THEME_KEY);
-  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-  applyTheme(saved || (prefersDark ? "dark" : "light"));
-}
-
-
 export function renderAdminLayout({ pageTitle, contentHtml }) {
   const app = document.getElementById("app");
   const currentPath = window.location.pathname;
   const user = getUser();
 
-  initTheme();
   app.innerHTML = `
     <header class="admin-header">
       <div class="admin-container admin-header-row">
         <a href="/" class="admin-brand" aria-label="ShopHub home">
-          <span class="brand-mark" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-              <path d="M3 6h18" />
-              <path d="M16 10a4 4 0 0 1-8 0" />
-            </svg>
-          </span>
-          <span class="brand-serif">İShine<span class="brand-accent">Accessories</span></span>
+          <img src="/src/assets/ishine-icon-transparent.png" alt="iShine" class="admin-brand-logo" />
         </a>
 
         <nav class="admin-global-nav" aria-label="Global navigation">
@@ -56,8 +26,8 @@ export function renderAdminLayout({ pageTitle, contentHtml }) {
         </nav>
 
         <div class="admin-global-actions">
-          <button id="themeToggle" type="button" class="theme-toggle" aria-label="Switch to dark mode" title="Toggle theme">☾</button>
-          <button class="account-btn" type="button" aria-label="Hesab" title="${user?.email || "Admin"}">
+          <button id="themeToggle" type="button" class="icon-btn" aria-label="Tema" title="Tema">☾</button>
+          <button class="icon-btn" type="button" aria-label="Hesab" title="${user?.email || "Admin"}">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
@@ -81,25 +51,17 @@ export function renderAdminLayout({ pageTitle, contentHtml }) {
       </aside>
 
       <main class="admin-main">
-        <header class="admin-topbar glass">
+        <header class="admin-topbar">
           <div>
             <h2>${pageTitle}</h2>
             <p>${user?.email || "Admin"}</p>
           </div>
           <button id="logoutBtn" class="btn btn-danger">Çıxış</button>
         </header>
-        <section class="admin-content glass">${contentHtml}</section>
+        <section class="admin-content">${contentHtml}</section>
       </main>
     </div>
   `;
-
-  applyTheme(document.documentElement.getAttribute("data-theme") || "light");
-
-  document.getElementById("themeToggle")?.addEventListener("click", () => {
-    const current = document.documentElement.getAttribute("data-theme") || "light";
-    applyTheme(current === "dark" ? "light" : "dark");
-  });
-
 
   document.getElementById("logoutBtn")?.addEventListener("click", () => {
     logout();

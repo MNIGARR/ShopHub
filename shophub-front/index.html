@@ -7,40 +7,47 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       :root {
-        --bg: #f6f5f2;
-        --surface: #ffffff;
-        --muted: #6a6a6a;
-        --text: #1f1f22;
-        --accent: #d86f00;
-        --line: #e6e4df;
-        --header-bg: #faf9f6e8;
-        --input-bg: #fff;
-      }
-      [data-theme="dark"] {
-        --bg: #101010;
-        --surface: #161616;
-        --muted: #a3a3a3;
-        --text: #f5f5f5;
-        --accent: #e07a12;
-        --line: #2a2a2a;
-        --header-bg: #131313e6;
-        --input-bg: #1b1b1b;
-      }
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        margin: 0;
-        font-family:
-          Inter,
-          system-ui,
-          -apple-system,
-          Segoe UI,
-          Roboto,
-          sans-serif;
-        background: var(--bg);
-        color: var(--text);
-      }
+    --bg: #f6f5f2;
+    --surface: #ffffff;
+    --muted: #6a6a6a;
+    --text: #1f1f22;
+    --accent: #d86f00;
+    --line: #e6e4df;
+    --header-bg: #faf9f6e8;
+    --input-bg: #fff;
+  }
+  [data-theme="dark"] {
+    --bg: #101010;
+    --surface: #161616;
+    --muted: #a3a3a3;
+    --text: #f5f5f5;
+    --accent: #e07a12;
+    --line: #2a2a2a;
+    --header-bg: #131313e6;
+    --input-bg: #1b1b1b;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family:
+      Inter,
+      system-ui,
+      -apple-system,
+      Segoe UI,
+      Roboto,
+      sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    width: 100%;
+    height: 100%;
+  }
+  html {
+    width: 100%;
+    height: 100%;
+  }
       .brand-serif {
         font-family: "Times New Roman", Georgia, serif;
         letter-spacing: 0.04em;
@@ -349,6 +356,26 @@
         border: 1px solid var(--line);
         border-radius: 14px;
       }
+      #accountDropdown {
+  background: var(--surface);
+  color: var(--text);
+}
+
+#accountDropdown a {
+  color: var(--muted);
+}
+
+#accountDropdown a:hover {
+  color: var(--text);
+}
+
+[data-theme="dark"] #accountDropdown a {
+  color: #a3a3a3;
+}
+
+[data-theme="dark"] #accountDropdown a:hover {
+  color: #f5f5f5;
+}
       @media (max-width: 900px) {
         .hero {
           grid-template-columns: 1fr;
@@ -388,7 +415,7 @@
         <img
           src="./src/assets/ishine-icon-transparent.png"
           alt="IshineAccesories"
-          class="w-20 h-20 rounded-lg"
+          class="w-20 h-20 ml-20 rounded-lg"
         />
         <nav class="md:flex items-center gap-8 text-sm muted2">
           <button id="navShopBtn2" class="transition-colors muted2">
@@ -455,7 +482,8 @@
 
               <div
                 id="accountDropdown"
-                class="hidden absolute right-0 mt-2 w-64 bg-[#071028] border border-white/10 rounded-lg p-3 shadow-lg z-50 text-sm"
+                class="hidden absolute right-0 mt-2 w-64 border border-white/10 rounded-lg p-3 shadow-lg z-50 text-sm"
+                style="background: var(--surface);"
               >
                 <div
                   id="accountEmail"
@@ -884,8 +912,6 @@
             href="https://www.instagram.com/ishine.accessories?igsh=MW1ieTZlNmFkcGgwbQ=="
             >Instagram</a
           >
-          <!-- <a href="#">Twitter</a
-          ><a href="#">Facebook</a> -->
         </div>
       </div>
       <div
