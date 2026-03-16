@@ -1,78 +1,126 @@
 # ShopHub
 
-E-commerce nümunə tətbiqi — ShopHub
-> Bu README repository-dəki faylların (xüsusilə `shophub-back` və `shophub-front`) analizinə əsaslanaraq hazırlanıb. Axtarış nəticələri məhdudiyyəti səbəbindən bəzi fayl və detalları qaçırmış ola bilər. Tam kodu və daha çox axtarışı burada görə bilərsiniz: https://github.com/MNIGARR/ShopHub
+Salam! Bu repository-də mənim hazırladığım **ShopHub** adlı full‑stack e‑commerce (onlayn mağaza) nümunə layihəsi var. Layihəni iki hissəyə bölüb yazmışam:
+
+- **Backend:** `shophub-back/` — Node.js + Express ilə yazdığım REST API
+- **Frontend:** `shophub-front/` — Vite + plain JavaScript + HTML/CSS ilə qurduğum sadə UI
+
+Repo dili əsasən: **JavaScript (~65%)**, **HTML (~31%)**, **CSS (~3%)**
 
 ---
 
-## Tez baxış (Overview)
+## Layihə nə edir?
 
-ShopHub — Node.js/Express ilə yazılmış REST API (backend) və Vite + plain JavaScript + Tailwind istifadə edən yüngül frontend (HTML/JS/CSS) olan e-commerce tətbiq nümunəsidir. Backend MSSQL (mssql paketi) üzərindən verilənlər bazası ilə işləyir və JWT ilə autentifikasiya təmin edir. Frontend `index.html` + `src/js/app.js` əsasında SPA-oxşar idarəetmə ilə səhifələrə yönəlir.
+ShopHub-da məqsədim klassik bir e‑commerce axınını end-to-end göstərmək idi:
 
-Əsas qovluqlar:
-- `shophub-back/` — backend server (Express, MSSQL)
-- `shophub-front/` — frontend (Vite, HTML səhifələr, `src/js/app.js`)
-- (Kökdə qısa README mövcud, amma bu sənəd daha ətraflıdır.)
+- istifadəçi qeydiyyatı/girişi,
+- məhsullara baxış və məhsul detail,
+- səbət (cart) məntiqi,
+- checkout / sifariş axını,
+- admin tərəfdə isə kateqoriya, məhsul, sifariş və istifadəçi idarəetməsi üçün API.
 
----
-
-## Texnologiyalar (Tech stack)
-
-- Backend: Node.js, Express, mssql (Microsoft SQL Server client), bcryptjs, jsonwebtoken, dotenv
-- Frontend: Vite, Plain JS (ES modules), HTML, Tailwind CSS
-- Development tooling: nodemon (backend dev)
-- Authentication: JWT
-- Parol hash: bcryptjs
-- E-poçt göndərmə (istifadə edilən util var: `sendEmail`)
-
-Repo dil tərkibi: JavaScript ~64.6%, HTML ~34.7%, CSS ~0.7%
+Frontend tərəfdə framework istifadə etmədən (plain JS) işləyən bir məntiq qurmağa çalışmışam, backend tərəfdə isə route-ları bölüb daha səliqəli API strukturu yaratmışam.
 
 ---
 
-## Xüsusiyyətlər (Features)
+## Əsas funksiyalar (Features)
 
-- İstifadəçi qeydiyyatı / login (JWT)
-- Parol unutma və sıfırlama (token əsasında)
-- Məhsulların siyahısı, məhsul detallarının göstərilməsi
-- Kateqoriyalar CRUD (admin)
-- Sifarişlər — istifadəçinin öz sifarişləri, admin üçün sifarişlərin idarəsi
-- İstifadəçi siyahısı və rola / aktivliyə nəzarət (admin)
-- Sadə frontend UI: mağaza görünüşü, səbət (cart), məhsul səhifələri, checkout səhifəsi
+### İstifadəçi tərəfi
+- Qeydiyyat və login (JWT)
+- Məhsulların siyahısı və məhsul detalları
+- Səbət (cart) funksionallığı
+- Checkout / sifariş axını
+- İstifadəçinin öz sifarişlərinə baxış (API)
 
----
-
-## Struktur (ən vacib fayllar)
-
-- shophub-back/
-  - package.json (scripts: `dev` = nodemon, `start` = node)
-  - src/
-    - server.js — tətbiqi başladan fayl (DB pool bağlantısı qurur)
-    - app.js — Express app, route mount-ları və global error middleware
-    - config/db.js — `getPool()` funksiyası (mssql bağlantısı)
-    - controllers/ — auth, products, categories, orders, users, və s.
-    - routes/ — route faylları (`/api/auth`, `/api/products`, ...)
-    - services/ — biznes məntiqi (məsələn auth.service)
-    - utils/ — `AppError`, `sendEmail` (görünür email util mövcuddur)
-- shophub-front/
-  - package.json (vite)
-  - index.html — əsas giriş səhifəsi, layout və `src/js/app.js` daxil edilir
-  - src/
-    - js/app.js — frontend məntiqinin böyük hissəsi (auth, products, cart, UI)
-    - pages/ — müstəqil HTML səhifələr (cart.html, product-detail.html, checkout.html, auth səhifələri)
-    - css/ — stil faylları (və Tailwind CDN istifadə olunur)
-- README.md (kökdə qısa)
+### Admin tərəfi (API səviyyəsində)
+- Kateqoriya CRUD
+- Məhsul CRUD
+- Sifarişlərin idarəsi
+- İstifadəçilərin idarəsi
 
 ---
 
-## Tələb olunanlar (Requirements)
+## Backend (shophub-back)
 
-- Node.js (v16+ tövsiyə olunur)
-- npm / pnpm / yarn
-- Microsoft SQL Server (və ya uyğun MSSQL instansiyası)
-- Ətraf mühit dəyişənləri (aşağıda nümunə göstərilib)
+Backend-i Express üzərində REST API kimi yazmışam.
+
+### Route-lar
+`shophub-back/src/app.js` faylında mount etdiyim əsas route-lar:
+
+- `/api/auth`
+- `/api/categories`
+- `/api/products`
+- `/api/orders`
+- `/api/users`
+
+Texniki endpoint-lər:
+- `GET /health` — servis sağlamlıq yoxlaması
+- `GET /` — servis haqqında qısa info
+
+### Entry point
+Backend server `shophub-back/src/server.js` faylından qalxır.
+
+- Default port: **5000** (`PORT` env olmasa)
+- Server start olmamışdan əvvəl DB-ə connect olmağa çalışır.
+
+### DB (MSSQL)
+DB bağlantısı `shophub-back/src/config/db.js` faylında `mssql` ilə qurulub və `getPool()` vasitəsilə pool idarə olunur.
+
+> Qeyd: `package.json`-da `mysql2` dependency də var, amma hazırkı konfiqurasiya `mssql` (Microsoft SQL Server) üzərindədir.
+
+### Backend-i işə salmaq
+```bash
+cd shophub-back
+npm install
+npm run dev
+```
+
+Backend bu env dəyişənlərini gözləyir:
+- `DB_USER`
+- `DB_PASSWORD`
+- `DB_SERVER`
+- `DB_PORT` (default 1433)
+- `DB_NAME`
+- `PORT` (default 5000)
 
 ---
 
-## Ətraf mühit dəyişənləri (Environment)
+## Frontend (shophub-front)
 
-Backend üçün `.env` nümunəsi (shophub-back/.env):
+Frontend-i Vite ilə qaldırıram və plain JavaScript ilə UI məntiqini idarə etmişəm.
+
+### Frontend-i işə salmaq
+```bash
+cd shophub-front
+npm install
+npm run dev
+```
+
+---
+
+## Repo strukturu (qısa)
+- `shophub-back/`
+  - `src/server.js` — server start + DB connect
+  - `src/app.js` — middleware + route-lar + error handling
+  - `src/config/db.js` — MSSQL pool config
+- `shophub-front/`
+  - `index.html`
+  - `src/js/` — əsas frontend JS məntiqi
+  - `src/pages/` — əlavə HTML səhifələr (cart/checkout/auth və s.)
+
+---
+
+## Mənim etdiklərim (Implementation highlights)
+Bu layihədə əsas fokusum:
+- Backend-i səliqəli REST API strukturu ilə qurmaq (routes/controllers/services yanaşması)
+- JWT ilə autentifikasiya axınını qurmaq
+- DB bağlantısını pool məntiqi ilə mərkəzləşdirmək (`getPool()`)
+- Frontend-də framework istifadə etmədən məhsul → səbət → checkout kimi axını işlək saxlamaq
+- Lokal development üçün rahat skriptlər yazmaq (`nodemon`, `vite`)
+
+---
+
+## Növbəti addımlar (istəsəm əlavə edəcəyəm)
+- `shophub-back/.env.example` əlavə etmək (real dəyərlərsiz)
+- API üçün Postman collection və ya Swagger dokumentasiyası
+- Docker ilə (DB + backend + frontend) bir komanda ilə qaldırma
