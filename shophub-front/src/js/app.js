@@ -1283,6 +1283,7 @@ function bindEvents() {
       showToast({ title: "Səbət boşdur", message: "Sifariş üçün məhsul əlavə edin.", type: "warn" });
       return;
     }
+    localStorage.setItem("shophub_checkout_draft_v1", JSON.stringify(state.cart));
     window.location.href = "/src/pages/checkout.html";
   });
   $("closeProductModal") &&

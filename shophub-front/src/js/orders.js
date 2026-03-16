@@ -2,10 +2,9 @@ import { $ } from "./utils/dom.js";
 import { myOrders, getOrderById } from "./services/order.service.js";
 import { getToken } from "./services/auth.service.js";
 
-
-// function redirectToLogin() {
-//   window.location.href = "/login";
-// }
+function redirectToLogin() {
+  window.location.href = "/src/pages/auth/login.html";
+}
 
 function isAuthError(err) {
   const message = String(err?.message || "").toLowerCase();

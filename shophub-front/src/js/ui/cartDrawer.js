@@ -1,6 +1,8 @@
 import { $ } from "../utils/dom.js";
 import { toast } from "./toast.js";
 import { getCart, clearCart } from "../services/cart.service.js";
+import { getUser } from "../services/auth.service.js";
+import { checkoutOrder } from "../services/order.service.js";
 import { renderCartBadge } from "./navbar.js";
 
 function openCart() {
@@ -42,29 +44,18 @@ async function checkout() {
   const u = getUser();
   if (!u) {
     toast("warn", "Checkout", "Əvvəlcə giriş edin.");
+    window.location.href = "/src/pages/auth/login.html";
     return;
   }
+
   const cart = getCart();
   if (!cart.length) {
     toast("info", "Checkout", "Səbət boşdur.");
     return;
   }
-
-  try {
-    const payload = {
-      items: cart.map(x => ({ productId: x.productId, qty: x.qty })),
-      shippingFee: 0
-    };
-
-    const res = await checkoutOrder(payload);
-    toast("success", "Sifariş yaradıldı", `OrderId: ${res.orderId ?? "OK"}`);
-
-    clearCart();
-    renderCart();
-    closeCart();
-  } catch (e) {
-    toast("danger", "Checkout xətası", e.message);
-  }
+  
+  closeCart();
+  window.location.href = "/src/pages/checkout.html";
 }
 
 export function bindCartDrawer() {

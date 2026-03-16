@@ -1,39 +1,88 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-    <meta charset="UTF-8">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Checkout - ShopHub</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShopHub | Checkout</title>
+  <script>
+    (function () {
+      const saved = localStorage.getItem("shophub_theme") || "light";
+      document.documentElement.setAttribute("data-theme", saved === "dark" ? "dark" : "light");
+    })();
+  </script>
+  <style>
+    :root {
+      --bg: #f6f5f2;
+      --surface: #ffffff;
+      --muted: #6a6a6a;
+      --text: #1f1f22;
+      --line: #e6e4df;
+      --primary: #2563eb;
+    }
+    [data-theme="dark"] {
+      --bg: #101010;
+      --surface: #161616;
+      --muted: #a3a3a3;
+      --text: #f5f5f5;
+      --line: #2a2a2a;
+      --primary: #3b82f6;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    .container { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 40px; }
+    .top { display:flex; justify-content:space-between; gap:16px; flex-wrap: wrap; margin-bottom: 18px; }
+    .muted { color: var(--muted); }
+    .back { border:1px solid var(--line); background: var(--surface); color: var(--text); padding: 10px 14px; border-radius: 12px; text-decoration: none; }
+    .grid { display:grid; grid-template-columns: 1.6fr 1fr; gap: 18px; }
+    .card { background: var(--surface); border:1px solid var(--line); border-radius: 16px; padding: 16px; }
+    .head { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom: 10px; margin-bottom: 10px; }
+    .list { display:grid; gap:10px; }
+    .row { display:flex; justify-content:space-between; align-items:center; gap:10px; border:1px solid var(--line); border-radius: 12px; padding: 10px; }
+    .row-left{ display:flex; align-items:center; gap:10px; min-width:0; }
+    .img { width: 56px; height:56px; object-fit:cover; border-radius:10px; border:1px solid var(--line); background:#ddd; }
+    .qty { display:flex; align-items:center; gap:6px; }
+    .qbtn { width:30px; height:30px; border-radius: 8px; border:1px solid var(--line); background: transparent; color:var(--text); cursor:pointer; }
+    .remove { border:0; background:transparent; color:#e14d4d; cursor:pointer; }
+    .summary-row { display:flex; justify-content:space-between; margin: 8px 0; }
+    .total { border-top:1px solid var(--line); padding-top:10px; margin-top: 10px; font-size: 30px; font-weight: 700; }
+    .btn { width:100%; border:0; background: var(--primary); color:#fff; padding: 12px; border-radius: 12px; font-weight: 700; cursor:pointer; margin-top: 12px; }
+    .btn:disabled { opacity: .6; cursor:not-allowed; }
+    .empty { border:1px dashed var(--line); border-radius:12px; padding: 18px; text-align:center; color:var(--muted); }
+    .msg { text-align:center; margin-top: 10px; min-height: 20px; }
+    @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
-<body class="bg-gray-50">
-    <div class="max-w-4xl mx-auto py-12 px-4">
-        <h1 class="text-3xl font-bold mb-8">Sifarişi rəsmiləşdir</h1>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border">
-                <h2 class="text-xl font-semibold mb-4 border-b pb-2">Məhsullar</h2>
-                <div id="checkoutItems" class="space-y-4">
-                    </div>
-            </div>
-
-            <div class="bg-white p-6 rounded-2xl shadow-sm border h-fit">
-                <h2 class="text-xl font-semibold mb-4 border-b pb-2">Cəmi</h2>
-                <div class="space-y-2 mb-6">
-                    <div class="flex justify-between"><span>Məhsullar:</span><span id="subtotal">0.00 AZN</span></div>
-                    <div class="flex justify-between"><span>Çatdırılma:</span><span>5.00 AZN</span></div>
-                    <div class="flex justify-between text-xl font-bold pt-2 border-t mt-2">
-                        <span>Toplam:</span><span id="totalPrice">0.00 AZN</span>
-                    </div>
-                </div>
-                
-                <button id="btnCheckout" class="w-full bg-black text-white py-4 rounded-xl font-bold hover:bg-gray-800 transition disabled:bg-gray-400">
-                    Sifarişi tamamla
-                </button>
-                <p id="msg" class="mt-4 text-center text-sm font-medium"></p>
-            </div>
-        </div>
+<body>
+  <main class="container">
+    <div class="top">
+      <div>
+        <div class="muted">IShine / Checkout</div>
+        <h1 style="margin:.2rem 0; font-size:42px;">Sifarişi rəsmiləşdir</h1>
+        <div class="muted">Məhsulları yoxlayın, sayları düzəldin və sifarişi tamamlayın.</div>
+      </div>
+      <a class="back" href="/">Mağazaya qayıt</a>
     </div>
+    <div class="grid">
+      <section class="card">
+        <div class="head">
+          <h2 style="margin:0">Səbətdəki məhsullar</h2>
+          <span id="itemCount" class="muted">0 məhsul</span>
+        </div>
+        <div id="checkoutItems" class="list"></div>
+        <div id="emptyState" class="empty" style="display:none">Səbətiniz boşdur. Məhsul əlavə edib yenidən checkout səhifəsinə gəlin.</div>
+      </section>
 
-    <script type="module" src="../js/checkout.js"></script>
+      <aside class="card">
+        <h2 style="margin:0 0 8px">Cəmi</h2>
+        <div class="summary-row"><span class="muted">Məhsullar:</span><span id="subtotal">₼0.00</span></div>
+        <div class="summary-row"><span class="muted">Çatdırılma:</span><span id="shippingFee">₼0.00</span></div>
+        <div class="summary-row total"><span>Toplam:</span><span id="totalPrice" style="color:var(--primary)">₼0.00</span></div>
+        <button id="btnCheckout" class="btn">Sifarişi tamamla</button>
+        <p id="msg" class="msg"></p>
+      </aside>
+    </div>
+  </main>
+
+  <script type="module" src="../js/checkout.js"></script>
 </body>
 </html>
