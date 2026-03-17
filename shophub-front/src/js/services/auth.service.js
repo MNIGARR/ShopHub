@@ -97,3 +97,16 @@ export async function sendResetEmail(email) {
     body: { email },
   });
 }
+
+export async function deleteAccount() {
+  try {
+    const data = await apiFetch(endpoints.auth.deleteAccount(), {
+      method: "DELETE",
+    });
+    // Hesab silindikdən sonra logout et
+    logout();
+    return data;
+  } catch (error) {
+    throw new Error(error.message || "Hesab silmə xətası");
+  }
+}

@@ -1,12 +1,11 @@
-import { $ } from "./utils/dom.js";
-import { getCart, setCart, clearCart } from "./services/cart.service.js";
+import { getCart, clearCart } from "./services/cart.service.js";
 import { getUser } from "./services/auth.service.js";
-import { checkoutOrder } from "./services/order.service.js";
+import { apiFetch } from "./api/http.js";
+import { endpoints } from "./api/endpoints.js";
 import { getProductById } from "./services/product.service.js";
 
 const SHIPPING_FEE = 5;
 const FREE_SHIPPING_MIN = 150;
-const CHECKOUT_DRAFT_KEY = "shophub_checkout_draft_v1";
 
 function formatAZN(value) {
   return `₼${Number(value || 0).toFixed(2)}`;
@@ -38,15 +37,17 @@ async function enrichCartItems(cart) {
       }
 
       try {
-        const { product } = await getProductById(item.productId);
+        const data = await getProductById(item.productId);
+        const product = data.product || data;
         return {
           productId: Number(item.productId),
           qty,
-          name: product?.Name || `Məhsul #${item.productId}`,
-          price: Number(product?.Price || 0),
+          name: product?.Name || product?.name || `Məhsul #${item.productId}`,
+          price: Number(product?.Price || product?.price || 0),
           image: (product?.ImageUrls && product.ImageUrls[0]) || product?.ImageUrl || null,
         };
-      } catch {
+      } catch (err) {
+        console.warn(`Məhsul ${item.productId} yüklənə bilmədi:`, err);
         return {
           productId: Number(item.productId),
           qty,
@@ -59,42 +60,19 @@ async function enrichCartItems(cart) {
   );
 }
 
-function updateCart(items) {
-  const next = items.map((item) => ({ productId: Number(item.productId), qty: normalizeQty(item.qty) }));
-  setCart(next);
-  localStorage.setItem(CHECKOUT_DRAFT_KEY, JSON.stringify(next));
-  window.dispatchEvent(new Event("storage"));
-  return next;
-}
-
-function readCheckoutSeed() {
-  const cart = getCart();
-  if (cart.length) return cart;
-
-  try {
-    const draft = JSON.parse(localStorage.getItem(CHECKOUT_DRAFT_KEY) || "[]");
-    if (Array.isArray(draft) && draft.length) {
-      setCart(draft);
-      return draft;
-    }
-  } catch {}
-
-  return [];
-}
-
 async function initCheckout() {
-  const container = $("checkoutItems");
-  const emptyState = $("emptyState");
-  const checkoutBtn = $("btnCheckout");
-  const msg = $("msg");
-  const subtotalEl = $("subtotal");
-  const shippingEl = $("shippingFee");
-  const totalEl = $("totalPrice");
-  const itemCountEl = $("itemCount");
+  const container = document.getElementById("checkoutItems");
+  const emptyState = document.getElementById("emptyState");
+  const checkoutBtn = document.getElementById("btnCheckout");
+  const msg = document.getElementById("msg");
+  const subtotalEl = document.getElementById("subtotal");
+  const shippingEl = document.getElementById("shippingFee");
+  const totalEl = document.getElementById("totalPrice");
+  const itemCountEl = document.getElementById("itemCount");
 
   if (!container || !checkoutBtn) return;
 
-  let cart = readCheckoutSeed();
+  let cart = getCart();
   let items = await enrichCartItems(cart);
 
   const render = () => {
@@ -116,18 +94,18 @@ async function initCheckout() {
           (item) => `
           <article class="row">
             <div class="row-left">
-              <img src="${item.image || "https://placehold.co/80x80?text=No+Image"}" alt="${item.name}" class="img" />
-              <div>
-                <p style="margin:0;font-weight:600;">${item.name}</p>
+              <img src="${item.image || "https://placehold.co/56x56?text=No+Image"}" alt="${item.name}" class="img" />
+              <div style="min-width: 0;">
+                <p style="margin:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;">${item.name}</p>
                 <p class="muted" style="margin:4px 0 0">${formatAZN(item.price)} / ədəd</p>
               </div>
             </div>
 
             <div class="qty">
-              <button data-dec="${item.productId}" class="qbtn">−</button>
+              <button data-dec="${item.productId}" class="qbtn" type="button">−</button>
               <span style="min-width:18px;text-align:center;">${item.qty}</span>
-              <button data-inc="${item.productId}" class="qbtn">+</button>
-              <button data-remove="${item.productId}" class="remove">Sil</button>
+              <button data-inc="${item.productId}" class="qbtn" type="button">+</button>
+              <button data-remove="${item.productId}" class="remove" type="button">✕</button>
             </div>
           </article>
         `,
@@ -141,8 +119,17 @@ async function initCheckout() {
     if (itemCountEl) itemCountEl.textContent = `${count} məhsul`;
   };
 
+  const persistCart = () => {
+    const next = items.map((item) => ({ 
+      productId: Number(item.productId), 
+      qty: normalizeQty(item.qty) 
+    }));
+    localStorage.setItem("shophub_cart", JSON.stringify(next));
+    window.dispatchEvent(new Event("storage"));
+  };
+
   const persistAndReRender = () => {
-    cart = updateCart(items);
+    persistCart();
     render();
   };
 
@@ -181,21 +168,24 @@ async function initCheckout() {
 
   checkoutBtn.onclick = async () => {
     const user = getUser();
+    
+    // User yoxlaması
     if (!user) {
       if (msg) {
-        msg.className = "msg";
-        msg.style.color = "#d58a00";
         msg.textContent = "Sifarişi tamamlamaq üçün giriş edin.";
+        msg.style.color = "#d58a00";
       }
-      window.location.href = "/src/pages/auth/login.html";
+      setTimeout(() => {
+        window.location.href = "/src/pages/auth/login.html";
+      }, 1500);
       return;
     }
 
-    if (!cart.length) {
+    // Səbət boşluğu yoxlaması
+    if (!items.length) {
       if (msg) {
-        msg.className = "msg";
-        msg.style.color = "#d58a00";
         msg.textContent = "Səbət boşdur.";
+        msg.style.color = "#d58a00";
       }
       return;
     }
@@ -203,36 +193,63 @@ async function initCheckout() {
     try {
       checkoutBtn.disabled = true;
       checkoutBtn.textContent = "Göndərilir...";
+      if (msg) {
+        msg.textContent = "";
+        msg.style.color = "";
+      }
 
       const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const shippingFee = getShippingFee(subtotal);
+
+      // Backend-ə göndərilən məlumat
       const payload = {
-        items: cart.map((x) => ({ productId: Number(x.productId), qty: normalizeQty(x.qty) })),
-        shippingFee: getShippingFee(subtotal),
+        items: items.map((x) => ({ 
+          productId: Number(x.productId), 
+          qty: normalizeQty(x.qty) 
+        })),
+        shippingFee: shippingFee,
       };
 
-      await checkoutOrder(payload);
+      console.log("Checkout payload:", payload);
+
+      // Checkout API çağırış
+      const response = await apiFetch(endpoints.orders.checkout(), {
+        method: "POST",
+        body: payload,
+      });
+
+      console.log("Checkout response:", response);
+
+      // Uğurlu sifarış
       clearCart();
-      localStorage.removeItem(CHECKOUT_DRAFT_KEY);
+      localStorage.removeItem("shophub_checkout_draft_v1");
+
       if (msg) {
-        msg.className = "msg";
+        msg.textContent = "✓ Sifarişiniz uğurla tamamlandı. Yönləndirilir...";
         msg.style.color = "#1f9e49";
-        msg.textContent = "Sifarişiniz uğurla tamamlandı.";
       }
-      window.location.href = "/src/pages/orders.html";
+
+      // Sifarişlərim səhifəsinə yönləndirmə
+      setTimeout(() => {
+        window.location.href = "/src/pages/orders.html";
+      }, 1500);
+
     } catch (err) {
-      if (msg) {
-        msg.className = "msg";
-        msg.style.color = "#d94a4a";
-        msg.textContent = err?.message || "Checkout zamanı xəta baş verdi.";
-      }
       console.error("Checkout error:", err);
-    } finally {
+      
+      if (msg) {
+        msg.textContent = err?.message || "Checkout zamanı xəta baş verdi.";
+        msg.style.color = "#d94a4a";
+      }
+
       checkoutBtn.disabled = false;
       checkoutBtn.textContent = "Sifarişi tamamla";
     }
   };
 
+  // İlk render
   render();
 }
 
-  initCheckout();
+// Səhifə yükləndikdə başlat
+initCheckout();

@@ -140,21 +140,6 @@
         font-weight: 600;
         margin: 0 0 20px;
         color: var(--text);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .card-title button {
-        background: none;
-        border: none;
-        color: var(--accent);
-        cursor: pointer;
-        font-size: 14px;
-        text-decoration: underline;
-        transition: opacity 0.2s;
-      }
-      .card-title button:hover {
-        opacity: 0.8;
       }
       .info-row {
         display: flex;
@@ -196,7 +181,15 @@
       .btn-secondary:hover {
         background: var(--line);
       }
-      .modal {
+      .btn-danger {
+        border-color: #ff6b6b;
+        color: #ff6b6b;
+      }
+      .btn-danger:hover {
+        background: rgba(255, 107, 107, 0.1);
+      }
+      /* Modal Styles */
+      .modal-overlay {
         display: none;
         position: fixed;
         inset: 0;
@@ -204,50 +197,100 @@
         z-index: 1000;
         align-items: center;
         justify-content: center;
+        animation: fadeIn 0.2s ease-in-out;
       }
-      .modal.active {
+      .modal-overlay.active {
         display: flex;
       }
-      .modal-content {
+      .modal-box {
         background: var(--surface);
         border: 1px solid var(--line);
         border-radius: 16px;
         padding: 32px;
-        max-width: 500px;
+        max-width: 450px;
         width: 90%;
+        animation: slideUp 0.3s ease-out;
+      }
+      .modal-header {
+        margin-bottom: 24px;
       }
       .modal-title {
         font-size: 22px;
         font-weight: 600;
-        margin: 0 0 24px;
+        margin: 0 0 8px;
       }
-      .form-group {
-        margin-bottom: 20px;
-      }
-      .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        color: var(--text);
-        font-weight: 500;
+      .modal-subtitle {
+        color: var(--muted);
         font-size: 14px;
+        margin: 0;
       }
-      .form-group input {
-        width: 100%;
+      .modal-content {
+        margin-bottom: 24px;
+      }
+      .modal-warning {
+        background: #ff6b6b20;
+        border: 1px solid #ff6b6b40;
+        color: #ff6b6b;
         padding: 12px;
-        border: 1px solid var(--line);
         border-radius: 8px;
-        background: var(--input-bg);
-        color: var(--text);
         font-size: 14px;
       }
-      .form-group input:focus {
-        outline: none;
-        border-color: var(--accent);
-      }
-      .form-buttons {
+      .modal-actions {
         display: flex;
         gap: 12px;
         justify-content: flex-end;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      /* Toast Notification */
+      .toast-container {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 2000;
+        pointer-events: none;
+      }
+      .toast {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 12px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        min-width: 300px;
+        pointer-events: auto;
+        animation: slideInRight 0.3s ease-out;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      .toast.success {
+        border-color: #51cf66;
+      }
+      .toast.error {
+        border-color: #ff6b6b;
+      }
+      .toast.info {
+        border-color: var(--accent);
+      }
+      .toast-icon {
+        flex-shrink: 0;
+        font-size: 20px;
+      }
+      .toast-message {
+        flex: 1;
+        font-size: 14px;
+        color: var(--text);
+      }
+      @keyframes slideInRight {
+        from { transform: translateX(400px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
       }
       .site-footer {
         background: #121317;
@@ -314,20 +357,14 @@
 
         <div class="main-content">
           <div class="card">
-            <div class="card-title">
-              Şəxsi Məlumatlar
-              <button onclick="openEditModal()">Redaktə et</button>
-            </div>
+            <div class="card-title">Şəxsi Məlumatlar</div>
             <div id="profileInfo">
               <div class="loading">Yüklənir...</div>
             </div>
           </div>
 
           <div class="card">
-            <div class="card-title">
-              Təhlükəsizlik
-              <button onclick="openPasswordModal()">Dəyiş</button>
-            </div>
+            <div class="card-title">Təhlükəsizlik</div>
             <div id="securityInfo">
               <div class="info-row">
                 <span class="info-label">Şifrə</span>
@@ -345,53 +382,51 @@
           <div class="card-title">Hesab</div>
           <div style="display: flex; gap: 12px;">
             <button class="btn btn-secondary" onclick="logout()">Çıxış</button>
-            <button class="btn btn-secondary" style="border-color: #ff6b6b; color: #ff6b6b;" onclick="deleteAccount()">Hesabı sil</button>
+            <button class="btn btn-secondary btn-danger" onclick="openDeleteModal()">Hesabı sil</button>
           </div>
         </div>
       </div>
     </main>
 
-    <!-- Edit Profile Modal -->
-    <div id="editModal" class="modal">
-      <div class="modal-content">
-        <h2 class="modal-title">Profili redaktə et</h2>
-        <form id="editForm" onsubmit="saveProfile(event)">
-          <div class="form-group">
-            <label for="editEmail">Email</label>
-            <input type="email" id="editEmail" required />
+    <!-- Delete Account Modal -->
+    <div id="deleteModal" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h2 class="modal-title">⚠️ Hesabı silmək</h2>
+          <p class="modal-subtitle">Bu əməliyyat geri qaytarıla bilməz</p>
+        </div>
+        <div class="modal-content">
+          <p style="color: var(--muted); margin: 0 0 16px;">Hesabınız silinəcəksə, bütün məlumatınız və sifarişləriniz silindi ləbi olacaq.</p>
+          <div class="modal-warning">
+            ⚠️ Hansı ki 30 gün ərzində bütün məlumatlar sistem-dən tamamilə silinəcək
           </div>
-          <div class="form-buttons">
-            <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Ləğv</button>
-            <button type="submit" class="btn">Yadda saxla</button>
-          </div>
-        </form>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeDeleteModal()">Ləğv et</button>
+          <button class="btn" style="background-color: #ff6b6b;" onclick="confirmDelete()">Silməyi təsdiq et</button>
+        </div>
       </div>
     </div>
 
-    <!-- Change Password Modal -->
-    <div id="passwordModal" class="modal">
-      <div class="modal-content">
-        <h2 class="modal-title">Şifrəni dəyiş</h2>
-        <form id="passwordForm" onsubmit="changePassword(event)">
-          <div class="form-group">
-            <label for="currentPassword">Hazırkı şifrə</label>
-            <input type="password" id="currentPassword" required />
-          </div>
-          <div class="form-group">
-            <label for="newPassword">Yeni şifrə</label>
-            <input type="password" id="newPassword" required />
-          </div>
-          <div class="form-group">
-            <label for="confirmPassword">Yeni şifrəni təkrar edin</label>
-            <input type="password" id="confirmPassword" required />
-          </div>
-          <div class="form-buttons">
-            <button type="button" class="btn btn-secondary" onclick="closePasswordModal()">Ləğv</button>
-            <button type="submit" class="btn">Dəyiş</button>
-          </div>
-        </form>
+    <!-- Confirm Delete Modal -->
+    <div id="confirmDeleteModal" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h2 class="modal-title">🔒 Final Təsdiq</h2>
+          <p class="modal-subtitle">Əmin olduğunuzu yenidən təsdiq edin</p>
+        </div>
+        <div class="modal-content">
+          <p style="color: var(--muted); margin: 0;">Bu əməliyyat <strong>tam olaraq geri qaytarıla bilməz</strong>. Davam etmək istəyirsiniz?</p>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeConfirmDeleteModal()">Ləğv et</button>
+          <button class="btn" style="background-color: #ff6b6b;" onclick="performDelete()">Həqiqətən silmək istəyirəm</button>
+        </div>
       </div>
     </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
 
     <footer class="site-footer">
       <div class="footer-content">
@@ -400,16 +435,39 @@
     </footer>
 
     <script type="module">
-      import { me } from "/src/js/services/auth.service.js";
+      import { me, deleteAccount, logout as authLogout } from "/src/js/services/auth.service.js";
 
       let currentUser = null;
+
+      // Toast notification system
+      function showToast(message, type = 'info', duration = 4000) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icons = {
+          success: '✓',
+          error: '✕',
+          info: 'ℹ'
+        };
+
+        toast.innerHTML = `
+          <div class="toast-icon">${icons[type]}</div>
+          <div class="toast-message">${message}</div>
+        `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+          toast.remove();
+        }, duration);
+      }
 
       // Load user data
       async function loadProfile() {
         try {
           currentUser = await me();
           document.getElementById("userEmail").textContent = currentUser.email;
-          document.getElementById("editEmail").value = currentUser.email;
           
           const profileInfo = document.getElementById("profileInfo");
           profileInfo.innerHTML = `
@@ -421,13 +479,8 @@
               <span class="info-label">Email</span>
               <span class="info-value">${currentUser.email}</span>
             </div>
-            <div class="info-row">
-              <span class="info-label">Rolu</span>
-              <span class="info-value">${currentUser.role || 'İstifadəçi'}</span>
-            </div>
           `;
 
-          // Set avatar initial
           const initial = currentUser.email.charAt(0).toUpperCase();
           document.getElementById("avatar").textContent = initial;
         } catch (error) {
@@ -442,55 +495,49 @@
       }
 
       // Modal functions
-      window.openEditModal = () => {
-        document.getElementById("editModal").classList.add("active");
+      window.openDeleteModal = () => {
+        document.getElementById("deleteModal").classList.add("active");
       };
 
-      window.closeEditModal = () => {
-        document.getElementById("editModal").classList.remove("active");
+      window.closeDeleteModal = () => {
+        document.getElementById("deleteModal").classList.remove("active");
       };
 
-      window.openPasswordModal = () => {
-        document.getElementById("passwordModal").classList.add("active");
+      window.closeConfirmDeleteModal = () => {
+        document.getElementById("confirmDeleteModal").classList.remove("active");
       };
 
-      window.closePasswordModal = () => {
-        document.getElementById("passwordModal").classList.remove("active");
+      window.confirmDelete = () => {
+        document.getElementById("deleteModal").classList.remove("active");
+        document.getElementById("confirmDeleteModal").classList.add("active");
       };
 
-      // Save profile
-      window.saveProfile = async (e) => {
-        e.preventDefault();
-        alert("Profil redaktəsi funksiyası backend-ə qoşulmamışdır");
-        closeEditModal();
-      };
+      // Perform actual deletion
+      window.performDelete = async () => {
+        const btn = event.target;
+        btn.disabled = true;
+        btn.textContent = "Siliniyor...";
 
-      // Change password
-      window.changePassword = async (e) => {
-        e.preventDefault();
-        const newPass = document.getElementById("newPassword").value;
-        const confirmPass = document.getElementById("confirmPassword").value;
-        
-        if (newPass !== confirmPass) {
-          alert("Şifrələr uyğun gəlmir");
-          return;
+        try {
+          await deleteAccount();
+          
+          showToast("Hesabınız silindi. Sizi anasəhifəyə yönləndiririk...", "success", 2000);
+          
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 2000);
+        } catch (error) {
+          showToast("Xəta: " + (error.message || "Hesab silmə uğursuz oldu"), "error");
+          btn.disabled = false;
+          btn.textContent = "Həqiqətən silmək istəyirəm";
+          document.getElementById("confirmDeleteModal").classList.remove("active");
         }
-        
-        alert("Şifrə dəyişmə funksiyası backend-ə qoşulmamışdır");
-        closePasswordModal();
       };
 
       // Logout
       window.logout = () => {
-        localStorage.removeItem("authToken");
+        authLogout();
         window.location.href = "/";
-      };
-
-      // Delete account
-      window.deleteAccount = () => {
-        if (confirm("Hesabınızı silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarıla bilməz.")) {
-          alert("Hesab silmə funksiyası backend-ə qoşulmamışdır");
-        }
       };
 
       document.getElementById("year").textContent = new Date().getFullYear();
