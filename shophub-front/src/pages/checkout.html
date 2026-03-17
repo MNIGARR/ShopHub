@@ -1,88 +1,558 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="az">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ShopHub | Checkout</title>
-  <script>
-    (function () {
-      const saved = localStorage.getItem("shophub_theme") || "light";
-      document.documentElement.setAttribute("data-theme", saved === "dark" ? "dark" : "light");
-    })();
-  </script>
-  <style>
-    :root {
-      --bg: #f6f5f2;
-      --surface: #ffffff;
-      --muted: #6a6a6a;
-      --text: #1f1f22;
-      --line: #e6e4df;
-      --primary: #2563eb;
-    }
-    [data-theme="dark"] {
-      --bg: #101010;
-      --surface: #161616;
-      --muted: #a3a3a3;
-      --text: #f5f5f5;
-      --line: #2a2a2a;
-      --primary: #3b82f6;
-    }
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); }
-    .container { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 40px; }
-    .top { display:flex; justify-content:space-between; gap:16px; flex-wrap: wrap; margin-bottom: 18px; }
-    .muted { color: var(--muted); }
-    .back { border:1px solid var(--line); background: var(--surface); color: var(--text); padding: 10px 14px; border-radius: 12px; text-decoration: none; }
-    .grid { display:grid; grid-template-columns: 1.6fr 1fr; gap: 18px; }
-    .card { background: var(--surface); border:1px solid var(--line); border-radius: 16px; padding: 16px; }
-    .head { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom: 10px; margin-bottom: 10px; }
-    .list { display:grid; gap:10px; }
-    .row { display:flex; justify-content:space-between; align-items:center; gap:10px; border:1px solid var(--line); border-radius: 12px; padding: 10px; }
-    .row-left{ display:flex; align-items:center; gap:10px; min-width:0; }
-    .img { width: 56px; height:56px; object-fit:cover; border-radius:10px; border:1px solid var(--line); background:#ddd; }
-    .qty { display:flex; align-items:center; gap:6px; }
-    .qbtn { width:30px; height:30px; border-radius: 8px; border:1px solid var(--line); background: transparent; color:var(--text); cursor:pointer; }
-    .remove { border:0; background:transparent; color:#e14d4d; cursor:pointer; }
-    .summary-row { display:flex; justify-content:space-between; margin: 8px 0; }
-    .total { border-top:1px solid var(--line); padding-top:10px; margin-top: 10px; font-size: 30px; font-weight: 700; }
-    .btn { width:100%; border:0; background: var(--primary); color:#fff; padding: 12px; border-radius: 12px; font-weight: 700; cursor:pointer; margin-top: 12px; }
-    .btn:disabled { opacity: .6; cursor:not-allowed; }
-    .empty { border:1px dashed var(--line); border-radius:12px; padding: 18px; text-align:center; color:var(--muted); }
-    .msg { text-align:center; margin-top: 10px; min-height: 20px; }
-    @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
-  </style>
-</head>
-<body>
-  <main class="container">
-    <div class="top">
-      <div>
-        <div class="muted">IShine / Checkout</div>
-        <h1 style="margin:.2rem 0; font-size:42px;">Sifarişi rəsmiləşdir</h1>
-        <div class="muted">Məhsulları yoxlayın, sayları düzəldin və sifarişi tamamlayın.</div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>iShine | Checkout</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --surface: #f5f5f5;
+        --text: #1a1a1a;
+        --muted: #666666;
+        --line: #e0e0e0;
+        --accent: #d86f00;
+      }
+
+      [data-theme="dark"] {
+        --bg: #121212;
+        --surface: #1e1e1e;
+        --text: #f5f5f5;
+        --muted: #a0a0a0;
+        --line: #303030;
+        --accent: #e8920f;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html, body {
+        height: 100%;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        transition: background 0.3s, color 0.3s;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      /* Header */
+      .site-header {
+        border-bottom: 1px solid var(--line);
+        padding: 16px 0;
+      }
+
+      .header-content {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .back-btn {
+        background: none;
+        border: none;
+        color: var(--text);
+        font-size: 24px;
+        cursor: pointer;
+        padding: 4px;
+      }
+
+      .header-title {
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      /* Main */
+      main {
+        flex: 1;
+        padding: 40px 0;
+      }
+
+      .page-title {
+        font-size: 32px;
+        font-weight: 600;
+        margin-bottom: 40px;
+      }
+
+      /* Grid Layout */
+      .checkout-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 32px;
+      }
+
+      /* Items Section */
+      .items-section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .checkout-item {
+        display: flex;
+        gap: 16px;
+        padding: 16px;
+        background: var(--surface);
+        border-radius: 8px;
+        align-items: flex-start;
+      }
+
+      .item-image {
+        width: 80px;
+        height: 80px;
+        background: #ddd;
+        border-radius: 6px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .item-content {
+        flex: 1;
+      }
+
+      .item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+      }
+
+      .item-name {
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 1.4;
+        max-width: 60%;
+      }
+
+      .item-price {
+        font-weight: 600;
+        font-size: 15px;
+      }
+
+      .item-meta {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 12px;
+      }
+
+      .item-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .qty-btn {
+        width: 24px;
+        height: 24px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        color: var(--text);
+      }
+
+      .qty-btn:hover {
+        background: var(--line);
+      }
+
+      .qty-value {
+        min-width: 20px;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .item-remove {
+        background: none;
+        border: none;
+        color: #e63946;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 0;
+        margin-left: auto;
+      }
+
+      .item-remove:hover {
+        color: #b91c1c;
+      }
+
+      /* Empty State */
+      .empty-checkout {
+        background: var(--surface);
+        border-radius: 8px;
+        padding: 60px 20px;
+        text-align: center;
+      }
+
+      .empty-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+
+      .empty-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .empty-text {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      /* Summary Sidebar */
+      .summary-card {
+        background: var(--surface);
+        border-radius: 8px;
+        padding: 24px;
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+      }
+
+      .summary-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--muted);
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 14px;
+      }
+
+      .summary-row.total {
+        border-top: 1px solid var(--line);
+        padding-top: 12px;
+        margin-top: 12px;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .summary-label {
+        color: var(--muted);
+      }
+
+      .summary-value {
+        font-weight: 600;
+      }
+
+      .checkout-btn {
+        width: 100%;
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: all 0.2s;
+      }
+
+      .checkout-btn:hover:not(:disabled) {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+
+      .checkout-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .message {
+        margin-top: 12px;
+        font-size: 13px;
+        text-align: center;
+        min-height: 18px;
+      }
+
+      /* Footer */
+      .site-footer {
+        border-top: 1px solid var(--line);
+        padding: 20px 0;
+        text-align: center;
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: auto;
+      }
+
+      @media (max-width: 768px) {
+        .checkout-wrapper {
+          grid-template-columns: 1fr;
+        }
+
+        .summary-card {
+          position: static;
+        }
+
+        .page-title {
+          font-size: 24px;
+        }
+
+        main {
+          padding: 24px 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      const savedTheme = localStorage.getItem("shophub_theme") || "light";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+    </script>
+
+    <!-- Header -->
+    <header class="site-header">
+      <div class="container header-content">
+        <button class="back-btn" onclick="window.location.href='/'">←</button>
+        <span class="header-title">Checkout</span>
       </div>
-      <a class="back" href="/">Mağazaya qayıt</a>
-    </div>
-    <div class="grid">
-      <section class="card">
-        <div class="head">
-          <h2 style="margin:0">Səbətdəki məhsullar</h2>
-          <span id="itemCount" class="muted">0 məhsul</span>
+    </header>
+
+    <!-- Main -->
+    <main>
+      <div class="container">
+        <h1 class="page-title">Sifarişi tamamla</h1>
+
+        <div class="checkout-wrapper">
+          <!-- Items -->
+          <div class="items-section" id="checkoutItems">
+            <div class="empty-checkout">
+              <div class="empty-icon">🛒</div>
+              <h3 class="empty-title">Səbət boşdur</h3>
+              <p class="empty-text">Məhsul əlavə edib dönə bilərsiz</p>
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div class="summary-card">
+            <div class="summary-title">Xülasə</div>
+
+            <div class="summary-row">
+              <span class="summary-label">Məhsullar</span>
+              <span class="summary-value" id="subtotal">₼0</span>
+            </div>
+
+            <div class="summary-row">
+              <span class="summary-label">Çatdırılma</span>
+              <span class="summary-value" id="shippingFee">₼0</span>
+            </div>
+
+            <div class="summary-row total">
+              <span>Toplam</span>
+              <span id="totalPrice">₼0</span>
+            </div>
+
+            <button class="checkout-btn" id="checkoutBtn" onclick="checkout()">
+              Sifarişi tamamla
+            </button>
+
+            <div class="message" id="msg"></div>
+          </div>
         </div>
-        <div id="checkoutItems" class="list"></div>
-        <div id="emptyState" class="empty" style="display:none">Səbətiniz boşdur. Məhsul əlavə edib yenidən checkout səhifəsinə gəlin.</div>
-      </section>
+      </div>
+    </main>
 
-      <aside class="card">
-        <h2 style="margin:0 0 8px">Cəmi</h2>
-        <div class="summary-row"><span class="muted">Məhsullar:</span><span id="subtotal">₼0.00</span></div>
-        <div class="summary-row"><span class="muted">Çatdırılma:</span><span id="shippingFee">₼0.00</span></div>
-        <div class="summary-row total"><span>Toplam:</span><span id="totalPrice" style="color:var(--primary)">₼0.00</span></div>
-        <button id="btnCheckout" class="btn">Sifarişi tamamla</button>
-        <p id="msg" class="msg"></p>
-      </aside>
-    </div>
-  </main>
+    <!-- Footer -->
+    <footer class="site-footer">
+      © <span id="year">2026</span> iShine. Bütün hüquqlar qorunur.
+    </footer>
 
-  <script type="module" src="../js/checkout.js"></script>
-</body>
+    <script type="module">
+      import { getCart, clearCart } from "/src/js/services/cart.service.js";
+      import { getUser } from "/src/js/services/auth.service.js";
+      import { apiFetch } from "/src/js/api/http.js";
+      import { endpoints } from "/src/js/api/endpoints.js";
+      import { getProductById } from "/src/js/services/product.service.js";
+
+      const SHIPPING = 5;
+      const FREE_THRESHOLD = 150;
+
+      function formatPrice(val) {
+        return `₼${Math.round(Number(val || 0))}`;
+      }
+
+      function normalizeQty(qty) {
+        const q = Number(qty || 1);
+        return Math.max(1, Math.floor(q));
+      }
+
+      async function loadItems(cart) {
+        return Promise.all(
+          cart.map(async (item) => {
+            try {
+              const data = await getProductById(item.productId);
+              const prod = data.product || data;
+              return {
+                id: Number(item.productId),
+                qty: normalizeQty(item.qty),
+                name: prod?.Name || prod?.name || "Məhsul",
+                price: Number(prod?.Price || prod?.price || 0),
+                image: prod?.ImageUrls?.[0] || prod?.ImageUrl || null,
+              };
+            } catch {
+              return {
+                id: Number(item.productId),
+                qty: normalizeQty(item.qty),
+                name: `Məhsul #${item.productId}`,
+                price: 0,
+                image: null,
+              };
+            }
+          })
+        );
+      }
+
+      async function init() {
+        const container = document.getElementById("checkoutItems");
+        const btn = document.getElementById("checkoutBtn");
+        const msg = document.getElementById("msg");
+
+        let items = await loadItems(getCart());
+
+        const render = () => {
+          if (!items.length) {
+            container.innerHTML = `
+              <div class="empty-checkout">
+                <div class="empty-icon">🛒</div>
+                <h3 class="empty-title">Səbət boşdur</h3>
+                <p class="empty-text">Məhsul əlavə edib dönə bilərsiz</p>
+              </div>
+            `;
+            btn.disabled = true;
+            updateSummary(0, 0);
+            return;
+          }
+
+          container.innerHTML = items.map(item => `
+            <div class="checkout-item">
+              <div class="item-image">
+                ${item.image ? `<img src="${item.image}" alt="${item.name}">` : "📦"}
+              </div>
+              <div class="item-content">
+                <div class="item-header">
+                  <div class="item-name">${item.name}</div>
+                  <div class="item-price">${formatPrice(item.price)}</div>
+                </div>
+                <div class="item-meta">₼${item.price} × ${item.qty}</div>
+                <div class="item-controls">
+                  <button class="qty-btn" onclick="dec(${item.id})">−</button>
+                  <span class="qty-value">${item.qty}</span>
+                  <button class="qty-btn" onclick="inc(${item.id})">+</button>
+                  <button class="item-remove" onclick="remove(${item.id})">✕</button>
+                </div>
+              </div>
+            </div>
+          `).join("");
+
+          btn.disabled = false;
+          const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+          updateSummary(subtotal, subtotal >= FREE_THRESHOLD ? 0 : SHIPPING);
+        };
+
+        const updateSummary = (sub, ship) => {
+          const total = sub + ship;
+          document.getElementById("subtotal").textContent = formatPrice(sub);
+          document.getElementById("shippingFee").textContent = formatPrice(ship);
+          document.getElementById("totalPrice").textContent = formatPrice(total);
+        };
+
+        window.inc = (id) => {
+          const item = items.find(i => i.id === id);
+          if (item) item.qty++;
+          render();
+        };
+
+        window.dec = (id) => {
+          const item = items.find(i => i.id === id);
+          if (item && item.qty > 1) item.qty--;
+          render();
+        };
+
+        window.remove = (id) => {
+          items = items.filter(i => i.id !== id);
+          render();
+        };
+
+        window.checkout = async () => {
+          const user = getUser();
+          if (!user) {
+            msg.textContent = "Giriş edin";
+            msg.style.color = "#d58a00";
+            setTimeout(() => window.location.href = "/src/pages/auth/login.html", 1500);
+            return;
+          }
+          if (!items.length) {
+            msg.textContent = "Səbət boşdur";
+            msg.style.color = "#d58a00";
+            return;
+          }
+
+          try {
+            btn.disabled = true;
+            btn.textContent = "Göndərilir...";
+            msg.textContent = "";
+
+            const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+            await apiFetch(endpoints.orders.checkout(), {
+              method: "POST",
+              body: {
+                items: items.map(i => ({ productId: i.id, qty: i.qty })),
+                shippingFee: subtotal >= FREE_THRESHOLD ? 0 : SHIPPING,
+              },
+            });
+
+            clearCart();
+            msg.textContent = "✓ Tamamlandı";
+            msg.style.color = "#1f9e49";
+            setTimeout(() => window.location.href = "/src/pages/orders.html", 1500);
+          } catch (err) {
+            msg.textContent = err?.message || "Xəta";
+            msg.style.color = "#d94a4a";
+            btn.disabled = false;
+            btn.textContent = "Sifarişi tamamla";
+          }
+        };
+
+        render();
+      }
+
+      document.getElementById("year").textContent = new Date().getFullYear();
+      init();
+    </script>
+  </body>
 </html>

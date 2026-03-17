@@ -14,6 +14,15 @@
         --footer: #151b29;
       }
 
+      [data-theme="dark"] {
+        --bg: #0a0a0a;
+        --surface: #151515;
+        --text: #f5f5f5;
+        --muted: #a3a3a3;
+        --line: #2a2a2a;
+        --footer: #0f1117;
+      }
+
       * {
         box-sizing: border-box;
       }
@@ -29,6 +38,7 @@
         color: var(--text);
         display: flex;
         flex-direction: column;
+        transition: background-color 0.3s, color 0.3s;
       }
 
       .container {
@@ -41,8 +51,9 @@
         position: sticky;
         top: 0;
         z-index: 50;
-        background: #f7f7f7;
-        border-bottom: 1px solid #dedede;
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+        transition: background-color 0.3s, border-color 0.3s;
       }
 
       .header-content {
@@ -65,14 +76,14 @@
       }
 
       .main-nav a {
-        color: #6b7280;
+        color: var(--muted);
         text-decoration: none;
         transition: color 0.2s;
       }
 
       .main-nav a:hover,
       .main-nav a.active {
-        color: #111827;
+        color: var(--text);
         font-weight: 600;
       }
 
@@ -86,50 +97,26 @@
         width: 50px;
         height: 50px;
         border-radius: 50%;
-        border: 1px solid #d8d8d8;
+        border: 1px solid var(--line);
         display: grid;
         place-items: center;
-        background: #f4f4f4;
-        color: #111827;
+        background: var(--line);
+        color: var(--text);
         text-decoration: none;
         cursor: pointer;
         transition: all 0.2s;
       }
 
       .icon-btn:hover {
-        background: #e8e8e8;
-      }
-
-      .icon-btn.cart {
-        background: #121826;
-        border-color: #121826;
-        color: #fff;
-        position: relative;
-      }
-
-      .icon-btn.cart:hover {
-        background: #1e2537;
-      }
-
-      .cart-badge {
-        position: absolute;
-        right: -2px;
-        top: -4px;
-        width: 20px;
-        height: 20px;
-        border-radius: 999px;
-        background: #4a9f8b;
-        color: #fff;
-        font-size: 12px;
-        display: grid;
-        place-items: center;
-        font-weight: 700;
+        border-color: var(--muted);
+        background: var(--muted);
+        color: var(--surface);
       }
 
       /* Main */
       main {
         flex: 1;
-        padding: 40px 0 68px;
+        padding: 40px 0;
       }
 
       .profile-head {
@@ -143,13 +130,13 @@
         width: 112px;
         height: 112px;
         border-radius: 50%;
-        background: #dddddd;
-        border: 3px solid #ececec;
+        background: var(--line);
+        border: 3px solid var(--line);
         display: grid;
         place-items: center;
         font-size: 48px;
         font-weight: 700;
-        color: #555;
+        color: var(--text);
         flex-shrink: 0;
       }
 
@@ -162,7 +149,7 @@
 
       .profile-head p {
         margin: 12px 0 0;
-        color: #4b5563;
+        color: var(--muted);
         font-size: 14px;
       }
 
@@ -180,6 +167,7 @@
         border-radius: 26px;
         padding: 32px 38px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s;
       }
 
       .card-head {
@@ -199,22 +187,22 @@
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        border: 1px solid #dedede;
+        border: 1px solid var(--line);
         display: grid;
         place-items: center;
-        color: #6b7280;
+        color: var(--muted);
         flex-shrink: 0;
       }
 
       .card-title {
         margin: 0;
-        color: #0b1220;
+        color: var(--text);
         font-size: 18px;
         font-weight: 600;
       }
 
       .watermark {
-        color: #d3d5d8;
+        color: var(--muted);
         opacity: 0.3;
         width: 80px;
         height: 80px;
@@ -239,7 +227,7 @@
       }
 
       .value {
-        color: #0b1220;
+        color: var(--text);
         font-weight: 700;
         text-align: right;
         font-size: 14px;
@@ -265,9 +253,9 @@
       }
 
       .btn {
-        border: 1px solid #d5d8de;
-        background: #fafafa;
-        color: #5b6470;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--text);
         border-radius: 999px;
         padding: 12px 20px;
         display: inline-flex;
@@ -279,24 +267,23 @@
       }
 
       .btn:hover {
-        background: #f3f3f3;
-        border-color: #c9ccd2;
+        background: var(--line);
+        border-color: var(--muted);
       }
 
       .btn-danger {
         color: #e02727;
         border-color: #efb7b7;
-        background: #fff;
       }
 
       .btn-danger:hover {
-        background: #fff5f5;
+        background: rgba(224, 39, 39, 0.1);
       }
 
       .error {
         color: #b91c1c;
-        background: #fee2e2;
-        border: 1px solid #fecaca;
+        background: rgba(185, 28, 28, 0.1);
+        border: 1px solid rgba(185, 28, 28, 0.3);
         border-radius: 10px;
         padding: 12px;
         margin-bottom: 18px;
@@ -320,7 +307,8 @@
 
       .modal-box {
         width: min(520px, 92vw);
-        background: #fff;
+        background: var(--surface);
+        border: 1px solid var(--line);
         border-radius: 16px;
         padding: 24px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -330,17 +318,18 @@
         margin: 0 0 8px;
         font-size: 18px;
         font-weight: 600;
+        color: var(--text);
       }
 
       .modal-subtitle {
         margin: 0 0 20px;
-        color: #6b7280;
+        color: var(--muted);
         font-size: 14px;
       }
 
       .modal-warning {
-        background: rgba(230, 57, 70, 0.1);
-        border: 1px solid rgba(230, 57, 70, 0.3);
+        background: rgba(224, 39, 39, 0.1);
+        border: 1px solid rgba(224, 39, 39, 0.3);
         color: #e02727;
         padding: 12px;
         border-radius: 8px;
@@ -392,6 +381,12 @@
     </style>
   </head>
   <body>
+    <script>
+      // Əsas səhifədən seçilən temayı oxu
+      const savedTheme = localStorage.getItem("shophub_theme") || "light";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+    </script>
+
     <!-- Header -->
     <header class="site-header">
       <div class="container header-content">
@@ -400,18 +395,12 @@
         </a>
 
         <nav class="main-nav">
-          <a href="/">Ana səhifə</a>
           <a href="/#shop">Mağaza</a>
-          <a href="/src/pages/orders.html" class="active">Sifarişlərim</a>
         </nav>
 
         <div class="header-actions">
           <a class="icon-btn" href="/src/pages/profile.html" aria-label="Profil">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4" /><path d="M5.5 21a6.5 6.5 0 0 1 13 0" /></svg>
-          </a>
-          <a class="icon-btn cart" href="/#cart" aria-label="Səbət">
-            <span class="cart-badge">0</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z" /><path d="M6 6L5 3H2" /><circle cx="9" cy="20" r="1" /><circle cx="18" cy="20" r="1" /></svg>
           </a>
         </div>
       </div>

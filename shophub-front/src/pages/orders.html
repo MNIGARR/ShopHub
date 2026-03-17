@@ -13,6 +13,14 @@
         --muted: #7b838d;
       }
 
+      [data-theme="dark"] {
+        --bg: #0a0a0a;
+        --surface: #151515;
+        --line: #2a2a2a;
+        --text: #f5f5f5;
+        --muted: #a3a3a3;
+      }
+
       * {
         box-sizing: border-box;
       }
@@ -28,6 +36,7 @@
         color: var(--text);
         display: flex;
         flex-direction: column;
+        transition: background-color 0.3s, color 0.3s;
       }
 
       .container {
@@ -40,8 +49,9 @@
         position: sticky;
         top: 0;
         z-index: 30;
-        background: #f7f7f7;
-        border-bottom: 1px solid #dddddd;
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+        transition: background-color 0.3s, border-color 0.3s;
       }
 
       .header-content {
@@ -62,14 +72,14 @@
       }
 
       nav a {
-        color: #7f8590;
+        color: var(--muted);
         text-decoration: none;
         transition: color 0.2s;
       }
 
       nav a:hover,
       nav a.active {
-        color: #151923;
+        color: var(--text);
         font-weight: 600;
       }
 
@@ -81,45 +91,21 @@
       .icon-btn {
         width: 50px;
         height: 50px;
-        border: 1px solid #d8d8d8;
+        border: 1px solid var(--line);
         border-radius: 50%;
         display: grid;
         place-items: center;
-        color: #121622;
-        background: #f2f2f2;
+        color: var(--text);
+        background: var(--line);
         text-decoration: none;
         transition: all 0.2s;
         cursor: pointer;
       }
 
       .icon-btn:hover {
-        background: #e8e8e8;
-      }
-
-      .cart-btn {
-        background: #151923;
-        color: #fff;
-        border-color: #151923;
-        position: relative;
-      }
-
-      .cart-btn:hover {
-        background: #1f2937;
-      }
-
-      .badge {
-        position: absolute;
-        right: -2px;
-        top: -4px;
-        width: 20px;
-        height: 20px;
-        border-radius: 999px;
-        background: #3d9d85;
-        color: #fff;
-        font-size: 12px;
-        font-weight: 700;
-        display: grid;
-        place-items: center;
+        border-color: var(--muted);
+        background: var(--muted);
+        color: var(--surface);
       }
 
       /* Main */
@@ -139,11 +125,11 @@
         width: 80px;
         height: 80px;
         border-radius: 50%;
-        border: 1px solid #d8d8d8;
-        background: #f5f5f5;
+        border: 1px solid var(--line);
+        background: var(--line);
         display: grid;
         place-items: center;
-        color: #1c2231;
+        color: var(--text);
         flex-shrink: 0;
       }
 
@@ -157,7 +143,7 @@
       .page-subtitle {
         margin: 8px 0 0;
         font-size: 14px;
-        color: #536276;
+        color: var(--muted);
       }
 
       /* Orders Grid */
@@ -180,7 +166,7 @@
       }
 
       .order-card:hover {
-        border-color: #999;
+        border-color: var(--muted);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       }
 
@@ -195,12 +181,12 @@
         width: 62px;
         height: 62px;
         border-radius: 50%;
-        border: 1px solid #d9d9d9;
-        color: #5e6470;
+        border: 1px solid var(--line);
+        color: var(--muted);
         display: grid;
         place-items: center;
         flex-shrink: 0;
-        background: #f8f8f8;
+        background: var(--line);
       }
 
       .order-info h3 {
@@ -214,7 +200,7 @@
 
       .order-meta {
         font-size: 13px;
-        color: #49586c;
+        color: var(--muted);
         margin: 0;
       }
 
@@ -256,7 +242,7 @@
 
       .price-label {
         font-size: 12px;
-        color: #99a0a8;
+        color: var(--muted);
         text-transform: uppercase;
         font-weight: 700;
         margin-bottom: 4px;
@@ -269,18 +255,19 @@
 
       .details-btn {
         border: none;
-        background: #f6f6f6;
+        background: var(--line);
         border-radius: 999px;
         padding: 12px 20px;
         cursor: pointer;
         font-size: 14px;
         font-weight: 600;
-        color: #111827;
+        color: var(--text);
         transition: all 0.2s;
       }
 
       .details-btn:hover {
-        background: #e8e8e8;
+        background: var(--muted);
+        color: var(--surface);
       }
 
       /* Empty State */
@@ -320,7 +307,8 @@
       }
 
       .modal-box {
-        background: #fff;
+        background: var(--surface);
+        border: 1px solid var(--line);
         border-radius: 16px;
         width: min(620px, 92vw);
         max-height: 85vh;
@@ -335,11 +323,11 @@
         background: none;
         font-size: 28px;
         cursor: pointer;
-        color: #999;
+        color: var(--muted);
       }
 
       .modal-close:hover {
-        color: #333;
+        color: var(--text);
       }
 
       .modal-title {
@@ -347,6 +335,7 @@
         font-size: 18px;
         font-weight: 600;
         clear: both;
+        color: var(--text);
       }
 
       .modal-header {
@@ -370,22 +359,23 @@
       .order-item {
         padding: 12px;
         border-radius: 10px;
-        background: #f4f4f4;
+        background: var(--line);
         margin-bottom: 8px;
       }
 
       .item-name {
         font-weight: 600;
         margin-bottom: 4px;
+        color: var(--text);
       }
 
       .item-detail {
         font-size: 13px;
-        color: #667085;
+        color: var(--muted);
       }
 
       .modal-summary {
-        background: #f6f6f6;
+        background: var(--line);
         padding: 14px;
         border-radius: 10px;
       }
@@ -400,16 +390,17 @@
       .detail-row:last-child {
         margin-bottom: 0;
         font-weight: 700;
-        border-top: 1px solid #e0e0e0;
+        border-top: 1px solid var(--line);
         padding-top: 8px;
       }
 
       .detail-label {
-        color: #667085;
+        color: var(--muted);
       }
 
       .detail-value {
         font-weight: 600;
+        color: var(--text);
       }
 
       /* Footer */
@@ -448,6 +439,12 @@
     </style>
   </head>
   <body>
+    <script>
+      // Əsas səhifədən seçilən temayı oxu
+      const savedTheme = localStorage.getItem("shophub_theme") || "light";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+    </script>
+
     <!-- Header -->
     <header class="site-header">
       <div class="container header-content">
@@ -455,17 +452,11 @@
           <img src="/src/assets/ishine-icon-transparent.png" alt="iShine" />
         </a>
         <nav>
-          <a href="/">Ana səhifə</a>
           <a href="/#shop">Mağaza</a>
-          <a href="/src/pages/orders.html" class="active">Sifarişlərim</a>
         </nav>
         <div class="header-actions">
           <a href="/src/pages/profile.html" class="icon-btn" aria-label="Profil">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>
-          </a>
-          <a href="/#cart" class="icon-btn cart-btn" aria-label="Səbət">
-            <span class="badge">0</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
           </a>
         </div>
       </div>
@@ -638,7 +629,7 @@
                   </div>
                 </div>
               `).join("")
-            : '<div style="color:#667085;text-align:center;padding:12px;">Məhsul tapılmadı</div>';
+            : '<div style="color:var(--muted);text-align:center;padding:12px;">Məhsul tapılmadı</div>';
 
           content.innerHTML = `
             <div class="modal-header">

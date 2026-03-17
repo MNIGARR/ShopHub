@@ -1353,7 +1353,7 @@ if (addProductForm) {
     const price = document.getElementById("admProdPrice").value;
     const stock = document.getElementById("admProdStock").value;
     const category = document.getElementById("admProdCategory").value;
-    const imageUrlValue = document.getElementById("admProdImage").value.trim();
+    // const imageUrlValue = document.getElementById("admProdImage").value.trim();
 
     // Validasiya: əsas sahələr
     if (!name || !price || !stock || !category) {
