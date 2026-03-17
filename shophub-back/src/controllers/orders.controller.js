@@ -3,13 +3,47 @@ const { getPool, sql } = require("../config/db");
 async function myOrders(req, res) {
   try {
     const pool = await getPool();
-    const r = await pool.request().input("UserId", sql.Int, req.user.id).query(`
+    
+    // Əsas sifarişləri al
+    const ordersResult = await pool
+      .request()
+      .input("UserId", sql.Int, req.user.id)
+      .query(`
         SELECT Id, Status, ShippingFee, Subtotal, Total, CreatedAt
         FROM Orders
         WHERE UserId=@UserId
         ORDER BY CreatedAt DESC;
       `);
-    return res.json({ items: r.recordset });
+
+    const orders = ordersResult.recordset || [];
+
+    // Hər sifariş üçün items-ləri al
+    const ordersWithItems = await Promise.all(
+      orders.map(async (order) => {
+        const itemsResult = await pool
+          .request()
+          .input("OrderId", sql.Int, order.Id)
+          .query(`
+            SELECT 
+              oi.Id,
+              oi.ProductId,
+              oi.Qty,
+              oi.UnitPrice,
+              oi.LineTotal,
+              p.Name AS ProductName
+            FROM OrderItems oi
+            JOIN Products p ON p.Id = oi.ProductId
+            WHERE oi.OrderId=@OrderId;
+          `);
+
+        return {
+          ...order,
+          items: itemsResult.recordset || []
+        };
+      })
+    );
+
+    return res.json({ items: ordersWithItems });
   } catch (err) {
     console.error("myOrders:", err);
     return res.status(500).json({ message: "Server error" });

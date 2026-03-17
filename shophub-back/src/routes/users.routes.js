@@ -5,5 +5,6 @@ const { requireAuth, requireAdmin } = require("../middleware/auth");
 router.get("/", requireAuth, requireAdmin, ctrl.listUsers);
 router.patch("/:id/active", requireAuth, requireAdmin, ctrl.setActive);
 router.patch("/:id/role", requireAuth, requireAdmin, ctrl.setRole);
+router.delete("/me", requireAuth, ctrl.deleteAccount);
 
 module.exports = router;

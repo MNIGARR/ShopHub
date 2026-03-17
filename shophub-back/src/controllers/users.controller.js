@@ -71,4 +71,36 @@ async function setRole(req, res) {
   }
 }
 
-module.exports = { listUsers, setActive, setRole };
+// DELETE ACCOUNT - istifadəçi öz hesabını silə bilər
+async function deleteAccount(req, res) {
+  try {
+    const userId = req.user.id; // Auth middleware-dən gələn user
+    const pool = await getPool();
+
+    // User mövcud olduğunu yoxla
+    const checkUser = await pool.request()
+      .input("Id", sql.Int, userId)
+      .query("SELECT Id FROM Users WHERE Id = @Id");
+
+    if (!checkUser.recordset.length) {
+      return res.status(404).json({ message: "İstifadəçi tapılmadı" });
+    }
+
+    // User-ə aid sifarişləri sil
+    await pool.request()
+      .input("UserId", sql.Int, userId)
+      .query("DELETE FROM Orders WHERE UserId = @UserId");
+
+    // User-i sil
+    const deleteResult = await pool.request()
+      .input("Id", sql.Int, userId)
+      .query("DELETE FROM Users WHERE Id = @Id");
+
+    res.json({ message: "Hesab uğurlu şəkildə silindi" });
+  } catch (err) {
+    console.error("deleteAccount error:", err);
+    res.status(500).json({ message: "Server xətası" });
+  }
+}
+
+module.exports = { listUsers, setActive, setRole, deleteAccount };
