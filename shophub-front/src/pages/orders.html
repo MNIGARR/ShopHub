@@ -3,345 +3,498 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ShopHub | Sifarişlərim</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>iShine | Sifarişlərim</title>
     <style>
       :root {
-        --bg: #f6f5f2;
-        --surface: #ffffff;
-        --muted: #6a6a6a;
-        --text: #1f1f22;
-        --accent: #d86f00;
-        --line: #e6e4df;
-        --header-bg: #faf9f6e8;
-        --input-bg: #fff;
+        --bg: #f3f3f3;
+        --surface: #fff;
+        --line: #e5e5e5;
+        --text: #0d1321;
+        --muted: #7b838d;
       }
-      [data-theme="dark"] {
-        --bg: #101010;
-        --surface: #161616;
-        --muted: #a3a3a3;
-        --text: #f5f5f5;
-        --accent: #e07a12;
-        --line: #2a2a2a;
-        --header-bg: #131313e6;
-        --input-bg: #1b1b1b;
-      }
+
       * {
         box-sizing: border-box;
       }
+
       html, body {
         margin: 0;
-        padding: 0;
-        width: 100%;
         min-height: 100vh;
       }
+
       body {
         font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
         background: var(--bg);
         color: var(--text);
-        overflow-x: hidden;
         display: flex;
         flex-direction: column;
       }
+
+      .container {
+        width: min(1280px, calc(100% - 48px));
+        margin: 0 auto;
+      }
+
+      /* Header */
       .site-header {
         position: sticky;
         top: 0;
-        z-index: 100;
-        background: var(--header-bg);
-        backdrop-filter: blur(8px);
-        border-bottom: 1px solid var(--line);
+        z-index: 30;
+        background: #f7f7f7;
+        border-bottom: 1px solid #dddddd;
       }
+
       .header-content {
-        width: min(1180px, calc(100% - 48px));
-        margin: 0 auto;
-        height: 78px;
+        height: 112px;
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        align-items: center;
       }
-      .header-logo {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        background: #1e1e1e;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #f6f6f6;
-        font-weight: bold;
-        font-size: 20px;
+
+      .brand img {
+        width: 126px;
       }
+
       nav {
         display: flex;
-        gap: 20px;
+        gap: 42px;
         font-size: 14px;
       }
-      nav a, nav button {
-        background: none;
-        border: none;
-        color: var(--muted);
-        cursor: pointer;
+
+      nav a {
+        color: #7f8590;
         text-decoration: none;
         transition: color 0.2s;
       }
-      nav a:hover, nav button:hover {
-        color: var(--text);
+
+      nav a:hover,
+      nav a.active {
+        color: #151923;
+        font-weight: 600;
       }
-      .container {
-        width: min(1180px, calc(100% - 48px));
-        margin: 0 auto;
-        flex: 1;
+
+      .header-actions {
+        display: flex;
+        gap: 14px;
       }
-      main {
-        padding: 48px 0;
-      }
-      .page-header {
-        margin-bottom: 32px;
-      }
-      .page-title {
-        font-size: 32px;
-        font-weight: 700;
-        margin: 0 0 8px;
-      }
-      .page-subtitle {
-        color: var(--muted);
-        font-size: 14px;
-        margin: 0;
-      }
-      .orders-grid {
+
+      .icon-btn {
+        width: 50px;
+        height: 50px;
+        border: 1px solid #d8d8d8;
+        border-radius: 50%;
         display: grid;
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-      .order-card {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 20px;
+        place-items: center;
+        color: #121622;
+        background: #f2f2f2;
+        text-decoration: none;
         transition: all 0.2s;
         cursor: pointer;
       }
-      .order-card:hover {
-        border-color: var(--accent);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+      .icon-btn:hover {
+        background: #e8e8e8;
       }
-      .order-header {
+
+      .cart-btn {
+        background: #151923;
+        color: #fff;
+        border-color: #151923;
+        position: relative;
+      }
+
+      .cart-btn:hover {
+        background: #1f2937;
+      }
+
+      .badge {
+        position: absolute;
+        right: -2px;
+        top: -4px;
+        width: 20px;
+        height: 20px;
+        border-radius: 999px;
+        background: #3d9d85;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        display: grid;
+        place-items: center;
+      }
+
+      /* Main */
+      main {
+        padding: 40px 0 50px;
+        flex: 1;
+      }
+
+      .page-header {
         display: flex;
-        justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 16px;
+        gap: 24px;
+        margin-bottom: 32px;
       }
-      .order-number {
+
+      .header-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 1px solid #d8d8d8;
+        background: #f5f5f5;
+        display: grid;
+        place-items: center;
+        color: #1c2231;
+        flex-shrink: 0;
+      }
+
+      .page-title {
+        margin: 0;
+        font-size: 52px;
+        font-weight: 700;
+        line-height: 1.1;
+      }
+
+      .page-subtitle {
+        margin: 8px 0 0;
+        font-size: 14px;
+        color: #536276;
+      }
+
+      /* Orders Grid */
+      .orders-grid {
+        display: grid;
+        gap: 18px;
+      }
+
+      .order-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 34px;
+        padding: 20px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .order-card:hover {
+        border-color: #999;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .left {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex: 1;
+      }
+
+      .order-icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        border: 1px solid #d9d9d9;
+        color: #5e6470;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        background: #f8f8f8;
+      }
+
+      .order-info h3 {
+        margin: 0 0 4px;
         font-size: 16px;
         font-weight: 700;
-        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 12px;
       }
-      .order-date {
-        font-size: 12px;
-        color: var(--muted);
+
+      .order-meta {
+        font-size: 13px;
+        color: #49586c;
+        margin: 0;
       }
+
       .order-status {
-        display: inline-block;
         padding: 6px 12px;
-        border-radius: 6px;
+        border-radius: 999px;
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
+
       .status-pending {
-        background: rgba(218, 111, 0, 0.15);
-        color: var(--accent);
-        border: 1px solid rgba(218, 111, 0, 0.3);
+        background: #fdf3e1;
+        color: #d86f00;
       }
-      .status-paid {
-        background: rgba(81, 207, 102, 0.15);
-        color: #51cf66;
-        border: 1px solid rgba(81, 207, 102, 0.3);
-      }
-      .status-shipped {
-        background: rgba(66, 153, 225, 0.15);
-        color: #4299e1;
-        border: 1px solid rgba(66, 153, 225, 0.3);
-      }
+
+      .status-paid,
+      .status-shipped,
       .status-delivered {
-        background: rgba(81, 207, 102, 0.15);
-        color: #51cf66;
-        border: 1px solid rgba(81, 207, 102, 0.3);
+        background: #dbf2e9;
+        color: #057a63;
       }
+
       .status-cancelled {
-        background: rgba(255, 107, 107, 0.15);
-        color: #ff6b6b;
-        border: 1px solid rgba(255, 107, 107, 0.3);
+        background: #ffe5e5;
+        color: #cd1f1f;
       }
-      .order-content {
+
+      .right {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+      }
+
+      .price-wrap {
+        text-align: right;
+      }
+
+      .price-label {
+        font-size: 12px;
+        color: #99a0a8;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+
+      .price {
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .details-btn {
+        border: none;
+        background: #f6f6f6;
+        border-radius: 999px;
+        padding: 12px 20px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        color: #111827;
+        transition: all 0.2s;
+      }
+
+      .details-btn:hover {
+        background: #e8e8e8;
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: var(--surface);
+        border-radius: 16px;
+        border: 1px solid var(--line);
+      }
+
+      .empty-state h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .empty-state p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      /* Modal */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.45);
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+      }
+
+      .modal-box {
+        background: #fff;
+        border-radius: 16px;
+        width: min(620px, 92vw);
+        max-height: 85vh;
+        overflow-y: auto;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .modal-close {
+        float: right;
+        border: 0;
+        background: none;
+        font-size: 28px;
+        cursor: pointer;
+        color: #999;
+      }
+
+      .modal-close:hover {
+        color: #333;
+      }
+
+      .modal-title {
+        margin: 0 0 20px;
+        font-size: 18px;
+        font-weight: 600;
+        clear: both;
+      }
+
+      .modal-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        flex-wrap: wrap;
-        gap: 16px;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--line);
       }
-      .order-details {
-        flex: 1;
-        min-width: 200px;
+
+      .modal-order-id {
+        font-size: 24px;
+        font-weight: 700;
       }
+
+      .modal-items {
+        margin-bottom: 16px;
+      }
+
+      .order-item {
+        padding: 12px;
+        border-radius: 10px;
+        background: #f4f4f4;
+        margin-bottom: 8px;
+      }
+
+      .item-name {
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .item-detail {
+        font-size: 13px;
+        color: #667085;
+      }
+
+      .modal-summary {
+        background: #f6f6f6;
+        padding: 14px;
+        border-radius: 10px;
+      }
+
       .detail-row {
         display: flex;
         justify-content: space-between;
         margin-bottom: 8px;
         font-size: 14px;
       }
-      .detail-label {
-        color: var(--muted);
+
+      .detail-row:last-child {
+        margin-bottom: 0;
+        font-weight: 700;
+        border-top: 1px solid #e0e0e0;
+        padding-top: 8px;
       }
+
+      .detail-label {
+        color: #667085;
+      }
+
       .detail-value {
         font-weight: 600;
-        color: var(--text);
       }
-      .order-total {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--accent);
-      }
-      .btn {
-        background: var(--accent);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 14px;
-        transition: opacity 0.2s;
-      }
-      .btn:hover {
-        opacity: 0.9;
-      }
-      .modal-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        align-items: center;
-        justify-content: center;
-      }
-      .modal-overlay.active {
-        display: flex;
-      }
-      .modal-box {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        padding: 32px;
-        max-width: 600px;
-        width: 90%;
-        max-height: 85vh;
-        overflow-y: auto;
-      }
-      .modal-close {
-        float: right;
-        background: none;
-        border: none;
-        color: var(--muted);
-        font-size: 28px;
-        cursor: pointer;
-        transition: color 0.2s;
-      }
-      .modal-close:hover {
-        color: var(--text);
-      }
-      .modal-title {
-        font-size: 22px;
-        font-weight: 600;
-        margin: 0 0 24px;
-        clear: both;
-      }
-      .order-item {
-        background: var(--line);
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 16px;
-        margin-bottom: 12px;
-      }
-      .item-name {
-        font-weight: 600;
-        color: var(--text);
-        margin-bottom: 8px;
-      }
-      .item-info {
-        font-size: 13px;
-        color: var(--muted);
-      }
-      .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-      }
-      .empty-icon {
-        font-size: 48px;
-        margin-bottom: 16px;
-      }
-      .empty-title {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 8px;
-      }
-      .empty-subtitle {
-        color: var(--muted);
-        margin-bottom: 24px;
-      }
+
+      /* Footer */
       .site-footer {
-        background: #121317;
-        color: #e4e4e4;
+        background: #171c29;
+        color: #aeb3bb;
         margin-top: auto;
       }
+
       .footer-content {
-        width: min(1180px, calc(100% - 48px));
-        margin: 0 auto;
-        padding: 50px 0 24px;
-        border-top: 1px solid #26272c;
         text-align: center;
+        padding: 24px;
         font-size: 14px;
       }
-      @media (max-width: 768px) {
-        .order-content {
+
+      /* Responsive */
+      @media (max-width: 900px) {
+        nav {
+          display: none;
+        }
+
+        .order-card {
           flex-direction: column;
           align-items: flex-start;
         }
-        nav {
-          display: none;
+
+        .right {
+          width: 100%;
+          justify-content: space-between;
+        }
+
+        .page-title {
+          font-size: 36px;
         }
       }
     </style>
   </head>
   <body>
+    <!-- Header -->
     <header class="site-header">
-      <div class="header-content">
-        <div class="header-logo">🛍</div>
+      <div class="container header-content">
+        <a href="/" class="brand">
+          <img src="/src/assets/ishine-icon-transparent.png" alt="iShine" />
+        </a>
         <nav>
           <a href="/">Ana səhifə</a>
-          <button onclick="window.location='/#shop'">Mağaza</button>
-          <a href="/src/pages/profile.html">Profil</a>
+          <a href="/#shop">Mağaza</a>
+          <a href="/src/pages/orders.html" class="active">Sifarişlərim</a>
         </nav>
+        <div class="header-actions">
+          <a href="/src/pages/profile.html" class="icon-btn" aria-label="Profil">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>
+          </a>
+          <a href="/#cart" class="icon-btn cart-btn" aria-label="Səbət">
+            <span class="badge">0</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6L5 3H2"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+          </a>
+        </div>
       </div>
     </header>
 
+    <!-- Main -->
     <main>
       <div class="container">
+        <!-- Page Header -->
         <div class="page-header">
-          <h1 class="page-title">Sifarişlərim</h1>
-          <p class="page-subtitle">Sizin bütün sifarişlərinizin siyahısı və detalları</p>
+          <div class="header-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="m8 7 1.5-3h5L16 7"/><path d="M9 12h6"/></svg>
+          </div>
+          <div>
+            <h1 class="page-title">Sifarişlərim</h1>
+            <p class="page-subtitle">Bütün keçmiş və aktiv sifarişləriniz</p>
+          </div>
         </div>
 
+        <!-- Orders List -->
         <div id="ordersContainer" class="orders-grid">
-          <div style="text-align: center; padding: 40px; color: var(--muted);">
-            ⏳ Sifarişlər yüklənir...
+          <div class="empty-state">
+            <h3>⏳ Sifarişlər yüklənir...</h3>
           </div>
         </div>
       </div>
     </main>
 
-    <!-- Order Details Modal -->
+    <!-- Modal -->
     <div id="orderModal" class="modal-overlay">
       <div class="modal-box">
         <button class="modal-close" onclick="closeOrderModal()">&times;</button>
@@ -350,10 +503,9 @@
       </div>
     </div>
 
+    <!-- Footer -->
     <footer class="site-footer">
-      <div class="footer-content">
-        © <span id="year">2026</span> iShine Accessories. Bütün hüquqlar qorunur.
-      </div>
+      <div class="footer-content">© <span id="year">2026</span> iShine Accessories. Bütün hüquqlar qorunur.</div>
     </footer>
 
     <script type="module">
@@ -365,7 +517,7 @@
         pending: "Gözləmədə",
         paid: "Ödənildi",
         shipped: "Göndərildi",
-        delivered: "Çatdırılıldı",
+        delivered: "Çatdırılıb",
         cancelled: "Ləğv edildi"
       };
 
@@ -380,18 +532,18 @@
       function formatDate(dateStr) {
         try {
           const date = new Date(dateStr);
-          return date.toLocaleDateString("az-AZ", {
-            year: "numeric",
-            month: "long",
-            day: "numeric"
-          });
+          const day = String(date.getDate()).padStart(2, "0");
+          const monthNames = ["Yan", "Fev", "Mar", "Apr", "May", "İyn", "İyl", "Avq", "Sen", "Okt", "Noy", "Dek"];
+          const month = monthNames[date.getMonth()];
+          const year = date.getFullYear();
+          return `${day} ${month} ${year}`;
         } catch {
           return "Məlum deyil";
         }
       }
 
       function formatMoney(amount) {
-        return `₼${Number(amount || 0).toFixed(2)}`;
+        return `$${Math.round(Number(amount || 0))}`;
       }
 
       // Load orders
@@ -403,137 +555,104 @@
         }
 
         try {
-          console.log("Orders API çağırılır...");
           const response = await apiFetch(endpoints.orders.my());
-          console.log("Orders API cavabı:", response);
-
-          // Flexible data handling
           let orders = [];
-          if (Array.isArray(response)) {
-            orders = response;
-          } else if (response && Array.isArray(response.items)) {
-            orders = response.items;
-          } else if (response && Array.isArray(response.data)) {
-            orders = response.data;
-          }
 
-          console.log("İşlənmiş sifarişlər:", orders);
+          if (Array.isArray(response)) orders = response;
+          else if (response && Array.isArray(response.items)) orders = response.items;
+          else if (response && Array.isArray(response.data)) orders = response.data;
 
           const container = document.getElementById("ordersContainer");
 
           if (!orders || orders.length === 0) {
             container.innerHTML = `
               <div class="empty-state">
-                <div class="empty-icon">📭</div>
-                <h3 class="empty-title">Henüz sifarişiniz yoxdur</h3>
-                <p class="empty-subtitle">Məhsulları keşfetməyə başlayın</p>
-                <a href="/" style="display: inline-block; padding: 12px 24px; background: var(--accent); color: white; border-radius: 8px; text-decoration: none; font-weight: 600;">Alış-verişə git</a>
+                <h3>Hələ sifarişiniz yoxdur</h3>
+                <p>Məhsulları kəşf etməyə başlayın</p>
               </div>
             `;
             return;
           }
 
-          container.innerHTML = orders.map(order => {
-            // Field names flexible
-            const id = order.Id || order.id;
-            const status = order.Status || order.status || "pending";
-            const total = order.Total || order.total || 0;
-            const createdAt = order.CreatedAt || order.createdAt;
-            const items = order.items || order.Items || [];
+          container.innerHTML = orders
+            .map((order) => {
+              const id = order.Id || order.id;
+              const status = (order.Status || order.status || "pending").toLowerCase();
+              const total = order.Total || order.total || 0;
+              const createdAt = order.CreatedAt || order.createdAt;
+              const items = order.items || order.Items || [];
 
-            return `
-              <div class="order-card" onclick="viewOrder(${id}, '${JSON.stringify(order).replace(/'/g, "&apos;")}')">
-                <div class="order-header">
-                  <div>
-                    <div class="order-number">Sifariş #${id}</div>
-                    <div class="order-date">${formatDate(createdAt)}</div>
-                  </div>
-                  <span class="order-status ${statusClasses[status] || 'status-pending'}">
-                    ${statusLabels[status] || status}
-                  </span>
-                </div>
-                <div class="order-content">
-                  <div class="order-details">
-                    <div class="detail-row">
-                      <span class="detail-label">Məhsul sayı:</span>
-                      <span class="detail-value">${items.length || 0}</span>
+              return `
+                <article class="order-card" onclick="viewOrder(${id}, '${JSON.stringify(order).replace(/'/g, "&apos;")}')">
+                  <div class="left">
+                    <div class="order-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
                     </div>
-                    <div class="detail-row">
-                      <span class="detail-label">Ümumi cəmi:</span>
-                      <span class="order-total">${formatMoney(total)}</span>
+                    <div class="order-info">
+                      <h3>#${id} <span class="order-status ${statusClasses[status] || "status-pending"}">${statusLabels[status] || status}</span></h3>
+                      <p class="order-meta">${formatDate(createdAt)} • ${items.length || 0} məhsul</p>
                     </div>
                   </div>
-                  <button class="btn" onclick="event.stopPropagation(); viewOrder(${id}, '${JSON.stringify(order).replace(/'/g, "&apos;")}')">Detalları Gör</button>
-                </div>
-              </div>
-            `;
-          }).join("");
-
+                  <div class="right">
+                    <div class="price-wrap">
+                      <div class="price-label">ÜMUMİ MƏBLƏĞ</div>
+                      <div class="price">${formatMoney(total)}</div>
+                    </div>
+                    <button class="details-btn" onclick="event.stopPropagation();viewOrder(${id}, '${JSON.stringify(order).replace(/'/g, "&apos;")}')">
+                      Detallar ›
+                    </button>
+                  </div>
+                </article>
+              `;
+            })
+            .join("");
         } catch (error) {
-          console.error("Orders yükləmə xətası:", error);
           const container = document.getElementById("ordersContainer");
           container.innerHTML = `
             <div class="empty-state">
-              <div class="empty-icon">❌</div>
-              <h3 class="empty-title">Xəta baş verdi</h3>
-              <p class="empty-subtitle">${error.message || "Sifarişlər yükləmə xətası"}</p>
-              <button onclick="location.reload()" style="padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Yenidən yükləyin</button>
+              <h3>Xəta baş verdi</h3>
+              <p>${error.message || "Sifarişlər yükləmə xətası"}</p>
             </div>
           `;
         }
       }
 
-      // View order details
       window.viewOrder = (id, orderStr) => {
         try {
           const order = JSON.parse(orderStr);
           const modal = document.getElementById("orderModal");
           const content = document.getElementById("modalContent");
 
-          const status = order.Status || order.status || "pending";
+          const status = (order.Status || order.status || "pending").toLowerCase();
           const items = order.items || order.Items || [];
-          const subtotal = order.Subtotal || order.subtotal || order.Total || order.total;
+          const subtotal = order.Subtotal || order.subtotal || order.Total || order.total || 0;
           const shippingFee = order.ShippingFee || order.shippingFee || 0;
           const total = order.Total || order.total || 0;
 
-          const itemsHtml = items.length > 0 
+          const itemsHtml = items.length > 0
             ? items.map(item => `
-              <div class="order-item">
-                <div class="item-name">${item.productName || item.ProductName || "Məhsul"}</div>
-                <div class="item-info">
-                  <div style="margin-bottom: 4px;">
-                    Miqdar: ${item.qty || item.Qty} × ${formatMoney(item.unitPrice || item.UnitPrice)}
-                  </div>
-                  <div style="color: var(--accent); font-weight: 600;">
-                    ${formatMoney((item.qty || item.Qty) * (item.unitPrice || item.UnitPrice))}
+                <div class="order-item">
+                  <div class="item-name">${item.productName || item.ProductName || "Məhsul"}</div>
+                  <div class="item-detail">
+                    Miqdar: ${item.qty || item.Qty} × ${formatMoney(item.unitPrice || item.UnitPrice)} = ${formatMoney((item.qty || item.Qty) * (item.unitPrice || item.UnitPrice))}
                   </div>
                 </div>
-              </div>
-            `).join("")
-            : '<div style="color: var(--muted); text-align: center; padding: 20px;">Məhsul tapılmadı</div>';
+              `).join("")
+            : '<div style="color:#667085;text-align:center;padding:12px;">Məhsul tapılmadı</div>';
 
           content.innerHTML = `
-            <div style="margin-bottom: 24px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
-                <div>
-                  <div style="color: var(--muted); font-size: 12px; margin-bottom: 4px;">Sifariş №</div>
-                  <div style="font-size: 18px; font-weight: 700;">#${id}</div>
-                </div>
-                <div style="text-align: right;">
-                  <div style="color: var(--muted); font-size: 12px; margin-bottom: 4px;">Status</div>
-                  <span class="order-status ${statusClasses[status] || 'status-pending'}" style="display: inline-block;">
-                    ${statusLabels[status] || status}
-                  </span>
-                </div>
-              </div>
+            <div class="modal-header">
+              <div class="modal-order-id">#${id}</div>
+              <span class="order-status ${statusClasses[status] || "status-pending"}">
+                ${statusLabels[status] || status}
+              </span>
             </div>
 
-            <div style="margin-bottom: 24px;">
-              <h3 style="font-size: 14px; font-weight: 600; margin: 0 0 12px; color: var(--muted); text-transform: uppercase;">Məhsullar</h3>
+            <div class="modal-items">
               ${itemsHtml}
             </div>
 
-            <div style="background: var(--line); padding: 16px; border-radius: 8px; margin-top: 24px;">
+            <div class="modal-summary">
               <div class="detail-row">
                 <span class="detail-label">Ara cəm:</span>
                 <span class="detail-value">${formatMoney(subtotal)}</span>
@@ -542,34 +661,26 @@
                 <span class="detail-label">Göndərmə:</span>
                 <span class="detail-value">${formatMoney(shippingFee)}</span>
               </div>
-              <div class="detail-row" style="margin-bottom: 0;">
-                <span class="detail-label" style="font-weight: 600;">Toplam:</span>
-                <span style="font-size: 18px; font-weight: 700; color: var(--accent);">${formatMoney(total)}</span>
+              <div class="detail-row">
+                <span class="detail-label">Toplam:</span>
+                <span class="detail-value">${formatMoney(total)}</span>
               </div>
             </div>
           `;
 
           modal.classList.add("active");
-        } catch (err) {
-          console.error("Modal açma xətası:", err);
+        } catch {
           alert("Sifariş detalları göstərilə bilmədi");
         }
       };
 
-      window.closeOrderModal = () => {
-        document.getElementById("orderModal").classList.remove("active");
-      };
+      window.closeOrderModal = () => document.getElementById("orderModal").classList.remove("active");
 
-      // Close modal on overlay click
       document.getElementById("orderModal")?.addEventListener("click", (e) => {
-        if (e.target.id === "orderModal") {
-          window.closeOrderModal();
-        }
+        if (e.target.id === "orderModal") window.closeOrderModal();
       });
 
       document.getElementById("year").textContent = new Date().getFullYear();
-
-      // Load orders on page load
       loadOrders();
     </script>
   </body>

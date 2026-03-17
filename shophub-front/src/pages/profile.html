@@ -3,407 +3,508 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ShopHub | Profil</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>iShine | Profil</title>
     <style>
       :root {
-        --bg: #f6f5f2;
+        --bg: #f3f3f3;
         --surface: #ffffff;
-        --muted: #6a6a6a;
-        --text: #1f1f22;
-        --accent: #d86f00;
-        --line: #e6e4df;
-        --header-bg: #faf9f6e8;
-        --input-bg: #fff;
+        --text: #0f172a;
+        --muted: #6b7280;
+        --line: #e5e7eb;
+        --footer: #151b29;
       }
-      [data-theme="dark"] {
-        --bg: #101010;
-        --surface: #161616;
-        --muted: #a3a3a3;
-        --text: #f5f5f5;
-        --accent: #e07a12;
-        --line: #2a2a2a;
-        --header-bg: #131313e6;
-        --input-bg: #1b1b1b;
-      }
+
       * {
         box-sizing: border-box;
       }
+
       html, body {
         margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
+        min-height: 100vh;
       }
+
       body {
         font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
         background: var(--bg);
         color: var(--text);
-        overflow-x: hidden;
         display: flex;
         flex-direction: column;
       }
+
+      .container {
+        width: min(1140px, calc(100% - 48px));
+        margin: 0 auto;
+      }
+
+      /* Header */
       .site-header {
         position: sticky;
         top: 0;
-        z-index: 100;
-        background: var(--header-bg);
-        backdrop-filter: blur(8px);
-        border-bottom: 1px solid var(--line);
+        z-index: 50;
+        background: #f7f7f7;
+        border-bottom: 1px solid #dedede;
       }
+
       .header-content {
-        width: min(1180px, calc(100% - 48px));
-        margin: 0 auto;
-        height: 78px;
+        height: 112px;
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        align-items: center;
       }
-      .header-logo {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        background: #1e1e1e;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #f6f6f6;
-        font-weight: bold;
-        font-size: 20px;
+
+      .logo img {
+        width: 128px;
+        height: auto;
+        display: block;
       }
-      nav {
+
+      .main-nav {
         display: flex;
-        gap: 20px;
+        gap: 34px;
         font-size: 14px;
       }
-      nav a, nav button {
-        background: none;
-        border: none;
-        color: var(--muted);
-        cursor: pointer;
+
+      .main-nav a {
+        color: #6b7280;
         text-decoration: none;
         transition: color 0.2s;
       }
-      nav a:hover, nav button:hover {
-        color: var(--text);
-      }
-      .container {
-        width: min(1180px, calc(100% - 48px));
-        margin: 0 auto;
-        flex: 1;
-      }
-      main {
-        padding: 48px 0;
-      }
-      .main-content {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 32px;
-        margin-bottom: 32px;
-      }
-      .profile-header {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        margin-bottom: 32px;
-      }
-      .profile-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--accent), #ff9a56);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 32px;
-        flex-shrink: 0;
-      }
-      .profile-header-info h1 {
-        margin: 0 0 8px;
-        font-size: 28px;
+
+      .main-nav a:hover,
+      .main-nav a.active {
+        color: #111827;
         font-weight: 600;
       }
-      .profile-header-info p {
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .icon-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 1px solid #d8d8d8;
+        display: grid;
+        place-items: center;
+        background: #f4f4f4;
+        color: #111827;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .icon-btn:hover {
+        background: #e8e8e8;
+      }
+
+      .icon-btn.cart {
+        background: #121826;
+        border-color: #121826;
+        color: #fff;
+        position: relative;
+      }
+
+      .icon-btn.cart:hover {
+        background: #1e2537;
+      }
+
+      .cart-badge {
+        position: absolute;
+        right: -2px;
+        top: -4px;
+        width: 20px;
+        height: 20px;
+        border-radius: 999px;
+        background: #4a9f8b;
+        color: #fff;
+        font-size: 12px;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+      }
+
+      /* Main */
+      main {
+        flex: 1;
+        padding: 40px 0 68px;
+      }
+
+      .profile-head {
+        display: flex;
+        align-items: center;
+        gap: 26px;
+        margin-bottom: 40px;
+      }
+
+      .avatar {
+        width: 112px;
+        height: 112px;
+        border-radius: 50%;
+        background: #dddddd;
+        border: 3px solid #ececec;
+        display: grid;
+        place-items: center;
+        font-size: 48px;
+        font-weight: 700;
+        color: #555;
+        flex-shrink: 0;
+      }
+
+      .profile-head h1 {
         margin: 0;
-        color: var(--muted);
+        font-size: 52px;
+        font-weight: 700;
+        line-height: 1.1;
+      }
+
+      .profile-head p {
+        margin: 12px 0 0;
+        color: #4b5563;
         font-size: 14px;
       }
+
+      /* Cards Grid */
+      .cards-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 26px;
+        margin-bottom: 26px;
+      }
+
       .card {
         background: var(--surface);
         border: 1px solid var(--line);
-        border-radius: 16px;
-        padding: 24px;
+        border-radius: 26px;
+        padding: 32px 38px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       }
+
+      .card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+
+      .card-title-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .card-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid #dedede;
+        display: grid;
+        place-items: center;
+        color: #6b7280;
+        flex-shrink: 0;
+      }
+
       .card-title {
+        margin: 0;
+        color: #0b1220;
         font-size: 18px;
         font-weight: 600;
-        margin: 0 0 20px;
-        color: var(--text);
       }
-      .info-row {
+
+      .watermark {
+        color: #d3d5d8;
+        opacity: 0.3;
+        width: 80px;
+        height: 80px;
+      }
+
+      .row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 16px 0;
-        border-bottom: 1px solid var(--line);
+        padding: 18px 0;
+        border-top: 1px solid var(--line);
       }
-      .info-row:last-child {
-        border-bottom: none;
+
+      .row:first-child {
+        border-top: 0;
+        padding-top: 0;
       }
-      .info-label {
+
+      .label {
         color: var(--muted);
         font-size: 14px;
-        font-weight: 500;
       }
-      .info-value {
-        color: var(--text);
-        font-weight: 600;
+
+      .value {
+        color: #0b1220;
+        font-weight: 700;
+        text-align: right;
+        font-size: 14px;
       }
-      .btn {
-        background: var(--accent);
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: opacity 0.2s;
-      }
-      .btn:hover {
-        opacity: 0.9;
-      }
-      .btn-secondary {
+
+      .account-card {
         background: var(--surface);
-        color: var(--text);
         border: 1px solid var(--line);
+        border-radius: 26px;
+        padding: 32px 38px;
       }
-      .btn-secondary:hover {
-        background: var(--line);
+
+      .account-title {
+        margin: 0 0 24px;
+        font-size: 18px;
+        font-weight: 600;
       }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        border: 1px solid #d5d8de;
+        background: #fafafa;
+        color: #5b6470;
+        border-radius: 999px;
+        padding: 12px 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+
+      .btn:hover {
+        background: #f3f3f3;
+        border-color: #c9ccd2;
+      }
+
       .btn-danger {
-        border-color: #ff6b6b;
-        color: #ff6b6b;
+        color: #e02727;
+        border-color: #efb7b7;
+        background: #fff;
       }
+
       .btn-danger:hover {
-        background: rgba(255, 107, 107, 0.1);
+        background: #fff5f5;
       }
-      /* Modal Styles */
+
+      .error {
+        color: #b91c1c;
+        background: #fee2e2;
+        border: 1px solid #fecaca;
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 18px;
+        font-size: 14px;
+      }
+
+      /* Modal */
       .modal-overlay {
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 90;
         align-items: center;
         justify-content: center;
-        animation: fadeIn 0.2s ease-in-out;
       }
+
       .modal-overlay.active {
         display: flex;
       }
+
       .modal-box {
-        background: var(--surface);
-        border: 1px solid var(--line);
+        width: min(520px, 92vw);
+        background: #fff;
         border-radius: 16px;
-        padding: 32px;
-        max-width: 450px;
-        width: 90%;
-        animation: slideUp 0.3s ease-out;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       }
-      .modal-header {
-        margin-bottom: 24px;
-      }
+
       .modal-title {
-        font-size: 22px;
-        font-weight: 600;
         margin: 0 0 8px;
+        font-size: 18px;
+        font-weight: 600;
       }
+
       .modal-subtitle {
-        color: var(--muted);
+        margin: 0 0 20px;
+        color: #6b7280;
         font-size: 14px;
-        margin: 0;
       }
-      .modal-content {
-        margin-bottom: 24px;
-      }
+
       .modal-warning {
-        background: #ff6b6b20;
-        border: 1px solid #ff6b6b40;
-        color: #ff6b6b;
+        background: rgba(230, 57, 70, 0.1);
+        border: 1px solid rgba(230, 57, 70, 0.3);
+        color: #e02727;
         padding: 12px;
         border-radius: 8px;
         font-size: 14px;
-      }
-      .modal-actions {
-        display: flex;
-        gap: 12px;
-        justify-content: flex-end;
-      }
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-      @keyframes slideUp {
-        from { transform: translateY(20px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-      }
-      /* Toast Notification */
-      .toast-container {
-        position: fixed;
-        top: 24px;
-        right: 24px;
-        z-index: 2000;
-        pointer-events: none;
-      }
-      .toast {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 16px 20px;
-        margin-bottom: 12px;
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        min-width: 300px;
-        pointer-events: auto;
-        animation: slideInRight 0.3s ease-out;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      }
-      .toast.success {
-        border-color: #51cf66;
-      }
-      .toast.error {
-        border-color: #ff6b6b;
-      }
-      .toast.info {
-        border-color: var(--accent);
-      }
-      .toast-icon {
-        flex-shrink: 0;
-        font-size: 20px;
-      }
-      .toast-message {
-        flex: 1;
-        font-size: 14px;
-        color: var(--text);
-      }
-      @keyframes slideInRight {
-        from { transform: translateX(400px); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-      }
-      .site-footer {
-        background: #121317;
-        color: #e4e4e4;
-        margin-top: auto;
-      }
-      .footer-content {
-        width: min(1180px, calc(100% - 48px));
-        margin: 0 auto;
-        padding: 50px 0 24px;
-        border-top: 1px solid #26272c;
-        text-align: center;
-        font-size: 14px;
-      }
-      .loading {
-        text-align: center;
-        padding: 40px;
-        color: var(--muted);
-      }
-      .error {
-        color: #ff6b6b;
-        padding: 16px;
-        background: #ff6b6b20;
-        border-radius: 8px;
         margin-bottom: 16px;
       }
-      @media (max-width: 768px) {
-        .main-content {
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      /* Footer */
+      .site-footer {
+        background: var(--footer);
+        color: #abb1bc;
+      }
+
+      .footer-content {
+        text-align: center;
+        padding: 24px;
+        font-size: 14px;
+      }
+
+      /* Responsive */
+      @media (max-width: 900px) {
+        .main-nav {
+          display: none;
+        }
+
+        .cards-grid {
           grid-template-columns: 1fr;
         }
-        .profile-header {
-          flex-direction: column;
-          text-align: center;
+
+        .profile-head {
+          gap: 16px;
         }
-        nav {
-          display: none;
+
+        .profile-head h1 {
+          font-size: 36px;
+        }
+
+        .container {
+          width: min(100%, calc(100% - 24px));
+          padding: 0 12px;
         }
       }
     </style>
   </head>
   <body>
+    <!-- Header -->
     <header class="site-header">
-      <div class="header-content">
-        <div class="header-logo">🛍</div>
-        <nav>
+      <div class="container header-content">
+        <a href="/" class="logo">
+          <img src="/src/assets/ishine-icon-transparent.png" alt="iShine" />
+        </a>
+
+        <nav class="main-nav">
           <a href="/">Ana səhifə</a>
-          <button onclick="window.location='/#shop'">Mağaza</button>
-          <a href="/orders">Sifarişlərim</a>
+          <a href="/#shop">Mağaza</a>
+          <a href="/src/pages/orders.html" class="active">Sifarişlərim</a>
         </nav>
+
+        <div class="header-actions">
+          <a class="icon-btn" href="/src/pages/profile.html" aria-label="Profil">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4" /><path d="M5.5 21a6.5 6.5 0 0 1 13 0" /></svg>
+          </a>
+          <a class="icon-btn cart" href="/#cart" aria-label="Səbət">
+            <span class="cart-badge">0</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z" /><path d="M6 6L5 3H2" /><circle cx="9" cy="20" r="1" /><circle cx="18" cy="20" r="1" /></svg>
+          </a>
+        </div>
       </div>
     </header>
 
+    <!-- Main -->
     <main>
       <div class="container">
-        <div class="profile-header">
-          <div class="profile-avatar" id="avatar">👤</div>
-          <div class="profile-header-info">
+        <!-- Profile Head -->
+        <section class="profile-head">
+          <div class="avatar" id="avatar">G</div>
+          <div>
             <h1>Profil</h1>
-            <p id="userEmail">Yüklənir...</p>
+            <p id="userEmail">gulendam@gmail.com</p>
           </div>
-        </div>
+        </section>
 
         <div id="errorMsg" class="error" style="display: none;"></div>
 
-        <div class="main-content">
-          <div class="card">
-            <div class="card-title">Şəxsi Məlumatlar</div>
+        <!-- Cards -->
+        <section class="cards-grid">
+          <!-- Personal Data -->
+          <article class="card">
+            <div class="card-head">
+              <div class="card-title-wrap">
+                <span class="card-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4" /><path d="M5.5 21a6.5 6.5 0 0 1 13 0" /></svg>
+                </span>
+                <h2 class="card-title">Şəxsi Məlumatlar</h2>
+              </div>
+              <svg class="watermark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="7" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>
+            </div>
             <div id="profileInfo">
-              <div class="loading">Yüklənir...</div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-title">Təhlükəsizlik</div>
-            <div id="securityInfo">
-              <div class="info-row">
-                <span class="info-label">Şifrə</span>
-                <span class="info-value">●●●●●●●●</span>
+              <div class="row">
+                <span class="label">İstifadəçi ID</span>
+                <span class="value">Yüklənir...</span>
               </div>
-              <div class="info-row">
-                <span class="info-label">Son dəyişmə</span>
-                <span class="info-value" id="passwordChanged">Məlum deyil</span>
+              <div class="row">
+                <span class="label">Email</span>
+                <span class="value">Yüklənir...</span>
               </div>
             </div>
-          </div>
-        </div>
+          </article>
 
-        <div class="card">
-          <div class="card-title">Hesab</div>
-          <div style="display: flex; gap: 12px;">
-            <button class="btn btn-secondary" onclick="logout()">Çıxış</button>
-            <button class="btn btn-secondary btn-danger" onclick="openDeleteModal()">Hesabı sil</button>
+          <!-- Security -->
+          <article class="card">
+            <div class="card-head">
+              <div class="card-title-wrap">
+                <span class="card-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 7v6c0 5 3 8 8 9 5-1 8-4 8-9V7z" /><path d="m9 12 2 2 4-4" /></svg>
+                </span>
+                <h2 class="card-title">Təhlükəsizlik</h2>
+              </div>
+              <svg class="watermark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 3 4 7v6c0 5 3 8 8 9 5-1 8-4 8-9V7z" /><path d="m9 12 2 2 4-4" /></svg>
+            </div>
+            <div class="row">
+              <span class="label">Şifrə</span>
+              <span class="value">••••••••</span>
+            </div>
+            <div class="row">
+              <span class="label">Son dəyişmə</span>
+              <span class="value" id="passwordChanged">Məlum deyil</span>
+            </div>
+          </article>
+        </section>
+
+        <!-- Account -->
+        <section class="account-card">
+          <h2 class="account-title">Hesab</h2>
+          <div class="actions">
+            <button class="btn" onclick="logout()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 16-4-4 4-4" /><path d="M5 12h12" /><path d="M15 4h4v16h-4" /></svg>
+              Çıxış
+            </button>
+            <button class="btn btn-danger" onclick="openDeleteModal()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18" /><path d="M8 6V4h8v2" /><path d="M19 6l-1 14H6L5 6" /></svg>
+              Hesabı sil
+            </button>
           </div>
-        </div>
+        </section>
       </div>
     </main>
 
-    <!-- Delete Account Modal -->
+    <!-- Delete Modal -->
     <div id="deleteModal" class="modal-overlay">
       <div class="modal-box">
-        <div class="modal-header">
-          <h2 class="modal-title">⚠️ Hesabı silmək</h2>
-          <p class="modal-subtitle">Bu əməliyyat geri qaytarıla bilməz</p>
-        </div>
-        <div class="modal-content">
-          <p style="color: var(--muted); margin: 0 0 16px;">Hesabınız silinəcəksə, bütün məlumatınız və sifarişləriniz silindi ləbi olacaq.</p>
-          <div class="modal-warning">
-            ⚠️ Hansı ki 30 gün ərzində bütün məlumatlar sistem-dən tamamilə silinəcək
-          </div>
-        </div>
+        <h2 class="modal-title">⚠️ Hesabı silmək</h2>
+        <p class="modal-subtitle">Bu əməliyyat geri qaytarıla bilməz.</p>
+        <p style="color: var(--muted); margin: 0 0 12px; font-size: 14px;">Hesabınız silinəcəksə, bütün məlumatınız və sifarişləriniz silindi ləbi olacaq.</p>
+        <div class="modal-warning">⚠️ 30 gün ərzində bütün məlumatlar sistem-dən tamamilə silinəcək</div>
         <div class="modal-actions">
-          <button class="btn btn-secondary" onclick="closeDeleteModal()">Ləğv et</button>
-          <button class="btn" style="background-color: #ff6b6b;" onclick="confirmDelete()">Silməyi təsdiq et</button>
+          <button class="btn" onclick="closeDeleteModal()">Ləğv et</button>
+          <button class="btn btn-danger" onclick="confirmDelete()">Silməyi təsdiq et</button>
         </div>
       </div>
     </div>
@@ -411,138 +512,82 @@
     <!-- Confirm Delete Modal -->
     <div id="confirmDeleteModal" class="modal-overlay">
       <div class="modal-box">
-        <div class="modal-header">
-          <h2 class="modal-title">🔒 Final Təsdiq</h2>
-          <p class="modal-subtitle">Əmin olduğunuzu yenidən təsdiq edin</p>
-        </div>
-        <div class="modal-content">
-          <p style="color: var(--muted); margin: 0;">Bu əməliyyat <strong>tam olaraq geri qaytarıla bilməz</strong>. Davam etmək istəyirsiniz?</p>
-        </div>
+        <h2 class="modal-title">🔒 Final təsdiq</h2>
+        <p class="modal-subtitle">Əmin olduğunuzu yenidən təsdiq edin</p>
+        <p style="color: var(--muted); margin: 0 0 20px; font-size: 14px;">Bu əməliyyat <strong>tam olaraq geri qaytarıla bilməz</strong>. Davam etmək istəyirsiniz?</p>
         <div class="modal-actions">
-          <button class="btn btn-secondary" onclick="closeConfirmDeleteModal()">Ləğv et</button>
-          <button class="btn" style="background-color: #ff6b6b;" onclick="performDelete()">Həqiqətən silmək istəyirəm</button>
+          <button class="btn" onclick="closeConfirmDeleteModal()">Ləğv et</button>
+          <button class="btn btn-danger" id="deleteBtn" onclick="performDelete()">Həqiqətən sil</button>
         </div>
       </div>
     </div>
 
-    <!-- Toast Container -->
-    <div id="toastContainer" class="toast-container"></div>
-
+    <!-- Footer -->
     <footer class="site-footer">
-      <div class="footer-content">
-        © <span id="year">2026</span> iShine Accessories. Bütün hüquqlar qorunur.
-      </div>
+      <div class="footer-content">© <span id="year">2026</span> iShine Accessories. Bütün hüquqlar qorunur.</div>
     </footer>
 
     <script type="module">
       import { me, deleteAccount, logout as authLogout } from "/src/js/services/auth.service.js";
 
-      let currentUser = null;
-
-      // Toast notification system
-      function showToast(message, type = 'info', duration = 4000) {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        
-        const icons = {
-          success: '✓',
-          error: '✕',
-          info: 'ℹ'
-        };
-
-        toast.innerHTML = `
-          <div class="toast-icon">${icons[type]}</div>
-          <div class="toast-message">${message}</div>
-        `;
-
-        container.appendChild(toast);
-
-        setTimeout(() => {
-          toast.remove();
-        }, duration);
-      }
-
-      // Load user data
       async function loadProfile() {
         try {
-          currentUser = await me();
-          document.getElementById("userEmail").textContent = currentUser.email;
-          
-          const profileInfo = document.getElementById("profileInfo");
-          profileInfo.innerHTML = `
-            <div class="info-row">
-              <span class="info-label">İstifadəçi ID</span>
-              <span class="info-value">${currentUser.id}</span>
+          const user = await me();
+          document.getElementById("userEmail").textContent = user.email;
+          document.getElementById("avatar").textContent = user.email.charAt(0).toUpperCase();
+
+          document.getElementById("profileInfo").innerHTML = `
+            <div class="row">
+              <span class="label">İstifadəçi ID</span>
+              <span class="value">${user.id}</span>
             </div>
-            <div class="info-row">
-              <span class="info-label">Email</span>
-              <span class="info-value">${currentUser.email}</span>
+            <div class="row">
+              <span class="label">Email</span>
+              <span class="value">${user.email}</span>
             </div>
           `;
-
-          const initial = currentUser.email.charAt(0).toUpperCase();
-          document.getElementById("avatar").textContent = initial;
         } catch (error) {
           const errorDiv = document.getElementById("errorMsg");
           errorDiv.textContent = error.message || "Profil yükləmə xətası";
           errorDiv.style.display = "block";
-          
           setTimeout(() => {
             window.location.href = "/src/pages/auth/login.html";
           }, 2000);
         }
       }
 
-      // Modal functions
-      window.openDeleteModal = () => {
-        document.getElementById("deleteModal").classList.add("active");
-      };
-
-      window.closeDeleteModal = () => {
-        document.getElementById("deleteModal").classList.remove("active");
-      };
-
-      window.closeConfirmDeleteModal = () => {
-        document.getElementById("confirmDeleteModal").classList.remove("active");
-      };
+      window.openDeleteModal = () => document.getElementById("deleteModal").classList.add("active");
+      window.closeDeleteModal = () => document.getElementById("deleteModal").classList.remove("active");
+      window.closeConfirmDeleteModal = () => document.getElementById("confirmDeleteModal").classList.remove("active");
 
       window.confirmDelete = () => {
         document.getElementById("deleteModal").classList.remove("active");
         document.getElementById("confirmDeleteModal").classList.add("active");
       };
 
-      // Perform actual deletion
       window.performDelete = async () => {
-        const btn = event.target;
+        const btn = document.getElementById("deleteBtn");
         btn.disabled = true;
-        btn.textContent = "Siliniyor...";
-
+        btn.textContent = "Silinir...";
         try {
           await deleteAccount();
-          
-          showToast("Hesabınız silindi. Sizi anasəhifəyə yönləndiririk...", "success", 2000);
-          
           setTimeout(() => {
             window.location.href = "/";
-          }, 2000);
+          }, 1000);
         } catch (error) {
-          showToast("Xəta: " + (error.message || "Hesab silmə uğursuz oldu"), "error");
+          alert("Xəta: " + (error.message || "Hesab silmə uğursuz oldu"));
           btn.disabled = false;
-          btn.textContent = "Həqiqətən silmək istəyirəm";
+          btn.textContent = "Həqiqətən sil";
           document.getElementById("confirmDeleteModal").classList.remove("active");
         }
       };
 
-      // Logout
       window.logout = () => {
         authLogout();
         window.location.href = "/";
       };
 
       document.getElementById("year").textContent = new Date().getFullYear();
-
-      // Load profile on page load
       loadProfile();
     </script>
   </body>
