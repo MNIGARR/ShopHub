@@ -83,7 +83,7 @@ Backend bu env dəyişənlərini gözləyir:
 - `DB_NAME`
 - `PORT` (default 5000)
 - `JWT_SECRET`
-- `CORS_ORIGIN` (comma-separated frontend domain-lər)
+- `CORS_ORIGIN` (comma-separated frontend domain-lar)
 - `FRONTEND_BASE_URL` (şifrə sıfırlama linkləri üçün)
 
 Env nümunəsi:

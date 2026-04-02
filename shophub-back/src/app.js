@@ -16,7 +16,7 @@ app.use(
       if (!allowedOrigins.length || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-      return callback(null, false);
+      return callback(new Error("Origin not allowed by CORS"));
     },
   })
 );
