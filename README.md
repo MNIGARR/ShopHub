@@ -82,6 +82,12 @@ Backend bu env dəyişənlərini gözləyir:
 - `DB_PORT` (default 1433)
 - `DB_NAME`
 - `PORT` (default 5000)
+- `JWT_SECRET`
+- `CORS_ORIGIN` (comma-separated frontend domain-lər)
+- `FRONTEND_BASE_URL` (şifrə sıfırlama linkləri üçün)
+
+Env nümunəsi:
+- `shophub-back/.env.example`
 
 ---
 
@@ -95,6 +101,12 @@ cd shophub-front
 npm install
 npm run dev
 ```
+
+Frontend API bazası env ilə idarə olunur:
+- `VITE_API_BASE` (məs: `https://your-backend-domain/api`)
+
+Env nümunəsi:
+- `shophub-front/.env.example`
 
 ---
 
@@ -124,3 +136,21 @@ Bu layihədə əsas fokusum:
 - `shophub-back/.env.example` əlavə etmək (real dəyərlərsiz)
 - API üçün Postman collection və ya Swagger dokumentasiyası
 - Docker ilə (DB + backend + frontend) bir komanda ilə qaldırma
+
+---
+
+## Deploy qeydləri (backend frontendlə birlikdə işləsin deyə)
+
+Bu repo monorepo kimidir, amma iki ayrı app var:
+- Backend servis root: `shophub-back/`
+- Frontend servis root: `shophub-front/`
+
+Deploy zamanı bunları ayrı servis kimi qaldırın:
+
+1. Backend-i `shophub-back` qovluğundan deploy edin.
+2. Backend env-ləri doldurun (`.env.example`-ə baxın).
+3. Backend URL-də `GET /health` endpoint-ini yoxlayın.
+4. Frontend-i `shophub-front` qovluğundan deploy edin.
+5. Frontend build env-də `VITE_API_BASE=https://<backend-domain>/api` verin.
+6. Backend-də `CORS_ORIGIN`-a frontend domain-ini əlavə edin.
+7. Frontend-i yenidən deploy edin və login/products/checkout axınını test edin.
