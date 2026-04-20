@@ -1,106 +1,9 @@
-# ShopHub
-
-A full-stack e-commerce reference project with a **Node.js/Express REST API** and a **Vite + vanilla JavaScript frontend**.
-
-ShopHub demonstrates a complete shopping flow (authentication, product browsing, cart, checkout, order history) and includes an admin area for managing products, categories, users, and orders.
-
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Core Features](#core-features)
-- [Tech Stack](#tech-stack)
-- [Repository Structure](#repository-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [1) Backend Setup](#1-backend-setup)
-  - [2) Frontend Setup](#2-frontend-setup)
-- [Environment Variables](#environment-variables)
-  - [Backend Environment](#backend-environment)
-  - [Frontend Environment](#frontend-environment)
-- [API Overview](#api-overview)
-- [Authentication & Authorization](#authentication--authorization)
-- [Checkout and Stock Safety](#checkout-and-stock-safety)
-- [Email / Password Reset Notes](#email--password-reset-notes)
-- [Development Notes](#development-notes)
-- [Deployment Notes](#deployment-notes)
-- [Known Limitations](#known-limitations)
-- [Roadmap](#roadmap)
-
----
-
-## Overview
-
-ShopHub is organized as a monorepo with two standalone applications:
-
-- **Backend**: `shophub-back/`  
-  Express API with JWT authentication and Microsoft SQL Server integration.
-- **Frontend**: `shophub-front/`  
-  Multi-page, vanilla JS storefront and admin dashboard served via Vite.
-  
-The project is suitable for:
-
-learning full-stack e-commerce architecture,
-- bootstrapping a small store MVP,
-- practicing role-based access control and order lifecycle logic.
-
----
-
-## Architecture
-
-### Backend (Express API)
-
-- Entry point: `src/server.js`
-- App composition and middleware: `src/app.js`
-- Route modules under `src/routes/`
-- Business logic under `src/controllers/`
-- MSSQL connection pooling under `src/config/db.js`
-
-### Frontend (Vite + Vanilla JS)
-
-- Multi-page HTML app under `src/pages/`
-- API client and endpoint mapping under `src/js/api/`
-- Domain services under `src/js/services/`
-- UI modules under `src/js/ui/`
-- Admin-specific modules under `src/js/admin/`
-
----
-
-## Core Features
-
-### Customer features
-
-- User registration and login with JWT.
-- Product listing with filtering, search, sorting, and pagination.
-- Product detail view with image support.
-- Client-side cart persistence (localStorage).
-- Checkout flow that creates orders through API.
-- “My Orders” view for authenticated users.
-- Forgot/reset password flow.
-
-### Admin features
-
-- Category CRUD.
-- Product CRUD.
-- Order listing and status updates (`pending`, `paid`, `shipped`, `delivered`, `cancelled`).
-- User management (activate/deactivate, role update).
-
----
-
-## Tech Stack
-
-# ShopHub
-
-Salam! Bu repository-də mənim hazırladığım **ShopHub** adlı full‑stack e‑commerce (onlayn mağaza) nümunə layihəsi var. Layihəni iki hissəyə bölüb yazmışam:
 A full-stack e-commerce reference project with a **Node.js/Express REST API** and a **Vite + vanilla JavaScript frontend**.
 
 - **Backend:** `shophub-back/` — Node.js + Express ilə yazdığım REST API
 - **Frontend:** `shophub-front/` — Vite + plain JavaScript + HTML/CSS ilə qurduğum sadə UI
 ShopHub demonstrates a complete shopping flow (authentication, product browsing, cart, checkout, order history) and includes an admin area for managing products, categories, users, and orders.
 
-Repo dili əsasən: **JavaScript (~65%)**, **HTML (~31%)**, **CSS (~3%)**
 ---
 
 ## Table of Contents
@@ -128,32 +31,23 @@ Repo dili əsasən: **JavaScript (~65%)**, **HTML (~31%)**, **CSS (~3%)**
 
 ---
 
-## Layihə nə edir?
 ## Overview
 
 ShopHub is organized as a monorepo with two standalone applications:
 
-ShopHub-da məqsədim klassik bir e‑commerce axınını end-to-end göstərmək idi:
 - **Backend**: `shophub-back/`  
   Express API with JWT authentication and Microsoft SQL Server integration.
 - **Frontend**: `shophub-front/`  
   Multi-page, vanilla JS storefront and admin dashboard served via Vite.
 
-- istifadəçi qeydiyyatı/girişi,
-- məhsullara baxış və məhsul detail,
-- səbət (cart) məntiqi,
-- checkout / sifariş axını,
-- admin tərəfdə isə kateqoriya, məhsul, sifariş və istifadəçi idarəetməsi üçün API.
 The project is suitable for:
 
-Frontend tərəfdə framework istifadə etmədən (plain JS) işləyən bir məntiq qurmağa çalışmışam, backend tərəfdə isə route-ları bölüb daha səliqəli API strukturu yaratmışam.
 - learning full-stack e-commerce architecture,
 - bootstrapping a small store MVP,
 - practicing role-based access control and order lifecycle logic.
 
 ---
 
-## Əsas funksiyalar (Features)
 ## Architecture
 
 ### Backend (Express API)
@@ -164,19 +58,9 @@ Frontend tərəfdə framework istifadə etmədən (plain JS) işləyən bir mən
 - Business logic under `src/controllers/`
 - MSSQL connection pooling under `src/config/db.js`
 
-### İstifadəçi tərəfi
-- Qeydiyyat və login (JWT)
-- Məhsulların siyahısı və məhsul detalları
-- Səbət (cart) funksionallığı
-- Checkout / sifariş axını
-- İstifadəçinin öz sifarişlərinə baxış (API)
+
 ### Frontend (Vite + Vanilla JS)
 
-### Admin tərəfi (API səviyyəsində)
-- Kateqoriya CRUD
-- Məhsul CRUD
-- Sifarişlərin idarəsi
-- İstifadəçilərin idarəsi
 - Multi-page HTML app under `src/pages/`
 - API client and endpoint mapping under `src/js/api/`
 - Domain services under `src/js/services/`
@@ -185,10 +69,8 @@ Frontend tərəfdə framework istifadə etmədən (plain JS) işləyən bir mən
 
 ---
 
-## Backend (shophub-back)
 ## Core Features
 
-Backend-i Express üzərində REST API kimi yazmışam.
 ### Customer features
 
 - User registration and login with JWT.
@@ -208,15 +90,9 @@ Backend-i Express üzərində REST API kimi yazmışam.
 
 ---
 
-### Route-lar
-`shophub-back/src/app.js` faylında mount etdiyim əsas route-lar:
 ## Tech Stack
 
-- `/api/auth`
-- `/api/categories`
-- `/api/products`
-- `/api/orders`
-- `/api/users`
+
 ### Backend
 
 - Node.js
