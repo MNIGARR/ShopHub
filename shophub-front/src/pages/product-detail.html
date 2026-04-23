@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ShopHub | Product Detail</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
       :root {
         --bg: #f3f3f5;
@@ -153,7 +155,7 @@
       .title {
         margin: 0;
         font-family: var(--brand-serif);
-        font-size: clamp(50px, 4vw, 68px);
+        font-size: clamp(50px, 4vw, 60px);
         line-height: 1.05;
         color: #0d1525;
       }
@@ -337,48 +339,23 @@
         line-height: 1.1;
       }
 
-      .footer {
-        background: var(--dark);
-        color: #ffffff;
-        margin-top: 50px;
-        padding: 56px 0 26px;
+      .site-footer {
+        background: #121317;
+        color: #e4e4e4;
+        margin-top: 0;
       }
-
       .footer-grid {
         display: grid;
-        grid-template-columns: 1.35fr 1fr 1fr 1fr;
-        gap: 24px;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 28px;
+        padding: 50px 0 24px;
       }
-
-      .footer-brand {
-        margin: 0 0 18px;
-        font-family: var(--brand-serif);
-        font-size: 50px;
-        letter-spacing: 2.3px;
-      }
-
-      .footer h4 {
-        margin: 0 0 18px;
-        font-size: 39px;
-        color: #ffffff;
-      }
-
-      .footer p {
-        margin: 0;
-        color: #c5c9d0;
-        font-size: 16px;
-        line-height: 1.6;
-      }
-
-      .footer-links {
-        display: grid;
-        gap: 10px;
-      }
-
-      .footer-links a {
-        color: #ffffff;
+      .footer-grid a {
+        color: #cfcfcf;
         text-decoration: none;
-        font-size: 16px;
+        display: block;
+        margin: 8px 0;
+        font-size: 14px;
       }
 
       .social-row {
@@ -483,13 +460,17 @@
   <body>
     <header class="topbar">
       <div class="container topbar-inner">
-        <a href="/" class="brand">LUMIÈRE</a>
-        <nav class="nav" aria-label="Main Navigation">
+        <img
+          src="../assets/ishine-icon-transparent.png"
+          alt="IshineAccesories"
+          class="w-16 h-16 rounded-full object-cover"
+        />
+          <nav class="nav" aria-label="Main Navigation">
           <a href="/">Home</a>
           <a href="/src/pages/products.html">Shop</a>
-          <a href="/src/pages/products.html">Rings</a>
-          <a href="/src/pages/products.html">Necklaces</a>
-          <a href="/src/pages/products.html">Earrings</a>
+          <a href="/src/pages/products.html?category=Rings">Rings</a>
+          <a href="/src/pages/products.html?category=Necklaces">Necklaces</a>
+          <a href="/src/pages/products.html?category=Earrings">Earrings</a>
         </nav>
         <div class="actions" aria-label="Header Actions">
           <button class="icon-btn" type="button" aria-label="Search">
@@ -539,56 +520,52 @@
       </section>
     </main>
 
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-grid">
-          <div>
-            <h3 class="footer-brand">LUMIÈRE</h3>
-            <p>Fine jewelry crafted with passion and precision. Every piece tells a story.</p>
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <div
+            class="brand-serif"
+            style="font-size: 30px; margin-bottom: 8px; color: #fff"
+          >
+            iShine Accessories
           </div>
-          <div>
-            <h4>Shop</h4>
-            <div class="footer-links">
-              <a href="/src/pages/products.html">Rings</a>
-              <a href="/src/pages/products.html">Necklaces</a>
-              <a href="/src/pages/products.html">Earrings</a>
-              <a href="/src/pages/products.html">Bracelets</a>
-            </div>
-          </div>
-          <div>
-            <h4>Customer Service</h4>
-            <div class="footer-links">
-              <a href="#">Contact Us</a>
-              <a href="#">Shipping Info</a>
-              <a href="#">Returns</a>
-              <a href="#">Size Guide</a>
-            </div>
-          </div>
-          <div>
-            <h4>Connect</h4>
-            <p>Follow us for the latest collections and updates.</p>
-            <div class="social-row" aria-label="Social links">
-              <a href="#" aria-label="Facebook">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                  <path d="M17 2h-3a5 5 0 0 0-5 5v3H6v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                </svg>
-              </a>
-              <a href="#" aria-label="Instagram">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                  <rect x="2.5" y="2.5" width="19" height="19" rx="5"></rect>
-                  <circle cx="12" cy="12" r="4"></circle>
-                  <circle cx="18" cy="6" r="0.8"></circle>
-                </svg>
-              </a>
-              <a href="#" aria-label="Twitter">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                  <path d="M23 3s-2 .9-3 1a4.5 4.5 0 0 0-7.7 4A13 13 0 0 1 1 2s-4 9 5 13a14 14 0 0 1-5 1c9 5 20 0 20-11v-.5A6.7 6.7 0 0 0 23 3z"></path>
-                </svg>
-              </a>
-            </div>
-          </div>
+          <p style="color: #a7a7a7; max-width: 320px">
+            Gündəlik və xüsusi günlər üçün zərif aksesuarlar. Parıldamaq sənin
+            stilindir! ✨
+          </p>
         </div>
-        <div class="copy">© 2026 Lumière Jewelry. All rights reserved.</div>
+        <div>
+          <h4 class="font-bold">Mağaza</h4>
+          <a href="/src/pages/products.html?category=Rings">Üzüklər</a
+          ><a href="/src/pages/products.html?category=Necklaces">Boyunbağılar</a
+          ><a href="/src/pages/products.html?category=Earrings">Sırğalar</a
+          ><a href="/src/pages/products.html">Qolbaqlar</a
+          ><a href="/src/pages/products.html">Saatlar</a>
+        </div>
+        <div>
+          <h4 class="font-bold">Müştəri Xidmətləri</h4>
+          <a href="#">Əlaqə</a><a href="#">Çatdırılma</a
+          ><a href="#">Qaytarma Şərtləri</a>
+        </div>
+        <div>
+          <h4 class="font-bold">Connect</h4>
+          <a
+            href="https://www.instagram.com/ishine.accessories?igsh=MW1ieTZlNmFkcGgwbQ=="
+            >Instagram</a
+          >
+        </div>
+      </div>
+      <div
+        class="container"
+        style="
+          border-top: 1px solid #26272c;
+          padding: 16px 0 26px;
+          color: #888;
+          text-align: center;
+        "
+      >
+        y© <span id="year">2026</span> iShine Accessories. Bütün hüquqlar
+        qorunur.
       </div>
     </footer>
 

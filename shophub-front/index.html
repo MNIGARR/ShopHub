@@ -561,9 +561,9 @@
               Tərzinizi tamamlayacaq və sizə xüsusi bir toxunuş qatacaq ən dəbli
               aksesuarları kəşf edin.
             </p>
-            <button id="ctaBrowse" class="pill-btn dark">
+            <a id="ctaBrowse" class="pill-btn dark" href="/src/pages/products.html">
               Kolleksiyaya Bax →
-            </button>
+            </a>
           </div>
           <img
             src="src/assets/first.jpeg"
@@ -605,50 +605,26 @@
               Seçilmiş Kolleksiya
             </h2>
             <p class="muted2" style="margin: 0">
-              Müasir stilinizə uyğun, ən çox bəyənilən məhsulları kəşf edin.
+              Filtrləmə və kateqoriya baxışı artıq ayrıca məhsullar səhifəsindədir.
             </p>
           </div>
 
-          <div class="shop-layout">
-            <aside class="filters">
-              <h3>Axtarış</h3>
-              <div class="search-wrap">
-                <span class="search-ico">⌕</span>
-                <input id="searchInput" placeholder="Məhsul axtar..." />
-              </div>
-              <h3>Kateqoriya</h3>
-              <select id="categorySelect"></select>
-              <h3>Qiymət</h3>
-              <div
-                style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px"
-              >
-                <input id="minPrice" type="number" placeholder="Min" />
-                <input id="maxPrice" type="number" placeholder="Max" />
-              </div>
-              <div class="filter-actions">
-                <select id="sortSelect">
-                  <option value="featured">Sıralama</option>
-                  <option value="price_asc">Ucuzdan bahaya</option>
-                  <option value="price_desc">Bahadan ucuza</option>
-                </select>
-                <button id="resetFiltersBtn" class="btn" style="width: 100%">
-                  Filtrləri təmizlə
-                </button>
-              </div>
-            </aside>
-            <div>
-              <div class="sort-bar">
-                <span id="resultCount" class="muted2">0 nəticə</span>
-              </div>
-              <div id="productsGrid"></div>
-              <div
-                id="emptyState"
-                class="hidden"
-                style="padding: 32px; text-align: center"
-              >
-                <p class="muted2">Heç bir məhsul tapılmadı.</p>
-              </div>
-            </div>
+          <div
+            style="
+              border: 1px solid var(--line);
+              border-radius: 16px;
+              padding: 26px;
+              text-align: center;
+              background: color-mix(in srgb, var(--surface) 88%, transparent);
+            "
+          >
+            <p class="muted2" style="margin: 0 0 16px">
+              Axtarış, kateqoriya, qiymət və sıralama filtrlərini istifadə etmək
+              üçün məhsullar səhifəsinə keçin.
+            </p>
+            <a class="pill-btn dark" href="/src/pages/products.html">
+              Məhsullara keç →
+            </a>
           </div>
         </div>
       </section>
@@ -897,9 +873,11 @@
         </div>
         <div>
           <h4 class="font-bold">Mağaza</h4>
-          <a href="#">Üzüklər</a><a href="#">Boyunbağılar</a
-          ><a href="#">Sırğalar</a><a href="#">Qolbaqlar</a
-          ><a href="#">Saatlar</a>
+          <a href="/src/pages/products.html?category=Rings">Üzüklər</a
+          ><a href="/src/pages/products.html?category=Necklaces">Boyunbağılar</a
+          ><a href="/src/pages/products.html?category=Earrings">Sırğalar</a
+          ><a href="/src/pages/products.html">Qolbaqlar</a
+          ><a href="/src/pages/products.html">Saatlar</a>
         </div>
         <div>
           <h4 class="font-bold">Müştəri Xidmətləri</h4>

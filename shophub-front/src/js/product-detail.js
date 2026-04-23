@@ -99,38 +99,16 @@ function renderProduct(product) {
         <button class="qty-btn" id="qtyPlus" type="button" aria-label="Increase quantity">+</button>
       </div>
 
-      <button id="addCartBtn" class="add-btn" type="button" ${stock <= 0 ? "disabled" : ""}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-          <circle cx="9" cy="21" r="1"></circle>
-          <circle cx="20" cy="21" r="1"></circle>
-          <path d="M1 1h4l2.68 12.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-        </svg>
-        <span>${stock <= 0 ? "Out of Stock" : "Add to Cart"}</span>
-      </button>
-
-      <div class="sep"></div>
-
-      <div class="perk">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-          <path d="M12 3l7 3v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-3z"></path>
-        </svg>
-        <div>
-          <p class="perk-title">Lifetime Warranty</p>
-          <p class="perk-text">Comprehensive coverage on all items</p>
-        </div>
-      </div>
-
-      <div class="perk">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-          <rect x="1.5" y="7.5" width="13" height="9" rx="2"></rect>
-          <path d="M14.5 10h4l3 3v3.5h-2"></path>
-          <circle cx="6" cy="18" r="1.5"></circle>
-          <circle cx="18" cy="18" r="1.5"></circle>
-        </svg>
-        <div>
-          <p class="perk-title">Free Insured Shipping</p>
-          <p class="perk-text">Worldwide delivery within 5-7 days</p>
-        </div>
+      <div class="mt-6 space-y-2">
+        <button
+          id="addCartBtn"
+          class="w-full rounded-xl bg-slate-900 px-5 py-4 text-base font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:text-slate-100 sm:text-lg"
+          type="button"
+          ${stock <= 0 ? "disabled" : ""}
+        >
+          ${stock <= 0 ? "Out of Stock" : "Add to Cart"}
+        </button>
+        <p class="text-sm text-slate-500">${stock > 0 ? `Available stock: ${stock}` : "Temporarily unavailable"}</p>
       </div>
     </div>
   `;
@@ -157,6 +135,7 @@ function renderProduct(product) {
 
 async function init() {
   const detail = $("#productDetail");
+  const backLink = document.querySelector(".back-link");
   const productId = Number(new URLSearchParams(window.location.search).get("id"));
 
   if (!productId) {
@@ -167,6 +146,9 @@ async function init() {
   try {
     const data = await getProductById(productId);
     const product = data.product || data;
+    if (backLink && product.CategoryName) {
+      backLink.href = `/src/pages/products.html?category=${encodeURIComponent(product.CategoryName)}`;
+    }
 
     renderProduct(product);
     await loadSimilarProducts(product);

@@ -1,24 +1,305 @@
 import { $ } from "./utils/dom.js";
 import { getProductsPaginated } from "./services/product.service.js";
 import { addToCart } from "./services/cart.service.js";
+import { apiFetch } from "./api/http.js";
+import { endpoints } from "./api/endpoints.js";
+
+const SORT_VALUES = new Set([
+  "featured",
+  "price_asc",
+  "price_desc",
+  "newest",
+  "rating_desc",
+]);
 
 const state = {
   page: 1,
-  pageSize: 12,
+  pageSize: 8,
   total: 0,
   totalPages: 1,
+  selectedSort: "featured",
+  selectedCategoryId: null,
+  selectedCategoryName: "",
+  categories: [],
+  pendingCategoryId: null,
+  pendingCategoryName: "",
+  requestToken: 0,
 };
+
+function foldLocale(value = "") {
+  return String(value)
+    .replace(/[Əə]/g, "e")
+    .replace(/[Ğğ]/g, "g")
+    .replace(/[İIı]/g, "i")
+    .replace(/[Öö]/g, "o")
+    .replace(/[Şş]/g, "s")
+    .replace(/[Çç]/g, "c")
+    .replace(/[Üü]/g, "u")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "");
+}
+
+function getImage(product) {
+  const images = product.Images || [];
+  return images[0]?.url || images[0]?.Url || "https://placehold.co/600x600?text=No+Image";
+}
 
 function productHref(id) {
   return `/src/pages/product-detail.html?id=${id}`;
 }
 
-function getImage(product) {
-  const images = product.Images || [];
-  return images[0]?.url || images[0]?.Url || "https://placehold.co/640x480?text=No+Image";
+function formatPrice(value) {
+  const amount = Number(value || 0);
+  return `${amount.toLocaleString("az-AZ", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  })} AZN`;
 }
 
+function parseUrlState() {
+  const params = new URLSearchParams(window.location.search);
 
+  const page = Number(params.get("page"));
+  state.page = Number.isFinite(page) && page > 0 ? page : 1;
+
+  const sort = params.get("sort") || "featured";
+  state.selectedSort = SORT_VALUES.has(sort) ? sort : "featured";
+
+  const categoryId = Number(params.get("categoryId"));
+  state.pendingCategoryId = Number.isFinite(categoryId) && categoryId > 0 ? categoryId : null;
+
+  state.pendingCategoryName = (params.get("category") || params.get("cat") || "").trim();
+}
+
+function updateUrlState() {
+  const params = new URLSearchParams();
+
+  if (state.selectedCategoryName) params.set("category", state.selectedCategoryName);
+  if (state.selectedCategoryId) params.set("categoryId", String(state.selectedCategoryId));
+  if (state.selectedSort !== "featured") params.set("sort", state.selectedSort);
+  if (state.page > 1) params.set("page", String(state.page));
+
+  const next = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+  window.history.replaceState({}, "", next);
+}
+
+function setSelectedCategory(category) {
+  if (!category) {
+    state.selectedCategoryId = null;
+    state.selectedCategoryName = "";
+    return;
+  }
+
+  state.selectedCategoryId = Number(category.Id) || null;
+  state.selectedCategoryName = category.Name || "";
+}
+
+function resolvePendingCategory() {
+  let matched = null;
+
+  if (state.pendingCategoryId) {
+    matched = state.categories.find((item) => Number(item.Id) === state.pendingCategoryId) || null;
+  }
+
+  if (!matched && state.pendingCategoryName) {
+    const pending = foldLocale(state.pendingCategoryName);
+    matched =
+      state.categories.find((item) => foldLocale(item.Name) === pending) ||
+      state.categories.find((item) => foldLocale(item.Name).includes(pending) || pending.includes(foldLocale(item.Name))) ||
+      null;
+  }
+
+  if (matched) {
+    setSelectedCategory(matched);
+  } else if (state.pendingCategoryName) {
+    state.selectedCategoryName = state.pendingCategoryName;
+  }
+
+  state.pendingCategoryId = null;
+  state.pendingCategoryName = "";
+}
+
+async function loadCategories() {
+  try {
+    const data = await apiFetch(endpoints.categories.list());
+    state.categories = Array.isArray(data?.items) ? data.items : [];
+  } catch {
+    state.categories = [];
+  }
+
+  resolvePendingCategory();
+  renderCategoryChips();
+}
+
+function setSortControl() {
+  const sort = $("#sortSelect");
+  if (sort) sort.value = state.selectedSort;
+}
+
+function updateHeaderTexts() {
+  const title = $("#productsTitle");
+  const subtitle = $("#productsSubtitle");
+
+  if (!title || !subtitle) return;
+
+  if (state.selectedCategoryName) {
+    title.textContent = `${state.selectedCategoryName} Kolleksiyası`;
+    subtitle.textContent = `"${state.selectedCategoryName}" kateqoriyası üzrə bütün məhsulları burada kəşf edin.`;
+    return;
+  }
+
+  title.textContent = "Məhsul Kolleksiyası";
+  subtitle.textContent =
+    "Gündəlik klassikadan modern vurğuya qədər bütün iShine Accessories modellərini bir arada kəşf edin.";
+}
+
+function chipClass(isActive) {
+  if (isActive) {
+    return "rounded-full border border-gray-900 bg-gray-900 px-5 py-2 text-sm font-semibold text-white transition";
+  }
+
+  return "rounded-full border border-gray-300 bg-white px-5 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:text-gray-900";
+}
+
+function renderCategoryChips() {
+  const chips = $("#categoryChips");
+  if (!chips) return;
+
+  const allActive = !state.selectedCategoryId;
+
+  const allChip = `
+    <button
+      type="button"
+      data-category-id=""
+      class="${chipClass(allActive)}"
+    >
+      Hamısı
+    </button>
+  `;
+
+  const categoryChips = state.categories
+    .map((category) => {
+      const active = Number(category.Id) === Number(state.selectedCategoryId);
+      return `
+        <button
+          type="button"
+          data-category-id="${category.Id}"
+          class="${chipClass(active)}"
+        >
+          ${category.Name}
+        </button>
+      `;
+    })
+    .join("");
+
+  chips.innerHTML = allChip + categoryChips;
+
+  chips.querySelectorAll("[data-category-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = Number(button.dataset.categoryId);
+
+      if (!id) {
+        setSelectedCategory(null);
+      } else {
+        const selected = state.categories.find((category) => Number(category.Id) === id);
+        setSelectedCategory(selected || null);
+      }
+
+      state.page = 1;
+      updateHeaderTexts();
+      renderCategoryChips();
+      loadPage(1);
+    });
+  });
+}
+
+function buildRequest(page) {
+  const request = {
+    page,
+    pageSize: state.pageSize,
+    sort: state.selectedSort,
+  };
+
+  if (state.selectedCategoryId) {
+    request.categoryId = state.selectedCategoryId;
+  }
+
+  return request;
+}
+
+function renderResultCount() {
+  const resultCount = $("#resultCount");
+  if (!resultCount) return;
+  resultCount.textContent = `${state.total} nəticə`;
+}
+
+function renderProducts(items) {
+  const grid = $("#productsGrid");
+  const empty = $("#emptyState");
+
+  if (!grid) return;
+
+  if (!items.length) {
+    grid.innerHTML = "";
+    empty?.classList.remove("hidden");
+    return;
+  }
+
+  empty?.classList.add("hidden");
+
+  grid.innerHTML = items
+    .map((product) => {
+      const inStock = Number(product.Stock || 0) > 0;
+      const stockClass = inStock ? "text-emerald-600" : "text-rose-600";
+      const stockText = inStock ? `Stok: ${product.Stock}` : "Stok yoxdur";
+
+      return `
+        <article class="overflow-hidden rounded-2xl border border-gray-300 bg-white transition hover:shadow-lg">
+          <a href="${productHref(product.Id)}" class="block h-80 overflow-hidden bg-gray-200">
+            <img src="${getImage(product)}" alt="${product.Name}" class="h-full w-full object-cover transition duration-500 hover:scale-105" />
+          </a>
+
+          <div class="p-4">
+            <p class="text-xs uppercase tracking-widest text-gray-500">${product.CategoryName || "Məhsul"}</p>
+            <a href="${productHref(product.Id)}" class="mt-2 block text-3xl text-gray-900" style="font-family: 'Times New Roman', Georgia, serif">
+              ${product.Name}
+            </a>
+
+            <div class="mt-3 flex items-end justify-between gap-3">
+              <p class="text-3xl text-gray-900" style="font-family: 'Times New Roman', Georgia, serif">${formatPrice(product.Price)}</p>
+              <button
+                type="button"
+                data-add-id="${product.Id}"
+                class="add-to-cart inline-flex h-11 w-11 items-center justify-center rounded-full bg-yellow-600 text-white transition hover:bg-yellow-500 disabled:cursor-not-allowed disabled:bg-gray-400"
+                title="Səbətə əlavə et"
+                aria-label="Səbətə əlavə et"
+                ${inStock ? "" : "disabled"}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5">
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 12.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+              </button>
+            </div>
+
+            <p class="mt-2 text-sm ${stockClass}">${stockText}</p>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+
+  grid.querySelectorAll(".add-to-cart").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      addToCart(Number(button.dataset.addId), 1);
+    });
+  });
+}
 
 function renderPagination() {
   const prevBtn = $("#prevPage");
@@ -34,66 +315,81 @@ function renderPagination() {
     const end = Math.min(state.totalPages, start + 4);
     pageNumbers.innerHTML = "";
 
-    for (let p = start; p <= end; p += 1) {
-      const btn = document.createElement("button");
-      btn.textContent = String(p);
-      btn.className = `px-3 py-1 rounded-md border text-sm ${p === state.page ? "bg-indigo-500 text-white border-indigo-400" : "bg-slate-900 border-white/20 text-slate-200"}`;      btn.onclick = () => loadPage(p);
-      pageNumbers.appendChild(btn);
+    for (let page = start; page <= end; page += 1) {
+      const button = document.createElement("button");
+      button.textContent = String(page);
+      button.className = `rounded-lg border px-3 py-1.5 text-sm transition ${
+        page === state.page
+          ? "border-gray-900 bg-gray-900 text-white"
+          : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
+      }`;
+      button.addEventListener("click", () => loadPage(page));
+      pageNumbers.appendChild(button);
     }
   }
 
   if (totalInfo) {
     const from = state.total === 0 ? 0 : (state.page - 1) * state.pageSize + 1;
     const to = Math.min(state.total, state.page * state.pageSize);
-    totalInfo.textContent = `${from}–${to} / ${state.total} • Səhifə ${state.page}/${state.totalPages}`;
+    totalInfo.textContent = `${from} - ${to} / ${state.total} məhsul • Səhifə ${state.page}/${state.totalPages}`;
   }
 }
 
-async function loadPage(page) {
-  const grid = $("#productsGrid");
-  if (!grid) return;
+async function loadPage(nextPage = 1) {
+  const safePage = Math.max(1, Number(nextPage) || 1);
+  const token = ++state.requestToken;
+
+  state.page = safePage;
+  updateUrlState();
 
   try {
-    const data = await getProductsPaginated({ page, pageSize: state.pageSize });
-    state.page = data.page;
-    state.pageSize = data.pageSize;
-    state.total = data.total;
-    state.totalPages = Math.max(1, data.totalPages);
+    const data = await getProductsPaginated(buildRequest(safePage));
+    if (token !== state.requestToken) return;
 
-    grid.innerHTML = data.items
-      .map((p) => {
-        const inStock = Number(p.Stock || 0) > 0;
-        return `
-          <a href="${productHref(p.Id)}" class="group block rounded-2xl border border-white/10 bg-slate-900/70 p-4 hover:border-indigo-400/70 transition">
-            <div class="aspect-[4/3] overflow-hidden rounded-xl bg-slate-800">
-              <img src="${getImage(p)}" alt="${p.Name}" class="h-full w-full object-cover transition group-hover:scale-105" />
-            </div>
-            <h3 class="mt-3 font-bold text-lg line-clamp-2">${p.Name}</h3>
-            <p class="mt-1 text-indigo-300 font-bold">${Number(p.Price || 0).toFixed(2)} AZN</p>
-            <p class="text-xs mt-1 ${inStock ? "text-emerald-300" : "text-rose-300"}">${inStock ? `Stok: ${p.Stock}` : "Stok yoxdur"}</p>
-            <button data-add-id="${p.Id}" class="add-to-cart mt-4 w-full rounded-lg bg-black/80 text-white py-2 hover:bg-black transition" ${inStock ? "" : "disabled"}>
-              Səbətə at
-            </button>
-          </a>
-        `;
-      })
-      .join("");
+    state.page = Number(data.page || safePage);
+    state.pageSize = Number(data.pageSize || state.pageSize);
+    state.total = Number(data.total || 0);
+    state.totalPages = Math.max(1, Number(data.totalPages || 1));
 
-    grid.querySelectorAll(".add-to-cart").forEach((btn) => {
-        btn.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        addToCart(Number(btn.dataset.addId), 1);
-      });
-    });
-
+    renderResultCount();
+    renderProducts(data.items || []);
     renderPagination();
-  } catch (err) {
-    grid.innerHTML = `<p class='text-red-500'>${err.message}</p>`;
+    updateUrlState();
+  } catch (error) {
+    const grid = $("#productsGrid");
+    if (grid) {
+      grid.innerHTML = `<p class="rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-rose-700">${error.message}</p>`;
+    }
   }
 }
 
-$("#prevPage")?.addEventListener("click", () => loadPage(state.page - 1));
-$("#nextPage")?.addEventListener("click", () => loadPage(state.page + 1));
+function bindEvents() {
+  $("#sortSelect")?.addEventListener("change", (event) => {
+    const value = event.target.value || "featured";
+    state.selectedSort = SORT_VALUES.has(value) ? value : "featured";
+    state.page = 1;
+    loadPage(1);
+  });
 
-loadPage(1);
+  $("#prevPage")?.addEventListener("click", () => {
+    if (state.page > 1) loadPage(state.page - 1);
+  });
+
+  $("#nextPage")?.addEventListener("click", () => {
+    if (state.page < state.totalPages) loadPage(state.page + 1);
+  });
+}
+
+async function init() {
+  parseUrlState();
+  setSortControl();
+  await loadCategories();
+
+  setSortControl();
+  updateHeaderTexts();
+  bindEvents();
+
+  await loadPage(state.page);
+}
+
+init();
