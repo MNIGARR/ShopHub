@@ -11,12 +11,9 @@ export function initProductModal({ getProductByIdFn }) {
 }
 
 export function openProductModal(id) {
-  currentId = Number(id);
-  $("#productBackdrop")?.classList.add("show");
-
-  // minimum render
-  const title = $("#pmTitle");
-  if (title) title.textContent = `Product #${currentId}`;
+  const targetId = Number(id);
+  if (!targetId) return;
+  window.location.href = `/src/pages/product-detail.html?id=${targetId}`;
 }
 
 export function closeProductModal() {

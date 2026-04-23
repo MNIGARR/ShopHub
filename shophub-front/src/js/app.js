@@ -22,6 +22,9 @@ function formatMoneyAZN(x) {
   const n = Number(x || 0);
   return `₼${n.toFixed(2)}`;
 }
+function productDetailHref(id) {
+  return `/src/pages/product-detail.html?id=${Number(id)}`;
+}
 function normalizeRole(role) {
   // backend /login -> "Role" gələ bilər, /me -> "role"
   if (!role) return "";
@@ -765,9 +768,11 @@ function renderProducts() {
 
   // bind buttons
   grid.querySelectorAll("[data-open-product]").forEach((btn) => {
-    btn.addEventListener("click", () =>
-      openProductModal(btn.getAttribute("data-open-product")),
-    );
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-open-product");
+      if (!id) return;
+      window.location.href = productDetailHref(id);
+    });
   });
   grid.querySelectorAll("[data-add-cart]").forEach((btn) => {
     btn.addEventListener("click", () =>
@@ -941,6 +946,9 @@ function renderCartDrawer() {
 
 // Product modal (minimal)
 function openProductModal(productId) {
+  window.location.href = productDetailHref(productId);
+  return;
+
   const id = Number(productId);
   const p = state.products.find((x) => Number(getProductId(x)) === id);
   if (!p) return;

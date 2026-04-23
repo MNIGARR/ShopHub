@@ -9,6 +9,17 @@ const state = {
   totalPages: 1,
 };
 
+function productHref(id) {
+  return `/src/pages/product-detail.html?id=${id}`;
+}
+
+function getImage(product) {
+  const images = product.Images || [];
+  return images[0]?.url || images[0]?.Url || "https://placehold.co/640x480?text=No+Image";
+}
+
+
+
 function renderPagination() {
   const prevBtn = $("#prevPage");
   const nextBtn = $("#nextPage");
@@ -26,8 +37,7 @@ function renderPagination() {
     for (let p = start; p <= end; p += 1) {
       const btn = document.createElement("button");
       btn.textContent = String(p);
-      btn.className = `px-3 py-1 rounded-md border text-sm ${p === state.page ? "bg-black text-white" : "bg-white"}`;
-      btn.onclick = () => loadPage(p);
+      btn.className = `px-3 py-1 rounded-md border text-sm ${p === state.page ? "bg-indigo-500 text-white border-indigo-400" : "bg-slate-900 border-white/20 text-slate-200"}`;      btn.onclick = () => loadPage(p);
       pageNumbers.appendChild(btn);
     }
   }
@@ -51,21 +61,28 @@ async function loadPage(page) {
     state.totalPages = Math.max(1, data.totalPages);
 
     grid.innerHTML = data.items
-      .map(
-        (p) => `
-            <div class="bg-white p-4 rounded-lg shadow border">
-                <h3 class="font-bold">${p.Name}</h3>
-                <p class="text-indigo-600 font-bold">${p.Price} AZN</p>
-                <button data-add-id="${p.Id}" class="add-to-cart mt-4 w-full bg-black text-white py-2 rounded">
-                    Səbətə at
-                </button>
+      .map((p) => {
+        const inStock = Number(p.Stock || 0) > 0;
+        return `
+          <a href="${productHref(p.Id)}" class="group block rounded-2xl border border-white/10 bg-slate-900/70 p-4 hover:border-indigo-400/70 transition">
+            <div class="aspect-[4/3] overflow-hidden rounded-xl bg-slate-800">
+              <img src="${getImage(p)}" alt="${p.Name}" class="h-full w-full object-cover transition group-hover:scale-105" />
             </div>
-        `,
-      )
+            <h3 class="mt-3 font-bold text-lg line-clamp-2">${p.Name}</h3>
+            <p class="mt-1 text-indigo-300 font-bold">${Number(p.Price || 0).toFixed(2)} AZN</p>
+            <p class="text-xs mt-1 ${inStock ? "text-emerald-300" : "text-rose-300"}">${inStock ? `Stok: ${p.Stock}` : "Stok yoxdur"}</p>
+            <button data-add-id="${p.Id}" class="add-to-cart mt-4 w-full rounded-lg bg-black/80 text-white py-2 hover:bg-black transition" ${inStock ? "" : "disabled"}>
+              Səbətə at
+            </button>
+          </a>
+        `;
+      })
       .join("");
 
     grid.querySelectorAll(".add-to-cart").forEach((btn) => {
-      btn.addEventListener("click", () => {
+        btn.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         addToCart(Number(btn.dataset.addId), 1);
       });
     });
