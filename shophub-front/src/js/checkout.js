@@ -1,4 +1,4 @@
-import { getCart, clearCart } from "./services/cart.service.js";
+import { getCart, setCart, clearCart } from "./services/cart.service.js";
 import { getUser } from "./services/auth.service.js";
 import { apiFetch } from "./api/http.js";
 import { endpoints } from "./api/endpoints.js";
@@ -124,8 +124,8 @@ async function initCheckout() {
       productId: Number(item.productId), 
       qty: normalizeQty(item.qty) 
     }));
-    localStorage.setItem("shophub_cart", JSON.stringify(next));
-    window.dispatchEvent(new Event("storage"));
+    setCart(next);
+    window.dispatchEvent(new Event("cart:changed"));
   };
 
   const persistAndReRender = () => {
@@ -222,6 +222,7 @@ async function initCheckout() {
 
       // Uğurlu sifarış
       clearCart();
+      window.dispatchEvent(new Event("cart:changed"));
       localStorage.removeItem("shophub_checkout_draft_v1");
 
       if (msg) {
