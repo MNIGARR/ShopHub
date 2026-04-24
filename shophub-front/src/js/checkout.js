@@ -92,20 +92,42 @@ async function initCheckout() {
       container.innerHTML = items
         .map(
           (item) => `
-          <article class="row">
-            <div class="row-left">
-              <img src="${item.image || "https://placehold.co/56x56?text=No+Image"}" alt="${item.name}" class="img" />
-              <div style="min-width: 0;">
-                <p style="margin:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;">${item.name}</p>
-                <p class="muted" style="margin:4px 0 0">${formatAZN(item.price)} / ədəd</p>
+          <article class="checkout-item">
+            <div class="checkout-item-main">
+              <img
+                src="${item.image || "https://placehold.co/56x56?text=No+Image"}"
+                alt="${item.name}"
+                class="item-thumb"
+              />
+              <div class="item-copy">
+                <p class="item-title">${item.name}</p>
+                <p class="item-price">${formatAZN(item.price)} / ədəd</p>
               </div>
             </div>
 
-            <div class="qty">
-              <button data-dec="${item.productId}" class="qbtn" type="button">−</button>
-              <span style="min-width:18px;text-align:center;">${item.qty}</span>
-              <button data-inc="${item.productId}" class="qbtn" type="button">+</button>
-              <button data-remove="${item.productId}" class="remove" type="button">✕</button>
+            <div class="qty-box">
+              <button
+                data-dec="${item.productId}"
+                class="qty-btn"
+                type="button"
+              >
+                −
+              </button>
+              <span class="qty-value">${item.qty}</span>
+              <button
+                data-inc="${item.productId}"
+                class="qty-btn"
+                type="button"
+              >
+                +
+              </button>
+              <button
+                data-remove="${item.productId}"
+                class="remove-btn"
+                type="button"
+              >
+                ✕
+              </button>
             </div>
           </article>
         `,

@@ -2,8 +2,38 @@ import { $ } from "../utils/dom.js";
 import { toast } from "./toast.js";
 import { getCart, clearCart } from "../services/cart.service.js";
 import { getUser } from "../services/auth.service.js";
-import { checkoutOrder } from "../services/order.service.js";
 import { renderCartBadge } from "./navbar.js";
+import { getProductById } from "../services/product.service.js";
+
+function formatAZN(value) {
+  return `${Number(value || 0).toFixed(2)} ₼`;
+}
+
+async function enrichCartItems(cart) {
+  return Promise.all(
+    cart.map(async (item) => {
+      try {
+        const data = await getProductById(item.productId);
+        const product = data?.product || data;
+        return {
+          productId: Number(item.productId),
+          qty: Number(item.qty || 1),
+          name: product?.Name || `Məhsul #${item.productId}`,
+          price: Number(product?.Price || 0),
+          image: product?.Images?.[0]?.Url || product?.Images?.[0]?.url || "https://placehold.co/64x64?text=No+Image",
+        };
+      } catch {
+        return {
+          productId: Number(item.productId),
+          qty: Number(item.qty || 1),
+          name: `Məhsul #${item.productId}`,
+          price: 0,
+          image: "https://placehold.co/64x64?text=No+Image",
+        };
+      }
+    }),
+  );
+}
 
 function openCart() {
   $("#cartDrawer")?.classList.add("show");
@@ -16,7 +46,7 @@ function closeCart() {
   $("#drawerBackdrop")?.classList.remove("show");
 }
 
-function renderCart() {
+async function renderCart() {
   const list = $("#cartList");
   const cart = getCart();
   if (!list) return;
@@ -27,15 +57,30 @@ function renderCart() {
     return;
   }
 
-  list.innerHTML = cart.map(i => `
-    <div class="glass p-3 flex items-center justify-between">
-      <div>
-        <div class="text-sm font-semibold">Product #${i.productId}</div>
-        <div class="text-xs muted2">Qty: ${i.qty}</div>
+  list.innerHTML = `<div class="muted2 text-sm">Məhsullar yüklənir...</div>`;
+  const items = await enrichCartItems(cart);
+
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+  list.innerHTML = items.map(item => `
+    <div class="glass p-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <img src="${item.image}" alt="${item.name}" class="w-14 h-14 rounded-xl object-cover border border-white/10" />
+        <div class="min-w-0">
+          <div class="text-sm font-semibold truncate">${item.name}</div>
+          <div class="text-xs muted2">${formatAZN(item.price)} × ${item.qty}</div>
+        </div>
       </div>
-      <div class="text-sm">${i.qty}</div>
+      <div class="text-sm font-semibold">${formatAZN(item.price * item.qty)}</div>
     </div>
   `).join("");
+
+  list.innerHTML += `
+    <div class="mt-2 text-right text-sm muted2">
+      Ara cəm: 
+        <strong style="color:var(--text, #fff)">${formatAZN(subtotal)}</strong>
+    </div>
+  `;
 
   renderCartBadge();
 }

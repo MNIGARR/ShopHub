@@ -7,3 +7,5 @@ export function initFooter() {
     yearEl.textContent = String(new Date().getFullYear());
   }
 }
+
+initFooter();

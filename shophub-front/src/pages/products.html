@@ -4,18 +4,530 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>iShine Accessories | Məhsullar</title>
+    <script>
+      (function () {
+        const key = "shophub_theme";
+        const saved = localStorage.getItem(key);
+        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = saved || (prefersDark ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+      })();
+    </script>
     <style>
-      .site-footer {
-        background: #121317;
-        color: #e4e4e4;
-        margin-top: 0;
+      :root {
+        --bg: #f6f2ec;
+        --surface: #fffdfa;
+        --surface-2: #faf4eb;
+        --text: #1f1813;
+        --muted: #6e6257;
+        --line: #e7ddd0;
+        --accent: #b9772e;
+        --accent-2: #9a6222;
+        --accent-soft: #efe0cb;
+        --footer-bg: #121317;
       }
+
+      [data-theme="dark"] {
+        --bg: #0f0b08;
+        --surface: #18110d;
+        --surface-2: #22170f;
+        --text: #f2e7d8;
+        --muted: #b7a692;
+        --line: #3a2b20;
+        --accent: #d2a060;
+        --accent-2: #bc8a4a;
+        --accent-soft: #2a1d12;
+        --footer-bg: #090705;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          sans-serif;
+        background:
+          radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 30%),
+          radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 22%),
+          var(--bg);
+        color: var(--text);
+      }
+
+      .container {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+      }
+
+      .brand-serif {
+        font-family: "Times New Roman", Georgia, serif;
+        letter-spacing: 0.04em;
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        border-bottom: 1px solid var(--line);
+        background: color-mix(in srgb, var(--bg) 88%, transparent);
+        backdrop-filter: blur(8px);
+      }
+
+      .header-row {
+        height: 78px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .brand-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: var(--text);
+      }
+
+      .brand-logo {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        object-fit: cover;
+      }
+
+      .brand-word {
+        margin: 0;
+        font-size: 39px;
+        line-height: 1;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .nav-link {
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 600;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        padding: 8px 14px;
+        transition: all 0.2s ease;
+      }
+
+      .nav-link:hover {
+        color: var(--text);
+        border-color: var(--line);
+        background: var(--surface);
+      }
+
+      .nav-link.active {
+        color: var(--text);
+        border-color: var(--line);
+        background: var(--surface);
+      }
+
+      .icon-btn,
+      .theme-toggle {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--text);
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+
+      .icon-btn svg {
+        width: 20px;
+        height: 20px;
+        stroke-width: 2;
+      }
+
+      .page-wrap {
+        padding: 34px 0 58px;
+      }
+
+      .hero {
+        border: 1px solid var(--line);
+        background:
+          linear-gradient(128deg, color-mix(in srgb, var(--surface) 68%, var(--accent-soft)), var(--surface));
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 12px 28px rgba(33, 22, 12, 0.08);
+      }
+
+      .hero-title {
+        margin: 0;
+        font-size: clamp(42px, 6vw, 72px);
+        line-height: 0.88;
+      }
+
+      .hero-sub {
+        margin: 12px 0 0;
+        max-width: 760px;
+        color: var(--muted);
+        line-height: 1.75;
+      }
+
+      .controls-wrap {
+        margin-top: 20px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 18px;
+        background: var(--surface);
+      }
+
+      #categoryChips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .chip-btn {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--muted);
+        border-radius: 999px;
+        padding: 9px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .chip-btn:hover {
+        color: var(--text);
+        border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+      }
+
+      .chip-btn--active {
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        border-color: color-mix(in srgb, var(--accent) 80%, #000);
+        color: #fff;
+      }
+
+      .tools-row {
+        margin-top: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .search-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface-2);
+        padding: 8px 10px;
+      }
+
+      #searchInput {
+        width: 300px;
+        max-width: 68vw;
+        border: 0;
+        outline: none;
+        background: transparent;
+        color: var(--text);
+        font-size: 14px;
+      }
+
+      #searchInput::placeholder {
+        color: color-mix(in srgb, var(--muted) 85%, transparent);
+      }
+
+      #searchBtn {
+        border: 0;
+        border-radius: 10px;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        color: #fff;
+        padding: 9px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .sort-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface-2);
+        padding: 8px 10px;
+        color: var(--muted);
+      }
+
+      #sortSelect {
+        border: 0;
+        outline: none;
+        background: transparent;
+        color: var(--text);
+        font-size: 14px;
+        min-width: 240px;
+      }
+
+      .list-wrap {
+        margin-top: 20px;
+      }
+
+      .list-head {
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      #resultCount {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .back-home {
+        text-decoration: none;
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface);
+        padding: 9px 14px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      #productsGrid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .product-card {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+        background: var(--surface);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .product-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(33, 22, 12, 0.12);
+      }
+
+      .product-link {
+        display: block;
+        height: 286px;
+        overflow: hidden;
+        background: var(--surface-2);
+      }
+
+      .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.45s ease;
+      }
+
+      .product-card:hover .product-image {
+        transform: scale(1.04);
+      }
+
+      .product-body {
+        padding: 14px;
+      }
+
+      .product-cat {
+        margin: 0;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+      }
+
+      .product-name {
+        display: block;
+        margin-top: 8px;
+        color: var(--text);
+        text-decoration: none;
+        font-family: "Times New Roman", Georgia, serif;
+        font-size: 32px;
+        line-height: 0.95;
+      }
+
+      .product-meta {
+        margin-top: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 10px;
+      }
+
+      .product-price {
+        margin: 0;
+        color: var(--text);
+        font-family: "Times New Roman", Georgia, serif;
+        font-size: 30px;
+        line-height: 1;
+      }
+
+      .product-add {
+        border: 0;
+        border-radius: 999px;
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #fff;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      }
+
+      .product-add svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .product-add:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      .product-stock {
+        margin: 10px 0 0;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .stock-ok {
+        color: #2d7c4a;
+      }
+
+      .stock-out {
+        color: #b54f4f;
+      }
+
+      #emptyState {
+        border: 1px dashed var(--line);
+        border-radius: 16px;
+        background: var(--surface);
+        padding: 44px 22px;
+        text-align: center;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      #emptyState p {
+        margin: 0;
+      }
+
+      .empty-title {
+        font-family: "Times New Roman", Georgia, serif;
+        font-size: 33px;
+      }
+
+      .empty-sub {
+        margin-top: 8px;
+        color: var(--muted);
+      }
+
+      .pager-wrap {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .pager {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface);
+        padding: 6px;
+      }
+
+      .pager-btn {
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--surface-2);
+        color: var(--text);
+        padding: 8px;
+        min-width: 36px;
+        cursor: pointer;
+      }
+
+      .pager-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      #pageNumbers {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .page-btn {
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--surface-2);
+        color: var(--text);
+        padding: 8px 11px;
+        min-width: 36px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+
+      .page-btn.active {
+        color: #fff;
+        border-color: color-mix(in srgb, var(--accent) 80%, #000);
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      }
+
+      #totalInfo {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .site-footer {
+        margin-top: 58px;
+        background: var(--footer-bg);
+        color: #e4e4e4;
+      }
+
       .footer-grid {
         display: grid;
         grid-template-columns: 2fr 1fr 1fr 1fr;
         gap: 28px;
         padding: 50px 0 24px;
       }
+
       .footer-grid a {
         color: #cfcfcf;
         text-decoration: none;
@@ -24,171 +536,150 @@
         font-size: 14px;
       }
 
-      .social-row {
-        margin-top: 14px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
+      .footer-grid a:hover {
+        color: #fff;
       }
-
-      .social-row a {
-        color: #90939a;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .social-row svg {
-        width: 22px;
-        height: 22px;
-        stroke-width: 1.9;
-      }
-
-      .copy {
-        margin-top: 34px;
-        padding-top: 18px;
-        border-top: 1px solid #25262c;
-        color: #9ea2ab;
-        text-align: center;
-        font-size: 15px;
-      }
-
 
       @media (max-width: 1120px) {
+        #productsGrid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 980px) {
+        #productsGrid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .header-row {
+          height: auto;
+          min-height: 78px;
+          padding: 10px 0;
+          flex-wrap: wrap;
+        }
+
         .footer-grid {
           grid-template-columns: 1fr;
-          gap: 30px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .container {
+          width: min(1180px, calc(100% - 28px));
+        }
+
+        #productsGrid {
+          grid-template-columns: 1fr;
+        }
+
+        .brand-word {
+          font-size: 33px;
+        }
+
+        #sortSelect {
+          min-width: 170px;
         }
       }
     </style>
-    <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
   </head>
-  <body class="min-h-screen bg-gray-100 text-gray-900">
-    <header class="border-b border-gray-200 bg-gray-100">
-      <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <a
-          href="/"
-          class="text-3xl text-gray-900"
-          style="font-family: 'Times New Roman', Georgia, serif; letter-spacing: 0.06em"
-        >
-          iShine Accessories
+  <body>
+    <header class="site-header">
+      <div class="container header-row">
+        <a href="/" class="brand-link" aria-label="iShine Accessories">
+          <img
+            src="../assets/ishine-icon-transparent.png"
+            alt="iShine Accessories"
+            class="brand-logo"
+          />
+          <h1 class="brand-word brand-serif">iShine</h1>
         </a>
 
-        <!-- <nav class="hidden items-center gap-8 text-base text-gray-700 md:flex">
-          <a href="/" class="transition hover:text-gray-900">Ana səhifə</a>
-          <a href="/src/pages/products.html" class="font-semibold text-gray-900">Mağaza</a>
-          <a href="/src/pages/products.html?category=Rings" class="transition hover:text-gray-900">Üzüklər</a>
-          <a href="/src/pages/products.html?category=Necklaces" class="transition hover:text-gray-900">Boyunbağılar</a>
-          <a href="/src/pages/products.html?category=Earrings" class="transition hover:text-gray-900">Sırğalar</a>
-        </nav> -->
-
-        <div class="hidden items-center gap-4 text-gray-600 sm:flex">
-          <button type="button" class="transition hover:text-gray-900" aria-label="Axtarış">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-6 w-6">
+        <div class="header-actions">
+          <a class="nav-link" href="/">Ana səhifə</a>
+          <a class="nav-link active" href="/src/pages/products.html">Mağaza</a>
+          <a class="nav-link" href="/src/pages/about.html">Haqqımızda</a>
+          <a href="/src/pages/checkout.html" class="icon-btn" aria-label="Checkout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="8" cy="21" r="1"></circle>
+              <circle cx="19" cy="21" r="1"></circle>
+              <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+            </svg>
+          </a>
+          <button id="headerSearchBtn" type="button" class="icon-btn" aria-label="Axtarış">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <circle cx="11" cy="11" r="7"></circle>
               <path d="M20 20L16.65 16.65"></path>
             </svg>
           </button>
-          <button type="button" class="transition hover:text-gray-900" aria-label="Mövzu">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-6 w-6">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
+          <button
+            id="themeToggle"
+            type="button"
+            class="theme-toggle"
+            aria-label="Switch to dark mode"
+            title="Toggle theme"
+          >
+            ☾
           </button>
-          <a href="/src/pages/checkout.html" class="transition hover:text-gray-900" aria-label="Səbət">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-6 w-6">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 12.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
-          </a>
         </div>
       </div>
     </header>
 
-    <main class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <section>
-        <h1
-          id="productsTitle"
-          class="text-5xl leading-tight text-gray-900"
-          style="font-family: 'Times New Roman', Georgia, serif"
-        >
-          Məhsul Kolleksiyası
-        </h1>
-        <p id="productsSubtitle" class="mt-4 max-w-3xl text-xl text-gray-600"></p>
+    <main class="container page-wrap">
+      <section class="hero">
+        <h2 id="productsTitle" class="hero-title brand-serif">Məhsul Kolleksiyası</h2>
+        <p id="productsSubtitle" class="hero-sub">
+          Gündəlik klassikadan modern vurğuya qədər bütün iShine Accessories modellərini bir arada kəşf edin.
+        </p>
       </section>
 
-      <section class="mt-10 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <div id="categoryChips" class="flex flex-wrap gap-3"></div>
-
-        <div class="inline-flex items-center gap-3">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5 text-gray-500">
-            <path d="M4 7h16"></path>
-            <path d="M7 12h10"></path>
-            <path d="M10 17h4"></path>
-          </svg>
-          <select
-            id="sortSelect"
-            class="min-w-[220px] rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-base text-gray-800 outline-none transition focus:border-gray-500"
-          >
-            <option value="featured">Tövsiyə olunan</option>
-            <option value="price_asc">Qiymət: ucuzdan bahaya</option>
-            <option value="price_desc">Qiymət: bahadan ucuza</option>
-            <option value="newest">Ən yenilər</option>
-            <option value="rating_desc">Reytinqə görə</option>
-          </select>
-        </div>
-      </section>
-
-      <section class="mt-6">
-        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <p id="resultCount" class="text-base font-medium text-gray-700">0 nəticə</p>
-          <a
-            href="/"
-            class="inline-flex items-center rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 transition hover:border-gray-400 hover:text-gray-900"
-          >
-            Ana səhifəyə qayıt
-          </a>
-        </div>
-
-        <div id="productsGrid" class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4" aria-live="polite"></div>
-
-        <div id="emptyState" class="hidden rounded-2xl border border-gray-300 bg-white px-6 py-14 text-center">
-          <p class="text-2xl text-gray-900" style="font-family: 'Times New Roman', Georgia, serif">
-            Uyğun məhsul tapılmadı
-          </p>
-          <p class="mt-2 text-base text-gray-600">Kateqoriyanı dəyişib yenidən yoxlayın.</p>
-        </div>
-
-        <div class="mt-10 flex flex-col items-center gap-3">
-          <div class="inline-flex items-center rounded-xl border border-gray-300 bg-white p-1.5">
-            <button
-              id="prevPage"
-              class="rounded-lg p-2 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-30"
-              aria-label="Əvvəlki səhifə"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m15 18-6-6 6-6" />
-              </svg>
-            </button>
-
-            <div id="pageNumbers" class="flex items-center gap-1 px-2"></div>
-
-            <button
-              id="nextPage"
-              class="rounded-lg p-2 text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-30"
-              aria-label="Növbəti səhifə"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m9 18 6-6-6-6" />
-              </svg>
-            </button>
+      <section class="controls-wrap">
+        <div id="categoryChips"></div>
+        <div class="tools-row">
+          <div class="search-box">
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="Məhsul adı, marka və ya təsvirə görə axtar..."
+            />
+            <button id="searchBtn" type="button">Axtar</button>
           </div>
+          <div class="sort-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16">
+              <path d="M4 7h16"></path>
+              <path d="M7 12h10"></path>
+              <path d="M10 17h4"></path>
+            </svg>
+            <select id="sortSelect">
+              <option value="featured">Tövsiyə olunan</option>
+              <option value="price_asc">Qiymət: ucuzdan bahaya</option>
+              <option value="price_desc">Qiymət: bahadan ucuza</option>
+              <option value="newest">Ən yenilər</option>
+              <option value="rating_desc">Reytinqə görə</option>
+            </select>
+          </div>
+        </div>
+      </section>
 
-          <p id="totalInfo" class="text-sm text-gray-600"></p>
+      <section class="list-wrap">
+        <div class="list-head">
+          <p id="resultCount">0 nəticə</p>
+          <a href="/" class="back-home">Ana səhifəyə qayıt</a>
+        </div>
+
+        <div id="productsGrid" aria-live="polite"></div>
+
+        <div id="emptyState" class="hidden">
+          <p class="empty-title">Uyğun məhsul tapılmadı</p>
+          <p class="empty-sub">Kateqoriyanı dəyişib yenidən yoxlayın.</p>
+        </div>
+
+        <div class="pager-wrap">
+          <div class="pager">
+            <button id="prevPage" class="pager-btn" aria-label="Əvvəlki səhifə">‹</button>
+            <div id="pageNumbers"></div>
+            <button id="nextPage" class="pager-btn" aria-label="Növbəti səhifə">›</button>
+          </div>
+          <p id="totalInfo"></p>
         </div>
       </section>
     </main>
@@ -196,36 +687,30 @@
     <footer class="site-footer">
       <div class="container footer-grid">
         <div>
-          <div
-            class="brand-serif"
-            style="font-size: 30px; margin-bottom: 8px; color: #fff"
-          >
+          <div class="brand-serif" style="font-size: 30px; margin-bottom: 8px; color: #fff">
             iShine Accessories
           </div>
           <p style="color: #a7a7a7; max-width: 320px">
-            Gündəlik və xüsusi günlər üçün zərif aksesuarlar. Parıldamaq sənin
-            stilindir! ✨
+            Gündəlik və xüsusi günlər üçün zərif aksesuarlar. Parıldamaq sənin stilindir! ✨
           </p>
         </div>
         <div>
-          <h4 class="font-bold">Mağaza</h4>
-          <a href="/src/pages/products.html?category=Rings">Üzüklər</a
-          ><a href="/src/pages/products.html?category=Necklaces">Boyunbağılar</a
-          ><a href="/src/pages/products.html?category=Earrings">Sırğalar</a
-          ><a href="/src/pages/products.html">Qolbaqlar</a
-          ><a href="/src/pages/products.html">Saatlar</a>
+          <h4 style="margin: 0">Mağaza</h4>
+          <a href="/src/pages/products.html?category=Rings">Üzüklər</a>
+          <a href="/src/pages/products.html?category=Necklaces">Boyunbağılar</a>
+          <a href="/src/pages/products.html?category=Earrings">Sırğalar</a>
+          <a href="/src/pages/products.html">Qolbaqlar</a>
+          <a href="/src/pages/products.html">Saatlar</a>
         </div>
         <div>
-          <h4 class="font-bold">Müştəri Xidmətləri</h4>
-          <a href="#">Əlaqə</a><a href="#">Çatdırılma</a
-          ><a href="#">Qaytarma Şərtləri</a>
+          <h4 style="margin: 0">Müştəri Xidmətləri</h4>
+          <a href="#">Əlaqə</a>
+          <a href="#">Çatdırılma</a>
+          <a href="#">Qaytarma Şərtləri</a>
         </div>
         <div>
-          <h4 class="font-bold">Connect</h4>
-          <a
-            href="https://www.instagram.com/ishine.accessories?igsh=MW1ieTZlNmFkcGgwbQ=="
-            >Instagram</a
-          >
+          <h4 style="margin: 0">Connect</h4>
+          <a href="https://www.instagram.com/ishine.accessories?igsh=MW1ieTZlNmFkcGgwbQ==">Instagram</a>
         </div>
       </div>
       <div
@@ -237,11 +722,42 @@
           text-align: center;
         "
       >
-        y© <span id="year">2026</span> iShine Accessories. Bütün hüquqlar
-        qorunur.
+        y© <span id="year">2026</span> iShine Accessories. Bütün hüquqlar qorunur.
       </div>
     </footer>
 
+    <script>
+      (function () {
+        const THEME_KEY = "shophub_theme";
+
+        function applyTheme(theme) {
+          const next = theme === "dark" ? "dark" : "light";
+          document.documentElement.setAttribute("data-theme", next);
+          localStorage.setItem(THEME_KEY, next);
+          const themeBtn = document.getElementById("themeToggle");
+          if (themeBtn) {
+            themeBtn.textContent = next === "dark" ? "☀" : "☾";
+            themeBtn.setAttribute("aria-label", next === "dark" ? "Switch to light mode" : "Switch to dark mode");
+          }
+        }
+
+        function initTheme() {
+          const saved = localStorage.getItem(THEME_KEY);
+          const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+          applyTheme(saved || (prefersDark ? "dark" : "light"));
+        }
+
+        initTheme();
+        const themeToggle = document.getElementById("themeToggle");
+        if (themeToggle) {
+          themeToggle.addEventListener("click", function () {
+            const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+            applyTheme(isDark ? "light" : "dark");
+          });
+        }
+      })();
+    </script>
+    <script type="module" src="/src/js/ui/footer.js"></script>
     <script type="module" src="/src/js/products.js"></script>
   </body>
 </html>

@@ -3,324 +3,744 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ShopHub | Haqqımızda</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>iShine Accessories | Haqqımızda</title>
+    <script>
+      (function () {
+        const key = "shophub_theme";
+        const saved = localStorage.getItem(key);
+        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = saved || (prefersDark ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
-        --bg: #f6f5f2;
-        --surface: #ffffff;
-        --muted: #6a6a6a;
-        --text: #1f1f22;
-        --accent: #d86f00;
-        --line: #e6e4df;
-        --header-bg: #faf9f6e8;
+        --bg: #f6f2ec;
+        --surface: #fffdfa;
+        --surface-2: #faf4eb;
+        --text: #1f1813;
+        --muted: #6e6257;
+        --line: #e7ddd0;
+        --accent: #b9772e;
+        --accent-2: #9a6222;
+        --accent-soft: #efe0cb;
+        --footer-bg: #121317;
       }
+
       [data-theme="dark"] {
-        --bg: #101010;
-        --surface: #161616;
-        --muted: #a3a3a3;
-        --text: #f5f5f5;
-        --accent: #e07a12;
-        --line: #2a2a2a;
-        --header-bg: #131313e6;
+        --bg: #0f0b08;
+        --surface: #18110d;
+        --surface-2: #22170f;
+        --text: #f2e7d8;
+        --muted: #b7a692;
+        --line: #3a2b20;
+        --accent: #d2a060;
+        --accent-2: #bc8a4a;
+        --accent-soft: #2a1d12;
+        --footer-bg: #090705;
       }
+
       * {
         box-sizing: border-box;
       }
-      html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        min-height: 100vh;
-      }
+
       body {
-        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-        background: var(--bg);
+        margin: 0;
+        font-family:
+          "Manrope",
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          sans-serif;
+        background:
+          radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 30%),
+          radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 22%),
+          var(--bg);
         color: var(--text);
-        overflow-x: hidden;
-        display: flex;
-        flex-direction: column;
       }
+
+      .container {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+      }
+
+      .brand-serif {
+        font-family: "Cormorant Garamond", "Times New Roman", Georgia, serif;
+        letter-spacing: 0.02em;
+      }
+
       .site-header {
         position: sticky;
         top: 0;
         z-index: 100;
-        background: var(--header-bg);
-        backdrop-filter: blur(8px);
         border-bottom: 1px solid var(--line);
+        background: color-mix(in srgb, var(--bg) 88%, transparent);
+        backdrop-filter: blur(8px);
       }
-      .header-content {
-        width: min(1180px, calc(100% - 48px));
-        margin: 0 auto;
+
+      .header-row {
         height: 78px;
         display: flex;
+        align-items: center;
         justify-content: space-between;
+        gap: 14px;
+      }
+
+      .brand-link {
+        display: inline-flex;
         align-items: center;
-      }
-      .header-logo {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        background: #1e1e1e;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #f6f6f6;
-        font-weight: bold;
-        font-size: 20px;
-      }
-      nav {
-        display: flex;
-        gap: 20px;
-        font-size: 14px;
-      }
-      nav a, nav button {
-        background: none;
-        border: none;
-        color: var(--muted);
-        cursor: pointer;
+        gap: 12px;
         text-decoration: none;
-        transition: color 0.2s;
-      }
-      nav a:hover, nav button:hover {
         color: var(--text);
       }
-      .container {
-        width: min(1180px, calc(100% - 48px));
-        margin: 0 auto;
-        flex: 1;
+
+      .brand-logo {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        object-fit: cover;
       }
-      main {
-        padding: 48px 0;
-      }
-      .hero {
-        text-align: center;
-        margin-bottom: 64px;
-      }
-      .hero-title {
-        font-size: 48px;
-        font-weight: 700;
-        margin: 0 0 16px;
-      }
-      .hero-subtitle {
-        font-size: 18px;
-        color: var(--muted);
+
+      .brand-word {
         margin: 0;
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
+        font-size: 39px;
+        line-height: 1;
       }
-      .content-section {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 48px;
-        margin-bottom: 64px;
-        align-items: center;
-      }
-      .section-image {
-        width: 100%;
-        height: 400px;
-        background: linear-gradient(135deg, var(--accent), #ff9a56);
-        border-radius: 16px;
+
+      .header-actions {
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-size: 80px;
+        gap: 10px;
       }
-      .section-content h2 {
-        font-size: 32px;
-        font-weight: 700;
-        margin: 0 0 16px;
-      }
-      .section-content p {
-        font-size: 16px;
-        line-height: 1.6;
-        color: var(--muted);
-        margin: 0 0 12px;
-      }
-      .features-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 24px;
-        margin: 64px 0;
-      }
-      .feature-card {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        padding: 32px;
-        text-align: center;
-      }
-      .feature-icon {
-        font-size: 48px;
-        margin-bottom: 16px;
-      }
-      .feature-title {
-        font-size: 18px;
-        font-weight: 700;
-        margin: 0 0 8px;
-      }
-      .feature-description {
-        font-size: 14px;
-        color: var(--muted);
-        margin: 0;
-      }
-      .cta-section {
-        background: var(--accent);
-        color: white;
-        border-radius: 16px;
-        padding: 64px 32px;
-        text-align: center;
-        margin: 64px 0;
-      }
-      .cta-title {
-        font-size: 32px;
-        font-weight: 700;
-        margin: 0 0 16px;
-      }
-      .cta-subtitle {
-        font-size: 16px;
-        margin: 0 0 32px;
-        opacity: 0.9;
-      }
-      .btn {
-        background: white;
-        color: var(--accent);
-        border: none;
-        padding: 12px 32px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 14px;
-        transition: all 0.2s;
+
+      .nav-link {
         text-decoration: none;
-        display: inline-block;
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 600;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        padding: 8px 14px;
+        transition: all 0.2s ease;
       }
+
+      .nav-link:hover {
+        color: var(--text);
+        border-color: var(--line);
+        background: var(--surface);
+      }
+
+      .nav-link.active {
+        color: var(--text);
+        border-color: var(--line);
+        background: var(--surface);
+      }
+
+      .theme-toggle {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--text);
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+      }
+
+      main {
+        padding: 34px 0 58px;
+      }
+
+      .hero {
+        border: 1px solid var(--line);
+        background:
+          linear-gradient(128deg, color-mix(in srgb, var(--surface) 68%, var(--accent-soft)), var(--surface));
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 12px 28px rgba(33, 22, 12, 0.08);
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 22px;
+        align-items: stretch;
+      }
+
+      .overline {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .hero-title {
+        margin: 16px 0 10px;
+        font-size: clamp(40px, 7vw, 78px);
+        line-height: 0.88;
+      }
+
+      .hero-text {
+        margin: 0;
+        max-width: 600px;
+        color: var(--muted);
+        line-height: 1.75;
+      }
+
+      .hero-cta {
+        margin-top: 26px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .btn {
+        text-decoration: none;
+        border-radius: 999px;
+        /* margin: 100px 0; */
+        padding: 11px 18px;
+        font-size: 13px;
+        font-weight: 700;
+        transition: transform 0.2s ease;
+      }
+
       .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
       }
-      .site-footer {
-        background: #121317;
-        color: #e4e4e4;
-        margin-top: auto;
+
+      .btn-primary {
+        color: #fff;
+        border: 1px solid color-mix(in srgb, var(--accent) 70%, #000);
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
       }
-      .footer-content {
-        width: min(1180px, calc(100% - 48px));
-        margin: 0 auto;
-        padding: 50px 0 24px;
-        border-top: 1px solid #26272c;
+
+      .btn-ghost {
+        color: var(--text);
+        border: 1px solid var(--line);
+        background: var(--surface);
+      }
+
+      .hero-aside {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 18px;
+        background: color-mix(in srgb, var(--surface) 88%, var(--accent-soft));
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 12px;
+      }
+
+      .aside-kicker {
+        margin: 0;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .aside-image {
+        min-height: 180px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        object-fit: cover;
+        width: 100%;
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .metric {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+        background: var(--surface);
+      }
+
+      .metric h3 {
+        margin: 0;
+        font-size: 23px;
+        font-weight: 700;
+      }
+
+      .metric p {
+        margin: 3px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .section {
+        margin-top: 28px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 24px;
+        background: var(--surface);
+      }
+
+      .section-title {
+        margin: 0;
+        font-size: clamp(34px, 5vw, 52px);
+        line-height: 0.95;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .story-layout {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 22px;
+      }
+
+      .story-copy p {
+        margin: 0 0 14px;
+        line-height: 1.85;
+        color: var(--muted);
+      }
+
+      .timeline {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 10px;
+      }
+
+      .timeline li {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface-2);
+        padding: 14px;
+      }
+
+      .timeline .year {
+        margin: 0 0 4px;
+        color: var(--accent);
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+
+      .timeline h3 {
+        margin: 0 0 6px;
+        font-size: 17px;
+      }
+
+      .timeline p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .values-grid {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .value-card {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 20px;
+        background: var(--surface-2);
+      }
+
+      .value-icon {
+        font-size: 22px;
+        margin-bottom: 10px;
+      }
+
+      .value-card h3 {
+        margin: 0 0 8px;
+        font-size: 19px;
+      }
+
+      .value-card p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--muted);
+      }
+
+      .atelier {
+        margin-top: 28px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 24px;
+        background:
+          linear-gradient(160deg, color-mix(in srgb, var(--surface) 76%, var(--accent-soft)), var(--surface));
+      }
+
+      .atelier-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      .atelier-grid article {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 16px;
+        background: color-mix(in srgb, var(--surface) 86%, var(--accent-soft));
+      }
+
+      .atelier-grid h3 {
+        margin: 0 0 6px;
+      }
+
+      .atelier-grid p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .cta {
+        margin-top: 28px;
+        border: 1px solid color-mix(in srgb, var(--accent) 50%, var(--line));
+        border-radius: 20px;
+        padding: 28px;
+        background: linear-gradient(92deg, color-mix(in srgb, var(--accent) 88%, #000 8%), color-mix(in srgb, var(--accent-2) 88%, #000 12%));
+        color: #fff;
         text-align: center;
+      }
+
+      .cta h2 {
+        margin: 0;
+        font-size: clamp(36px, 5vw, 56px);
+        line-height: 0.9;
+      }
+
+      .cta p {
+        margin: 10px auto 0;
+        max-width: 700px;
+        line-height: 1.8;
+        opacity: 0.94;
+      }
+
+      .cta .btn {
+        margin-top: 18px;
+        background: #fff;
+        color: #212121;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+      }
+
+      .site-footer {
+        margin-top: 58px;
+        background: var(--footer-bg);
+        color: #e4e4e4;
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 28px;
+        padding: 50px 0 24px;
+      }
+
+      .footer-grid a {
+        color: #cfcfcf;
+        text-decoration: none;
+        display: block;
+        margin: 8px 0;
         font-size: 14px;
       }
-      @media (max-width: 768px) {
-        .content-section {
+
+      .footer-grid a:hover {
+        color: #fff;
+      }
+
+      @media (max-width: 1080px) {
+        .hero-grid,
+        .story-layout,
+        .values-grid,
+        .atelier-grid {
           grid-template-columns: 1fr;
-          gap: 32px;
         }
-        .features-grid {
+      }
+
+      @media (max-width: 900px) {
+        .container {
+          width: min(1180px, calc(100% - 28px));
+        }
+
+        .header-row {
+          height: auto;
+          min-height: 78px;
+          padding: 10px 0;
+          flex-wrap: wrap;
+        }
+
+        .brand-word {
+          font-size: 34px;
+        }
+
+        .footer-grid {
           grid-template-columns: 1fr;
-        }
-        .hero-title {
-          font-size: 32px;
-        }
-        nav {
-          display: none;
+          gap: 30px;
         }
       }
     </style>
   </head>
   <body>
     <header class="site-header">
-      <div class="header-content">
-        <div class="header-logo">🛍</div>
-        <nav>
-          <a href="/">Ana səhifə</a>
-          <button onclick="window.location='/#shop'">Mağaza</button>
-          <a href="/src/pages/about.html">Haqqımızda</a>
-          <a href="/src/pages/profile.html">Profil</a>
-        </nav>
+      <div class="container header-row">
+        <a href="/" class="brand-link" aria-label="iShine Accessories">
+          <img
+            src="../assets/ishine-icon-transparent.png"
+            alt="iShine Accessories"
+            class="brand-logo"
+          />
+          <h1 class="brand-word brand-serif">iShine</h1>
+        </a>
+
+        <div class="header-actions">
+          <a class="nav-link" href="/">Ana səhifə</a>
+          <a class="nav-link" href="/src/pages/products.html">Mağaza</a>
+          <a class="nav-link active" href="/src/pages/about.html">Haqqımızda</a>
+          <a class="nav-link" href="/src/pages/checkout.html">Checkout</a>
+          <button
+            id="themeToggle"
+            type="button"
+            class="theme-toggle"
+            aria-label="Switch to dark mode"
+            title="Toggle theme"
+          >
+            ☾
+          </button>
+        </div>
       </div>
     </header>
 
-    <main>
-      <div class="container">
-        <!-- Hero Section -->
-        <div class="hero">
-          <h1 class="hero-title">İdeal Aksesuarını Keşf Et</h1>
-          <p class="hero-subtitle">Gündəlik sadəlikdən tutmuş xüsusi günlərin parıltısına qədər — yeni favorit aksesuarınızı keşf edin.</p>
-        </div>
+    <main class="container">
+      <section class="hero">
+        <div class="hero-grid">
+          <article>
+            <div class="overline">iShine Accessories • Since 2021</div>
+            <h2 class="hero-title brand-serif">Zəriflik, gündəlik stilin bir hissəsi olsun.</h2>
+            <p class="hero-text">
+              iShine, hər gün rahatlıqla istifadə edilən, amma hər baxışda xüsusi görünən
+              aksessuarlar üçün yaradılıb. Bizim üçün məhsul yalnız satış deyil, sizin
+              hekayənizə əlavə olunan kiçik bir imzadır.
+            </p>
+            <div class="hero-cta">
+              <a class="btn btn-primary" href="/src/pages/products.html">Kolleksiyaya bax</a>
+              <a class="btn btn-ghost" href="/src/pages/checkout.html">Sifarişi tamamla</a>
+            </div>
+          </article>
 
-        <!-- About Section -->
-        <div class="content-section">
-          <div class="section-image">✨</div>
-          <div class="section-content">
-            <h2>Biz Kimik?</h2>
-            <p>
-              ShopHub, siz üçün seçilmiş, keyfiyyətli aksesuarların mərkəzi ünvanıdır. Hər məhsul, eləcə də hər müştəriniz bizim üçün xüsusdur.
-            </p>
-            <p>
-              Gündəlik stilinizi tamamlamaq üçün saf qızıl əsaslı zərgərlərə, klassik çantalardan tutmuş müasır bəzəklərə qədər geniş seçim təqdim edirik.
-            </p>
-            <p>
-              Hər məhsul bizim təcrübəli komandası tərəfindən etibarlı mənbələrdən seçilir.
-            </p>
-          </div>
+          <aside class="hero-aside">
+            <p class="aside-kicker">Atelier qeydi</p>
+            <img
+              src="../assets/first.jpeg"
+              alt="iShine selected accessories"
+              class="aside-image"
+            />
+            <div class="metric-grid">
+              <div class="metric">
+                <h3>20K+</h3>
+                <p>Məmnun müştəri</p>
+              </div>
+              <div class="metric">
+                <h3>48h</h3>
+                <p>Sürətli çatdırılma ritmi</p>
+              </div>
+            </div>
+          </aside>
         </div>
+      </section>
 
-        <!-- Features Section -->
-        <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon">🎁</div>
-            <h3 class="feature-title">Keyfiyyət</h3>
-            <p class="feature-description">Hər məhsul rigoroz kalite kontrol vasitəsilə keçir.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">🚚</div>
-            <h3 class="feature-title">Sürətli Çatdırılma</h3>
-            <p class="feature-description">Sifariş etdikdən 2-3 iş günü ərzində çatdırılır.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">💯</div>
-            <h3 class="feature-title">Müşteri Desteği</h3>
-            <p class="feature-description">Sizin səviyyəniz bizim prioritetimizdir.</p>
-          </div>
-        </div>
+      <section class="section">
+        <h2 class="section-title brand-serif">Biz Kimik?</h2>
+        <p class="muted" style="margin: 10px 0 0">
+          Seçimimizdə bir prinsip var: az, amma dəyərli.
+        </p>
 
-        <!-- Mission Section -->
-        <div class="content-section">
-          <div class="section-content">
-            <h2>Bizim Missiyamız</h2>
+        <div class="story-layout">
+          <article class="story-copy">
             <p>
-              Hər kişinin özünün üslubunu ifadə etmə imkanı vermək istəyirik. Aksesuarlar yalnız bəzəkmə deyil, fərdi ifadənin bir vasitəsidir.
+              Biz klassik və müasir xəttin balansını qoruyan aksessuarlar seçirik. Məhsul
+              siyahısına daxil olan hər model material keyfiyyəti, gündəlik istifadəyə uyğunluq
+              və vizual zəriflik baxımından ayrıca yoxlanılır.
             </p>
             <p>
-              Biz inanırıq ki, gözəllik kiçik şeylərdir. Kiçik bir sağma, bir cümlə saat, ya da parlaq bir bilezik, bütün günü dəyişə biləcək parıltıyla dolu ola bilər.
+              iShine komandası üçün əsas prioritet etibarlı alış-veriş, şəffaf xidmət və
+              uzunmüddətli məmnuniyyətdir. Bu səbəbdən biz trendi kor-koranə izləmirik, real
+              istifadə dəyəri olan məhsulları ön plana çəkirik.
             </p>
             <p>
-              ShopHub ilə keşfetmə prosesini sadə, əlçatan və zövqvər etmək bizim hədəfidir.
+              Məqsədimiz sadədir: hər sifarişi “gözləntini aşan təcrübə”yə çevirmək.
             </p>
-          </div>
-          <div class="section-image">💎</div>
-        </div>
+          </article>
 
-        <!-- CTA Section -->
-        <div class="cta-section">
-          <h2 class="cta-title">Başlamaq Üçün Hazırsan?</h2>
-          <p class="cta-subtitle">Geniş koleksiyonımızı kəşf et və özünə uyğun aksesuarı tap</p>
-          <a href="/#shop" class="btn">Alış-verişə Başla</a>
+          <ul class="timeline">
+            <li>
+              <p class="year">2021</p>
+              <h3>Brendin başlanğıcı</h3>
+              <p>İlk kurasiya kolleksiyası və online butik modeli ilə fəaliyyətə start verdik.</p>
+            </li>
+            <li>
+              <p class="year">2023</p>
+              <h3>Yeni kateqoriyalar</h3>
+              <p>Gündəlik istifadə üçün daha geniş seçim və daha sürətli sifariş axını quruldu.</p>
+            </li>
+            <li>
+              <p class="year">2026</p>
+              <h3>Premium təcrübə mərhələsi</h3>
+              <p>Müştəri dəstəyi, dizayn dili və checkout prosesi daha elegant formaya gətirildi.</p>
+            </li>
+          </ul>
         </div>
-      </div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title brand-serif">Dəyərlərimiz</h2>
+        <div class="values-grid">
+          <article class="value-card">
+            <div class="value-icon">✦</div>
+            <h3>Kurasiya Keyfiyyəti</h3>
+            <p>
+              Hər model estetik görünüşlə yanaşı, gündəlik istifadə rahatlığına görə seçilir.
+            </p>
+          </article>
+          <article class="value-card">
+            <div class="value-icon">🛡</div>
+            <h3>Güvənli Servis</h3>
+            <p>
+              Sifarişin hər mərhələsində şəffaf məlumatlandırma və operativ dəstək təqdim edirik.
+            </p>
+          </article>
+          <article class="value-card">
+            <div class="value-icon">⟡</div>
+            <h3>Zövqlü Sadəlik</h3>
+            <p>
+              İddialı, amma yorucu olmayan dizayn xətti ilə fərqli görünüş yaradırıq.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="atelier">
+        <h2 class="section-title brand-serif">Sizin üçün necə işləyirik?</h2>
+        <div class="atelier-grid">
+          <article>
+            <h3>1. Seçim və kurasiya</h3>
+            <p>Komandamız mövsümə uyğun modelləri material və istifadə performansına görə seçir.</p>
+          </article>
+          <article>
+            <h3>2. Vizual təqdimat</h3>
+            <p>Məhsul səhifələrini qərar verməyi asanlaşdıran real təsvir və təmiz strukturla hazırlayırıq.</p>
+          </article>
+          <article>
+            <h3>3. Sifariş və çatdırılma</h3>
+            <p>Checkout axını sürətli saxlanılır, sifariş statusu isə addım-addım izlənilə bilir.</p>
+          </article>
+          <article>
+            <h3>4. Satış sonrası dəstək</h3>
+            <p>Müştəri məmnuniyyəti üçün suallar və geri bildirimlərə qısa müddətdə cavab veririk.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="cta">
+        <h2 class="brand-serif">Parıldamaq sənin stilindir.</h2>
+        <p>
+          Kolleksiyanı kəşf et, stilinə uyğun parçaları seç və iShine ilə gündəlik görünüşünü
+          daha zərif et.
+        </p>
+        <a href="/src/pages/products.html" class="btn">Məhsullara keç</a>
+      </section>
     </main>
 
     <footer class="site-footer">
-      <div class="footer-content">
-        © <span id="year">2026</span> iShine Accessories. Bütün hüquqlar qorunur.
+      <div class="container footer-grid">
+        <div>
+          <div class="brand-serif" style="font-size: 30px; margin-bottom: 8px; color: #fff">
+            iShine Accessories
+          </div>
+          <p style="color: #a7a7a7; max-width: 320px">
+            Gündəlik və xüsusi günlər üçün zərif aksesuarlar. Parıldamaq sənin stilindir! ✨
+          </p>
+        </div>
+        <div>
+          <h4 style="margin: 0">Mağaza</h4>
+          <a href="/src/pages/products.html?category=Rings">Üzüklər</a>
+          <a href="/src/pages/products.html?category=Necklaces">Boyunbağılar</a>
+          <a href="/src/pages/products.html?category=Earrings">Sırğalar</a>
+          <a href="/src/pages/products.html">Qolbaqlar</a>
+          <a href="/src/pages/products.html">Saatlar</a>
+        </div>
+        <div>
+          <h4 style="margin: 0">Müştəri Xidmətləri</h4>
+          <a href="#">Əlaqə</a>
+          <a href="#">Çatdırılma</a>
+          <a href="#">Qaytarma Şərtləri</a>
+        </div>
+        <div>
+          <h4 style="margin: 0">Connect</h4>
+          <a href="https://www.instagram.com/ishine.accessories?igsh=MW1ieTZlNmFkcGgwbQ==">Instagram</a>
+        </div>
+      </div>
+      <div
+        class="container"
+        style="
+          border-top: 1px solid #26272c;
+          padding: 16px 0 26px;
+          color: #888;
+          text-align: center;
+        "
+      >
+        y© <span id="year">2026</span> iShine Accessories. Bütün hüquqlar qorunur.
       </div>
     </footer>
 
     <script>
-      document.getElementById("year").textContent = new Date().getFullYear();
+      (function () {
+        const THEME_KEY = "shophub_theme";
+
+        function applyTheme(theme) {
+          const next = theme === "dark" ? "dark" : "light";
+          document.documentElement.setAttribute("data-theme", next);
+          localStorage.setItem(THEME_KEY, next);
+          const themeBtn = document.getElementById("themeToggle");
+          if (themeBtn) {
+            themeBtn.textContent = next === "dark" ? "☀" : "☾";
+            themeBtn.setAttribute("aria-label", next === "dark" ? "Switch to light mode" : "Switch to dark mode");
+          }
+        }
+
+        function initTheme() {
+          const saved = localStorage.getItem(THEME_KEY);
+          const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+          applyTheme(saved || (prefersDark ? "dark" : "light"));
+        }
+
+        initTheme();
+        const themeToggle = document.getElementById("themeToggle");
+        if (themeToggle) {
+          themeToggle.addEventListener("click", function () {
+            const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+            applyTheme(isDark ? "light" : "dark");
+          });
+        }
+      })();
     </script>
+    <script type="module" src="../js/ui/footer.js"></script>
   </body>
 </html>

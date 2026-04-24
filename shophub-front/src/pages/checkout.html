@@ -1,91 +1,623 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="az">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ShopHub | Checkout</title>
-  <script>
-    (function () {
-      const saved = localStorage.getItem("shophub_theme") || "light";
-      document.documentElement.setAttribute("data-theme", saved === "dark" ? "dark" : "light");
-    })();
-  </script>
-  <style>
-    :root {
-      --bg: #f6f5f2;
-      --surface: #ffffff;
-      --muted: #6a6a6a;
-      --text: #1f1f22;
-      --line: #e6e4df;
-      --primary: #2563eb;
-    }
-    [data-theme="dark"] {
-      --bg: #101010;
-      --surface: #161616;
-      --muted: #a3a3a3;
-      --text: #f5f5f5;
-      --line: #2a2a2a;
-      --primary: #3b82f6;
-    }
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); }
-    .container { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 40px; }
-    .top { display:flex; justify-content:space-between; gap:16px; flex-wrap: wrap; margin-bottom: 18px; }
-    .muted { color: var(--muted); }
-    .back { border:1px solid var(--line); background: var(--surface); color: var(--text); padding: 10px 14px; border-radius: 12px; text-decoration: none; }
-    .grid { display:grid; grid-template-columns: 1.6fr 1fr; gap: 18px; }
-    .card { background: var(--surface); border:1px solid var(--line); border-radius: 16px; padding: 16px; }
-    .head { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom: 10px; margin-bottom: 10px; }
-    .list { display:grid; gap:10px; }
-    .row { display:flex; justify-content:space-between; align-items:center; gap:10px; border:1px solid var(--line); border-radius: 12px; padding: 10px; }
-    .row-left{ display:flex; align-items:center; gap:10px; min-width:0; }
-    .img { width: 56px; height:56px; object-fit:cover; border-radius:10px; border:1px solid var(--line); background:#ddd; }
-    .qty { display:flex; align-items:center; gap:6px; }
-    .qbtn { width:30px; height:30px; border-radius: 8px; border:1px solid var(--line); background: transparent; color:var(--text); cursor:pointer; }
-    .remove { border:0; background:transparent; color:#e14d4d; cursor:pointer; }
-    .summary-row { display:flex; justify-content:space-between; margin: 8px 0; }
-    .total { border-top:1px solid var(--line); padding-top:10px; margin-top: 10px; font-size: 30px; font-weight: 700; }
-    .btn { width:100%; border:0; background: var(--primary); color:#fff; padding: 12px; border-radius: 12px; font-weight: 700; cursor:pointer; margin-top: 12px; }
-    .btn:disabled { opacity: .6; cursor:not-allowed; }
-    .empty { border:1px dashed var(--line); border-radius:12px; padding: 18px; text-align:center; color:var(--muted); }
-    .msg { text-align:center; margin-top: 10px; min-height: 20px; }
-    @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
-  </style>
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShopHub | Checkout</title>
+    <script>
+      (function () {
+        const key = "shophub_theme";
+        const saved = localStorage.getItem(key);
+        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = saved || (prefersDark ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+      })();
+    </script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f6f5f2;
+        --surface: #ffffff;
+        --surface-soft: #faf8f3;
+        --text: #1f1f22;
+        --muted: #6a6a6a;
+        --line: #e6e4df;
+        --accent: #d86f00;
+        --accent-strong: #b55a00;
+        --hero-top: #f9f5ed;
+        --hero-btm: #f3efe7;
+        --footer-bg: #121317;
+        --footer-line: #26272c;
+        --shadow-soft: 0 14px 34px rgba(34, 24, 16, 0.08);
+        --shadow-card: 0 12px 26px rgba(19, 17, 14, 0.08);
+      }
 
-<body>
-  <main class="container">
-    <div class="top">
-      <div>
-        <div class="muted">IShine / Checkout</div>
-        <h1 style="margin:.2rem 0; font-size:42px;">Sifarişi rəsmiləşdir</h1>
-        <div class="muted">Məhsulları yoxlayın, sayları düzəldin və sifarişi tamamlayın.</div>
-      </div>
-      <a class="back" href="/">Mağazaya qayıt</a>
-    </div>
+      [data-theme="dark"] {
+        --bg: #100d0a;
+        --surface: #18130f;
+        --surface-soft: #1f1813;
+        --text: #f3ece3;
+        --muted: #b6aa9a;
+        --line: #30261d;
+        --accent: #d6a24f;
+        --accent-strong: #be852f;
+        --hero-top: #1a140f;
+        --hero-btm: #140f0c;
+        --footer-bg: #0b0907;
+        --footer-line: #241b14;
+        --shadow-soft: 0 20px 46px rgba(0, 0, 0, 0.42);
+        --shadow-card: 0 16px 34px rgba(0, 0, 0, 0.36);
+      }
 
-            
-    <div class="grid">
-      <section class="card">
-        <div class="head">
-          <h2 style="margin:0">Səbətdəki məhsullar</h2>
-          <span id="itemCount" class="muted">0 məhsul</span>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          sans-serif;
+        background: radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 30%), var(--bg);
+        color: var(--text);
+      }
+
+      .container {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+      }
+
+      .brand-serif {
+        font-family: "Times New Roman", Georgia, serif;
+        letter-spacing: 0.04em;
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        border-bottom: 1px solid var(--line);
+        background: color-mix(in srgb, var(--bg) 90%, transparent);
+        backdrop-filter: blur(8px);
+      }
+
+      .header-inner {
+        height: 78px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .header-logo {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 1px solid var(--line);
+        background: var(--surface);
+      }
+
+      .header-title {
+        margin: 0;
+        line-height: 1;
+        font-size: 39px;
+        color: var(--text);
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .nav-link {
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 600;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        padding: 8px 14px;
+        transition: all 0.2s ease;
+      }
+
+      .nav-link:hover {
+        color: var(--text);
+        border-color: var(--line);
+        background: var(--surface);
+      }
+
+      .nav-link.active {
+        color: var(--text);
+        border-color: var(--line);
+        background: var(--surface);
+      }
+
+      .theme-toggle {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--text);
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+      }
+
+      .nav-btn {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--text);
+        text-decoration: none;
+        padding: 9px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+      }
+
+      .nav-btn:hover {
+        transform: translateY(-1px);
+        border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+      }
+
+      .page-wrap {
+        padding: 32px 0 52px;
+      }
+
+      .hero {
+        /* border: 1px solid var(--line); */
+        /* background: linear-gradient(160deg, var(--hero-top), var(--hero-btm)); */
+        border-radius: 20px;
+        padding: 26px;
+        /* box-shadow: var(--shadow-soft); */
+      }
+
+      .crumb {
+        margin: 0 0 8px;
+        color: var(--muted);
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .title {
+        margin: 0;
+        font-size: clamp(33px, 5vw, 52px);
+        line-height: 0.95;
+      }
+
+      .desc {
+        margin: 12px 0 0;
+        color: var(--muted);
+        max-width: 760px;
+      }
+
+      .checkout-grid {
+        margin-top: 22px;
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 18px;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: var(--shadow-card);
+      }
+
+      .card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 12px;
+        margin-bottom: 12px;
+        gap: 10px;
+      }
+
+      .card-title {
+        margin: 0;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      #checkoutItems {
+        display: grid;
+        gap: 10px;
+      }
+
+      .checkout-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        border: 1px solid var(--line);
+        background: var(--surface-soft);
+        border-radius: 14px;
+        padding: 10px;
+      }
+
+      .checkout-item-main {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .item-thumb {
+        width: 58px;
+        height: 58px;
+        border-radius: 10px;
+        object-fit: cover;
+        border: 1px solid var(--line);
+        background: color-mix(in srgb, var(--surface) 90%, #d8d8d8);
+        flex-shrink: 0;
+      }
+
+      .item-copy {
+        min-width: 0;
+      }
+
+      .item-title {
+        margin: 0;
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .item-price {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .qty-box {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .qty-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--text);
+        cursor: pointer;
+      }
+
+      .qty-btn:hover {
+        border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+      }
+
+      .qty-value {
+        min-width: 18px;
+        text-align: center;
+        color: var(--text);
+        font-weight: 700;
+        font-size: 14px;
+      }
+
+      .remove-btn {
+        border: 0;
+        background: transparent;
+        color: #c64747;
+        cursor: pointer;
+        font-size: 18px;
+        line-height: 1;
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+      }
+
+      .remove-btn:hover {
+        background: rgba(198, 71, 71, 0.12);
+      }
+
+      #emptyState {
+        display: none;
+        border: 1px dashed var(--line);
+        border-radius: 14px;
+        padding: 16px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 8px 0;
+      }
+
+      .summary-total {
+        border-top: 1px solid var(--line);
+        padding-top: 12px;
+        margin-top: 10px;
+        font-size: 29px;
+        font-weight: 700;
+      }
+
+      .summary-accent {
+        color: var(--accent);
+      }
+
+      .checkout-btn {
+        width: 100%;
+        border: 0;
+        border-radius: 12px;
+        margin-top: 12px;
+        padding: 12px;
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+        background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+        box-shadow: 0 9px 18px color-mix(in srgb, var(--accent) 36%, transparent);
+      }
+
+      .checkout-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      .msg {
+        text-align: center;
+        margin-top: 10px;
+        min-height: 20px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .site-footer {
+        background: var(--footer-bg);
+        color: #e4e4e4;
+        margin-top: 0;
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 28px;
+        padding: 50px 0 24px;
+      }
+
+      .footer-grid a {
+        color: #cfcfcf;
+        text-decoration: none;
+        display: block;
+        margin: 8px 0;
+        font-size: 14px;
+      }
+
+      .footer-grid a:hover {
+        color: #fff;
+      }
+
+      @media (max-width: 980px) {
+        .checkout-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .header-inner {
+          height: auto;
+          min-height: 78px;
+          padding: 12px 0;
+          flex-wrap: wrap;
+        }
+
+        .header-title {
+          font-size: 34px;
+        }
+
+        .footer-grid {
+          grid-template-columns: 1fr;
+          gap: 30px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .container {
+          width: min(1180px, calc(100% - 28px));
+        }
+
+        .card {
+          padding: 14px;
+        }
+
+        .checkout-item {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .qty-box {
+          justify-content: flex-end;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="header-left">
+          <img
+            src="../assets/ishine-icon-transparent.png"
+            alt="iShine Accessories"
+            class="header-logo"
+          />
+          <h1 class="header-title brand-serif">iShine Accessories</h1>
         </div>
-        <div id="checkoutItems" class="list"></div>
-        <div id="emptyState" class="empty" style="display:none">Səbətiniz boşdur. Məhsul əlavə edib yenidən checkout səhifəsinə gəlin.</div>
+
+        <div class="header-actions">
+          <a class="nav-link" href="/">Ana səhifə</a>
+          <a class="nav-link" href="/src/pages/products.html">Mağaza</a>
+          <a class="nav-link" href="/src/pages/about.html">Haqqımızda</a>
+          <a class="nav-link active" href="/src/pages/checkout.html">Checkout</a>
+          <button
+            id="themeToggle"
+            type="button"
+            class="theme-toggle"
+            aria-label="Switch to dark mode"
+            title="Toggle theme"
+          >
+            ☾
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container page-wrap">
+      <section class="hero">
+        <p class="crumb">iShine / Checkout</p>
+        <h2 class="title brand-serif">Sifarişi rəsmiləşdir</h2>
+        <p class="desc">
+          Məhsulları yoxlayın, sayları düzəldin və sifarişi tamamlayın.
+        </p>
+        <div style="margin-top: 16px">
+          <a
+            class="nav-btn"
+            href="/"
+            style="display: inline-flex; align-items: center; gap: 6px"
+          >
+            Mağazaya qayıt
+          </a>
+        </div>
       </section>
 
-      <aside class="card">
-        <h2 style="margin:0 0 8px">Cəmi</h2>
-        <div class="summary-row"><span class="muted">Məhsullar:</span><span id="subtotal">₼0.00</span></div>
-        <div class="summary-row"><span class="muted">Çatdırılma:</span><span id="shippingFee">₼0.00</span></div>
-        <div class="summary-row total"><span>Toplam:</span><span id="totalPrice" style="color:var(--primary)">₼0.00</span></div>
-        <button id="btnCheckout" class="btn">Sifarişi tamamla</button>
-        <p id="msg" class="msg"></p>
-      </aside>
-    </div>
-  </main>
+      <div class="checkout-grid">
+        <section class="card">
+          <div class="card-head">
+            <h2 class="card-title">Səbətdəki məhsullar</h2>
+            <span id="itemCount" class="muted">0 məhsul</span>
+          </div>
 
-  <script type="module" src="../js/checkout.js"></script>
-</body>
+          <div id="checkoutItems"></div>
+
+          <div id="emptyState">
+            Səbətiniz boşdur. Məhsul əlavə edib yenidən checkout səhifəsinə gəlin.
+          </div>
+        </section>
+
+        <aside class="card">
+          <h2 class="card-title" style="margin: 0 0 8px">Cəmi</h2>
+          <div class="summary-row">
+            <span class="muted">Məhsullar:</span><span id="subtotal">₼0.00</span>
+          </div>
+          <div class="summary-row">
+            <span class="muted">Çatdırılma:</span><span id="shippingFee">₼0.00</span>
+          </div>
+          <div class="summary-row summary-total">
+            <span>Toplam:</span><span id="totalPrice" class="summary-accent">₼0.00</span>
+          </div>
+          <button id="btnCheckout" class="checkout-btn">Sifarişi tamamla</button>
+          <p id="msg" class="msg"></p>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <div class="brand-serif" style="font-size: 30px; margin-bottom: 8px; color: #fff">
+            iShine Accessories
+          </div>
+          <p style="color: #a7a7a7; max-width: 320px">
+            Gündəlik və xüsusi günlər üçün zərif aksesuarlar. Parıldamaq sənin stilindir! ✨
+          </p>
+        </div>
+        <div>
+          <h4 style="margin: 0">Mağaza</h4>
+          <a href="/src/pages/products.html?category=Rings">Üzüklər</a>
+          <a href="/src/pages/products.html?category=Necklaces">Boyunbağılar</a>
+          <a href="/src/pages/products.html?category=Earrings">Sırğalar</a>
+          <a href="/src/pages/products.html">Qolbaqlar</a>
+          <a href="/src/pages/products.html">Saatlar</a>
+        </div>
+        <div>
+          <h4 style="margin: 0">Müştəri Xidmətləri</h4>
+          <a href="#">Əlaqə</a>
+          <a href="#">Çatdırılma</a>
+          <a href="#">Qaytarma Şərtləri</a>
+        </div>
+        <div>
+          <h4 style="margin: 0">Connect</h4>
+          <a href="https://www.instagram.com/ishine.accessories?igsh=MW1ieTZlNmFkcGgwbQ==">
+            Instagram
+          </a>
+        </div>
+      </div>
+      <div
+        class="container"
+        style="
+          border-top: 1px solid var(--footer-line);
+          padding: 16px 0 26px;
+          color: #888;
+          text-align: center;
+        "
+      >
+        y© <span id="year">2026</span> iShine Accessories. Bütün hüquqlar qorunur.
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        const THEME_KEY = "shophub_theme";
+
+        function applyTheme(theme) {
+          const next = theme === "dark" ? "dark" : "light";
+          document.documentElement.setAttribute("data-theme", next);
+          localStorage.setItem(THEME_KEY, next);
+          const themeBtn = document.getElementById("themeToggle");
+          if (themeBtn) {
+            themeBtn.textContent = next === "dark" ? "☀" : "☾";
+            themeBtn.setAttribute("aria-label", next === "dark" ? "Switch to light mode" : "Switch to dark mode");
+          }
+        }
+
+        function initTheme() {
+          const saved = localStorage.getItem(THEME_KEY);
+          const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+          applyTheme(saved || (prefersDark ? "dark" : "light"));
+        }
+
+        initTheme();
+        const themeToggle = document.getElementById("themeToggle");
+        if (themeToggle) {
+          themeToggle.addEventListener("click", () => {
+            const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+            applyTheme(isDark ? "light" : "dark");
+          });
+        }
+      })();
+    </script>
+    <script type="module" src="../js/ui/footer.js"></script>
+    <script type="module" src="../js/checkout.js"></script>
+  </body>
 </html>

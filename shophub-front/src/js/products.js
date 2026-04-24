@@ -21,6 +21,7 @@ const state = {
   selectedCategoryId: null,
   selectedCategoryName: "",
   categories: [],
+  searchQuery: "",
   pendingCategoryId: null,
   pendingCategoryName: "",
   requestToken: 0,
@@ -71,6 +72,7 @@ function parseUrlState() {
   state.pendingCategoryId = Number.isFinite(categoryId) && categoryId > 0 ? categoryId : null;
 
   state.pendingCategoryName = (params.get("category") || params.get("cat") || "").trim();
+  state.searchQuery = (params.get("q") || "").trim();
 }
 
 function updateUrlState() {
@@ -78,6 +80,7 @@ function updateUrlState() {
 
   if (state.selectedCategoryName) params.set("category", state.selectedCategoryName);
   if (state.selectedCategoryId) params.set("categoryId", String(state.selectedCategoryId));
+  if (state.searchQuery) params.set("q", state.searchQuery);
   if (state.selectedSort !== "featured") params.set("sort", state.selectedSort);
   if (state.page > 1) params.set("page", String(state.page));
 
@@ -136,6 +139,9 @@ async function loadCategories() {
 function setSortControl() {
   const sort = $("#sortSelect");
   if (sort) sort.value = state.selectedSort;
+  
+  const search = $("#searchInput");
+  if (search) search.value = state.searchQuery;
 }
 
 function updateHeaderTexts() {
@@ -157,10 +163,10 @@ function updateHeaderTexts() {
 
 function chipClass(isActive) {
   if (isActive) {
-    return "rounded-full border border-gray-900 bg-gray-900 px-5 py-2 text-sm font-semibold text-white transition";
+    return "chip-btn chip-btn--active";
   }
 
-  return "rounded-full border border-gray-300 bg-white px-5 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:text-gray-900";
+  return "chip-btn";
 }
 
 function renderCategoryChips() {
@@ -226,6 +232,10 @@ function buildRequest(page) {
     request.categoryId = state.selectedCategoryId;
   }
 
+  if (state.searchQuery) {
+    request.q = state.searchQuery;
+  }
+
   return request;
 }
 
@@ -252,27 +262,27 @@ function renderProducts(items) {
   grid.innerHTML = items
     .map((product) => {
       const inStock = Number(product.Stock || 0) > 0;
-      const stockClass = inStock ? "text-emerald-600" : "text-rose-600";
+      const stockClass = inStock ? "stock-ok" : "stock-out";
       const stockText = inStock ? `Stok: ${product.Stock}` : "Stok yoxdur";
 
       return `
-        <article class="overflow-hidden rounded-2xl border border-gray-300 bg-white transition hover:shadow-lg">
-          <a href="${productHref(product.Id)}" class="block h-80 overflow-hidden bg-gray-200">
-            <img src="${getImage(product)}" alt="${product.Name}" class="h-full w-full object-cover transition duration-500 hover:scale-105" />
+        <article class="product-card">
+          <a href="${productHref(product.Id)}" class="product-link">
+            <img src="${getImage(product)}" alt="${product.Name}" class="product-image" />
           </a>
 
-          <div class="p-4">
-            <p class="text-xs uppercase tracking-widest text-gray-500">${product.CategoryName || "Məhsul"}</p>
-            <a href="${productHref(product.Id)}" class="mt-2 block text-3xl text-gray-900" style="font-family: 'Times New Roman', Georgia, serif">
+          <div class="product-body">
+            <p class="product-cat">${product.CategoryName || "Məhsul"}</p>
+            <a href="${productHref(product.Id)}" class="product-name">
               ${product.Name}
             </a>
 
-            <div class="mt-3 flex items-end justify-between gap-3">
-              <p class="text-3xl text-gray-900" style="font-family: 'Times New Roman', Georgia, serif">${formatPrice(product.Price)}</p>
+            <div class="product-meta">
+              <p class="product-price">${formatPrice(product.Price)}</p>
               <button
                 type="button"
                 data-add-id="${product.Id}"
-                class="add-to-cart inline-flex h-11 w-11 items-center justify-center rounded-full bg-yellow-600 text-white transition hover:bg-yellow-500 disabled:cursor-not-allowed disabled:bg-gray-400"
+                class="add-to-cart product-add"
                 title="Səbətə əlavə et"
                 aria-label="Səbətə əlavə et"
                 ${inStock ? "" : "disabled"}
@@ -285,7 +295,7 @@ function renderProducts(items) {
               </button>
             </div>
 
-            <p class="mt-2 text-sm ${stockClass}">${stockText}</p>
+            <p class="product-stock ${stockClass}">${stockText}</p>
           </div>
         </article>
       `;
@@ -318,11 +328,7 @@ function renderPagination() {
     for (let page = start; page <= end; page += 1) {
       const button = document.createElement("button");
       button.textContent = String(page);
-      button.className = `rounded-lg border px-3 py-1.5 text-sm transition ${
-        page === state.page
-          ? "border-gray-900 bg-gray-900 text-white"
-          : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
-      }`;
+      button.className = `page-btn ${page === state.page ? "active" : ""}`;
       button.addEventListener("click", () => loadPage(page));
       pageNumbers.appendChild(button);
     }
@@ -358,12 +364,39 @@ async function loadPage(nextPage = 1) {
   } catch (error) {
     const grid = $("#productsGrid");
     if (grid) {
-      grid.innerHTML = `<p class="rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-rose-700">${error.message}</p>`;
+      grid.innerHTML = `<p style="border:1px solid #c87c7c;background:#f6dfdf;color:#8e3838;border-radius:12px;padding:12px 14px;">${error.message}</p>`;
     }
   }
 }
 
 function bindEvents() {
+  const submitSearch = () => {
+    const searchInput = $("#searchInput");
+    const value = searchInput?.value.trim() || "";
+    state.searchQuery = value;
+    state.page = 1;
+    loadPage(1);
+  };
+
+  $("#searchBtn")?.addEventListener("click", submitSearch);
+  $("#headerSearchBtn")?.addEventListener("click", () => {
+    const searchInput = $("#searchInput");
+    if (!searchInput) return;
+
+    const value = searchInput.value.trim();
+    searchInput.focus();
+    searchInput.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    if (value) submitSearch();
+  });
+
+  $("#searchInput")?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      submitSearch();
+    }
+  });
+
   $("#sortSelect")?.addEventListener("change", (event) => {
     const value = event.target.value || "featured";
     state.selectedSort = SORT_VALUES.has(value) ? value : "featured";
