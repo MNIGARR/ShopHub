@@ -599,35 +599,35 @@ async function loadAdminData() {
 
 // Products UI + filters (simple)
 function getProductId(p) {
-  return p.id ?? p.Id ?? p.productId ?? p.ProductId;
+  return p?.id ?? p?.Id ?? p?.productId ?? p?.ProductId ?? null;
 }
 
 function productName(p) {
-  return p.name ?? p.title ?? p.Name ?? "Məhsul";
+  return p?.name ?? p?.title ?? p?.Name ?? "Məhsul";
 }
 
 function productPrice(p) {
-  return Number(p.price ?? p.Price ?? 0);
+  return Number(p?.price ?? p?.Price ?? 0);
 }
 
 function productStock(p) {
-  return Number(p.stock ?? p.Stock ?? 0);
+  return Number(p?.stock ?? p?.Stock ?? 0);
 }
 
 function productCategory(p) {
-  return p.category ?? p.Category ?? p.CategoryName ?? "Digər";
+  return p?.category ?? p?.Category ?? p?.CategoryName ?? "Digər";
 }
 
 function productBrand(p) {
-  return p.brand ?? p.Brand ?? "—";
+  return p?.brand ?? p?.Brand ?? "—";
 }
 
 function productColor(p) {
-  return p.color ?? p.Color ?? "—";
+  return p?.color ?? p?.Color ?? "—";
 }
 
 function productRating(p) {
-  return Number(p.rating ?? p.Rating ?? 0);
+  return Number(p?.rating ?? p?.Rating ?? 0);
 }
 
 // Gücləndirilmiş productImages funksiyası (p yoxlaması + optional chaining)
@@ -784,9 +784,51 @@ function renderProducts() {
 // Cart (minimal, UI works)
 function loadCart() {
   const raw = safeJsonParse(localStorage.getItem("shophub_cart_v1"), []);
-  state.cart = Array.isArray(raw) ? raw : [];
+  const normalized = Array.isArray(raw)
+    ? raw
+        .map((item) => normalizeCartItem(item))
+        .filter(Boolean)
+    : [];
+  state.cart = normalized;
+  localStorage.setItem("shophub_cart_v1", JSON.stringify(state.cart));
   renderCartBadge();
   renderCartDrawer();
+}
+
+function normalizeCartItem(item) {
+  if (!item || typeof item !== "object") return null;
+
+  const qty = Number(item.qty ?? item.quantity ?? 0);
+  if (!Number.isFinite(qty) || qty <= 0) return null;
+
+  const snapshot =
+    item.productSnapshot && typeof item.productSnapshot === "object"
+      ? item.productSnapshot
+      : null;
+
+  const directId = Number(
+    item.productId ?? item.ProductId ?? item.id ?? item.Id,
+  );
+  const snapshotId = Number(getProductId(snapshot));
+  const productId = Number.isFinite(directId) && directId > 0
+    ? directId
+    : Number.isFinite(snapshotId) && snapshotId > 0
+      ? snapshotId
+      : null;
+
+  if (!productId) return null;
+  return { productId, qty, productSnapshot: snapshot };
+}
+
+function resolveCartProduct(item) {
+  if (!item) return null;
+  return (
+    item.productSnapshot ||
+    state.products.find(
+      (pp) => Number(getProductId(pp)) === Number(item.productId),
+    ) ||
+    null
+  );
 }
 
 function saveCart() {
@@ -845,11 +887,7 @@ function clearCart() {
 
 function cartTotals() {
   const subtotal = state.cart.reduce((s, x) => {
-    const p =
-      x.productSnapshot ||
-      state.products.find(
-        (pp) => Number(getProductId(pp)) === Number(x.productId),
-      );
+    const p = resolveCartProduct(x);
     return s + productPrice(p) * Number(x.qty || 0);
   }, 0);
   const shipping = 0;
@@ -877,11 +915,7 @@ function renderCartDrawer() {
     empty && empty.classList.add("hidden");
     itemsWrap.innerHTML = state.cart
       .map((x) => {
-        const p =
-          x.productSnapshot ||
-          state.products.find(
-            (pp) => Number(getProductId(pp)) === Number(x.productId),
-          );
+        const p = resolveCartProduct(x);
         const img = productImages(p)[0];
         return `
         <div class="glass p-3 flex gap-3">
