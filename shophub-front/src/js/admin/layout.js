@@ -1,5 +1,7 @@
 import { getUser, logout } from "../services/auth.service.js";
 
+const THEME_KEY = "shophub_theme";
+
 const links = [
   ["/src/pages/admin/dashboard.html", "Dashboard"],
   ["/src/pages/admin/products.html", "Məhsullar"],
@@ -12,6 +14,7 @@ export function renderAdminLayout({ pageTitle, contentHtml }) {
   const app = document.getElementById("app");
   const currentPath = window.location.pathname;
   const user = getUser();
+  initTheme();
 
   app.innerHTML = `
     <header class="admin-header">
@@ -67,10 +70,40 @@ export function renderAdminLayout({ pageTitle, contentHtml }) {
     logout();
     window.location.href = "/src/pages/auth/login.html";
   });
+
+  const themeToggle = document.getElementById("themeToggle");
+  if (themeToggle) {
+    syncThemeButton(themeToggle);
+    themeToggle.addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme") || "light";
+      applyTheme(current === "dark" ? "light" : "dark");
+    });
+  }
 }
 
 export function showPageError(message) {
   const root = document.getElementById("pageRoot");
   if (!root) return;
   root.innerHTML = `<p class="error">${message}</p>`;
+}
+
+function applyTheme(theme) {
+  const next = theme === "dark" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem(THEME_KEY, next);
+  syncThemeButton(document.getElementById("themeToggle"));
+}
+
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  applyTheme(saved || (prefersDark ? "dark" : "light"));
+}
+
+function syncThemeButton(btn) {
+  if (!btn) return;
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  btn.textContent = isDark ? "☀" : "☾";
+  btn.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+  btn.setAttribute("title", isDark ? "Light theme" : "Dark theme");
 }

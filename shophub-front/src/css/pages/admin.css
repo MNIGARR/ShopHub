@@ -1,11 +1,23 @@
 :root {
-  --bg: #f5f5f5;
+  --bg: #f6f5f2;
   --surface: #ffffff;
-  --text: #151923;
-  --muted: #727985;
-  --line: #e6e6e6;
-  --accent: #57b79f;
-  --active: #141b2c;
+  --text: #1f1f22;
+  --muted: #6a6a6a;
+  --line: #e6e4df;
+  --accent: #d86f00;
+  --active: #1f1f22;
+  --header-bg: #faf9f6e8;
+}
+
+[data-theme="dark"] {
+  --bg: #101010;
+  --surface: #161616;
+  --text: #f5f5f5;
+  --muted: #a3a3a3;
+  --line: #2a2a2a;
+  --accent: #e07a12;
+  --active: #262626;
+  --header-bg: #131313e6;
 }
 
 * {
@@ -20,15 +32,16 @@ body {
 }
 
 .admin-container {
-  width: min(1180px, calc(100% - 48px));
-  margin: 0 auto;
+  width: min(1360px, calc(100% - 48px));
+  margin-left: max(16px, calc((100vw - 1360px) / 2 - 24px));
+  margin-right: auto;
 }
 
 .admin-header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(250, 249, 246, 0.92);
+  background: var(--header-bg);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
 }
@@ -58,14 +71,14 @@ body {
 }
 
 .admin-global-link {
-  color: #6a6a6a;
+  color: var(--muted);
   text-decoration: none;
   font-size: 14px;
   font-weight: 400;
 }
 
 .admin-global-link.active {
-  color: #1f1f22;
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -96,13 +109,16 @@ body {
 
 .admin-sidebar {
   padding-top: 36px;
+  position: sticky;
+  top: 96px;
+  align-self: start;
 }
 
 .admin-sidebar h1 {
   margin: 0 0 18px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #8f97a3;
+  color: var(--muted);
   font-size: 18px;
 }
 
@@ -110,10 +126,11 @@ body {
   display: block;
   margin-bottom: 10px;
   text-decoration: none;
-  color: #4f5664;
+  color: var(--muted);
   font-size: 16px;
   border-radius: 16px;
   padding: 13px 20px;
+  border: 1px solid transparent;
 }
 
 .admin-link.active {
@@ -165,7 +182,7 @@ body {
 
 .admin-topbar p {
   margin: 10px 0 0;
-  color: #586171;
+  color: var(--muted);
   font-size: 15px;
   font-weight: 600;
 }
@@ -181,7 +198,7 @@ select {
 button {
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   cursor: pointer;
   padding: 10px 18px;
@@ -235,12 +252,12 @@ button {
 
 input,
 select {
-  border: 1px solid #d8dbe0;
+  border: 1px solid var(--line);
   border-radius: 16px;
   min-height: 48px;
   padding: 10px 16px;
-  background: #fff;
-  color: #222938;
+  background: var(--surface);
+  color: var(--text);
 }
 
 #name,
@@ -277,8 +294,8 @@ td {
 }
 
 th {
-  color: #7a8190;
-  background: #fff;
+  color: var(--muted);
+  background: var(--surface);
   font-weight: 500;
   font-size: 13px;
   text-transform: uppercase;
@@ -304,12 +321,17 @@ td button {
 
 @media (max-width: 1280px) {
   .admin-container {
-    width: min(1180px, calc(100% - 28px));
+    width: auto;
+    margin-left: 14px;
+    margin-right: 14px;
   }
 
   .admin-header-row {
-    grid-template-columns: 1fr auto;
+    height: auto;
+    min-height: 78px;
+    padding: 10px 0;
     gap: 14px;
+    flex-wrap: wrap;
   }
 
   .admin-global-nav {

@@ -3,20 +3,45 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ShopHub | Product Detail</title>
+    <title>iShine Accessories | Məhsul Detalı</title>
+    <script>
+      (function () {
+        const key = "shophub_theme";
+        const saved = localStorage.getItem(key);
+        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = saved || (prefersDark ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+      })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
       :root {
-        --bg: #f3f3f5;
+        --bg: #f6f5f2;
         --surface: #ffffff;
-        --text: #0f172a;
-        --muted: #6b7280;
-        --line: #dddfe4;
-        --dark: #141519;
-        --accent: #ef7b13;
+        --surface-2: #faf8f3;
+        --text: #1f1f22;
+        --muted: #6a6a6a;
+        --line: #e6e4df;
+        --accent: #d86f00;
+        --accent-2: #b55a00;
+        --accent-soft: #f3e8d8;
+        --footer-bg: #121317;
         --brand-serif: "Times New Roman", Georgia, serif;
         --ui-sans: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+      }
+
+      [data-theme="dark"] {
+        --bg: #101010;
+        --surface: #161616;
+        --surface-2: #1b1b1b;
+        --text: #f5f5f5;
+        --muted: #a3a3a3;
+        --line: #2a2a2a;
+        --accent: #e07a12;
+        --accent-2: #c9670a;
+        --accent-soft: #24180d;
+        --footer-bg: #121317;
       }
 
       * {
@@ -25,67 +50,98 @@
 
       body {
         margin: 0;
-        background: var(--bg);
+        background:
+          radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 30%),
+          radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 22%),
+          var(--bg);
         color: var(--text);
         font-family: var(--ui-sans);
       }
 
       .container {
-        width: calc(100% - 48px);
-        max-width: 1520px;
-        margin: 0 auto;
+        width: min(1240px, calc(100% - 32px));
+        margin-left: max(16px, calc((100vw - 1240px) / 2 - 28px));
+        margin-right: auto;
       }
 
       .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
         border-bottom: 1px solid var(--line);
-        background: #f6f6f7;
+        background: color-mix(in srgb, var(--bg) 88%, transparent);
+        backdrop-filter: blur(8px);
       }
 
       .topbar-inner {
-        height: 72px;
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
+        height: 78px;
+        display: flex;
         align-items: center;
-        column-gap: 28px;
+        justify-content: space-between;
+        gap: 14px;
       }
 
-      .brand {
-        justify-self: start;
-        color: #111111;
+      .brand-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
         text-decoration: none;
+        color: var(--text);
+      }
+
+      .brand-logo {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        object-fit: cover;
+      }
+
+      .brand-word {
+        margin: 0;
         font-family: var(--brand-serif);
-        font-size: 42px;
-        letter-spacing: 2.2px;
+        font-size: 39px;
         line-height: 1;
       }
 
       .nav {
-        justify-self: center;
         display: flex;
         align-items: center;
-        gap: 36px;
+        gap: 10px;
       }
 
-      .nav a {
-        color: #3f444d;
+      .nav-link {
+        color: var(--muted);
         text-decoration: none;
-        font-size: 16px;
-        font-weight: 500;
+        font-size: 14px;
+        font-weight: 600;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        padding: 8px 14px;
+        transition: all 0.2s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: var(--text);
+        border-color: var(--line);
+        background: var(--surface);
       }
 
       .actions {
-        justify-self: end;
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 10px;
       }
 
       .icon-btn {
-        width: 32px;
-        height: 32px;
-        border: 0;
-        background: transparent;
-        color: #3f444d;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--text);
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -93,9 +149,22 @@
       }
 
       .icon-btn svg {
-        width: 21px;
-        height: 21px;
-        stroke-width: 1.85;
+        width: 20px;
+        height: 20px;
+        stroke-width: 2;
+      }
+
+      .theme-toggle {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--text);
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
       }
 
       main {
@@ -106,7 +175,7 @@
         display: inline-flex;
         align-items: center;
         gap: 9px;
-        color: #334155;
+        color: var(--muted);
         text-decoration: none;
         font-size: 29px;
         margin: 0 0 26px;
@@ -128,7 +197,8 @@
       .detail-media {
         border-radius: 12px;
         overflow: hidden;
-        background: #d9dde6;
+        border: 1px solid var(--line);
+        background: var(--surface-2);
         aspect-ratio: 1 / 0.89;
       }
 
@@ -145,7 +215,7 @@
 
       .cat {
         margin: 2px 0 12px;
-        color: #64748b;
+        color: var(--muted);
         font-size: 14px;
         letter-spacing: 0.12em;
         text-transform: uppercase;
@@ -157,7 +227,7 @@
         font-family: var(--brand-serif);
         font-size: clamp(50px, 4vw, 60px);
         line-height: 1.05;
-        color: #0d1525;
+        color: var(--text);
       }
 
       .price {
@@ -165,7 +235,7 @@
         font-family: var(--brand-serif);
         font-size: clamp(43px, 3.2vw, 56px);
         line-height: 1.04;
-        color: #0d1525;
+        color: var(--text);
       }
 
       .sep {
@@ -175,7 +245,7 @@
 
       .desc {
         margin: 0;
-        color: #1f2937;
+        color: var(--text);
         font-size: 18px;
         line-height: 1.55;
         max-width: 760px;
@@ -183,13 +253,13 @@
 
       .label {
         margin: 0 0 8px;
-        color: #374151;
+        color: var(--muted);
         font-size: 16px;
       }
 
       .value {
         margin: 0 0 24px;
-        color: #111827;
+        color: var(--text);
         font-size: 35px;
       }
 
@@ -202,9 +272,9 @@
       .qty-btn {
         width: 40px;
         height: 40px;
-        border: 1px solid #cfd3da;
-        background: transparent;
-        color: #111827;
+        border: 1px solid var(--line);
+        background: var(--surface-2);
+        color: var(--text);
         border-radius: 12px;
         font-size: 28px;
         line-height: 1;
@@ -215,7 +285,7 @@
         min-width: 36px;
         text-align: center;
         font-size: 32px;
-        color: #111827;
+        color: var(--text);
       }
 
       .add-btn {
@@ -224,7 +294,7 @@
         min-height: 58px;
         border: 0;
         border-radius: 11px;
-        background: var(--dark);
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
         color: #ffffff;
         font-size: 35px;
         font-weight: 600;
@@ -281,7 +351,7 @@
       .similar-title {
         margin: 0 0 24px;
         font-family: var(--brand-serif);
-        color: #0d1525;
+        color: var(--text);
         font-size: clamp(42px, 3.8vw, 56px);
         line-height: 1.08;
       }
@@ -295,7 +365,7 @@
       .card {
         display: block;
         background: var(--surface);
-        border: 1px solid #d6d7db;
+        border: 1px solid var(--line);
         border-radius: 12px;
         overflow: hidden;
         text-decoration: none;
@@ -303,7 +373,7 @@
       }
 
       .card-media {
-        background: #e5e7eb;
+        background: var(--surface-2);
         aspect-ratio: 1 / 1;
       }
 
@@ -319,7 +389,7 @@
       }
 
       .card-cat {
-        color: #64748b;
+        color: var(--muted);
         font-size: 13px;
         text-transform: uppercase;
         letter-spacing: 0.1em;
@@ -327,20 +397,20 @@
 
       .card-name {
         margin: 8px 0 8px;
-        color: #0f172a;
+        color: var(--text);
         font-size: 36px;
         line-height: 1.2;
         font-weight: 600;
       }
 
       .card-price {
-        color: #0f172a;
+        color: var(--text);
         font-size: 39px;
         line-height: 1.1;
       }
 
       .site-footer {
-        background: #121317;
+        background: var(--footer-bg);
         color: #e4e4e4;
         margin-top: 0;
       }
@@ -389,6 +459,12 @@
       }
 
       @media (max-width: 1120px) {
+        .container {
+          width: auto;
+          margin-left: 16px;
+          margin-right: 16px;
+        }
+
         .detail-grid {
           grid-template-columns: 1fr;
           gap: 30px;
@@ -409,15 +485,21 @@
 
       @media (max-width: 880px) {
         .topbar-inner {
-          grid-template-columns: 1fr auto;
+          height: auto;
+          min-height: 78px;
+          padding: 10px 0;
+          flex-wrap: wrap;
         }
 
         .nav {
-          display: none;
+          width: 100%;
+          order: 3;
+          justify-content: flex-start;
+          flex-wrap: wrap;
         }
 
-        .brand {
-          font-size: 36px;
+        .brand-word {
+          font-size: 34px;
         }
 
         .actions {
@@ -427,7 +509,8 @@
 
       @media (max-width: 640px) {
         .container {
-          width: calc(100% - 28px);
+          margin-left: 14px;
+          margin-right: 14px;
         }
 
         main {
@@ -460,36 +543,42 @@
   <body>
     <header class="topbar">
       <div class="container topbar-inner">
-        <img
-          src="../assets/ishine-icon-transparent.png"
-          alt="IshineAccesories"
-          class="w-16 h-16 rounded-full object-cover"
-        />
-          <nav class="nav" aria-label="Main Navigation">
-          <a href="/">Home</a>
-          <a href="/src/pages/products.html">Shop</a>
-          <a href="/src/pages/products.html?category=Rings">Rings</a>
-          <a href="/src/pages/products.html?category=Necklaces">Necklaces</a>
-          <a href="/src/pages/products.html?category=Earrings">Earrings</a>
+        <a href="/" class="brand-link" aria-label="iShine Accessories">
+          <img
+            src="../assets/ishine-icon-transparent.png"
+            alt="iShine Accessories"
+            class="brand-logo"
+          />
+          <h1 class="brand-word">iShine</h1>
+        </a>
+
+        <nav class="nav" aria-label="Main Navigation">
+          <a class="nav-link" href="/">Ana səhifə</a>
+          <a class="nav-link active" href="/src/pages/products.html">Mağaza</a>
+          <a class="nav-link" href="/src/pages/about.html">Haqqımızda</a>
         </nav>
         <div class="actions" aria-label="Header Actions">
+          <a href="/src/pages/checkout.html" class="icon-btn" aria-label="Checkout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="8" cy="21" r="1"></circle>
+              <circle cx="19" cy="21" r="1"></circle>
+              <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+            </svg>
+          </a>
           <button class="icon-btn" type="button" aria-label="Search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
               <circle cx="11" cy="11" r="7"></circle>
               <path d="M20 20L16.65 16.65"></path>
             </svg>
           </button>
-          <button class="icon-btn" type="button" aria-label="Theme">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-          </button>
-          <button class="icon-btn" type="button" aria-label="Cart">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 12.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
+          <button
+            id="themeToggle"
+            type="button"
+            class="theme-toggle"
+            aria-label="Switch to dark mode"
+            title="Toggle theme"
+          >
+            ☾
           </button>
         </div>
       </div>
@@ -569,6 +658,37 @@
       </div>
     </footer>
 
+    <script>
+      (function () {
+        const THEME_KEY = "shophub_theme";
+
+        function applyTheme(theme) {
+          const next = theme === "dark" ? "dark" : "light";
+          document.documentElement.setAttribute("data-theme", next);
+          localStorage.setItem(THEME_KEY, next);
+          const themeBtn = document.getElementById("themeToggle");
+          if (themeBtn) {
+            themeBtn.textContent = next === "dark" ? "☀" : "☾";
+            themeBtn.setAttribute("aria-label", next === "dark" ? "Switch to light mode" : "Switch to dark mode");
+          }
+        }
+
+        function initTheme() {
+          const saved = localStorage.getItem(THEME_KEY);
+          const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+          applyTheme(saved || (prefersDark ? "dark" : "light"));
+        }
+
+        initTheme();
+        const themeToggle = document.getElementById("themeToggle");
+        if (themeToggle) {
+          themeToggle.addEventListener("click", function () {
+            const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+            applyTheme(isDark ? "light" : "dark");
+          });
+        }
+      })();
+    </script>
     <script type="module" src="/src/js/product-detail.js"></script>
   </body>
 </html>
