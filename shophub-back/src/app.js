@@ -28,6 +28,7 @@ app.get("/", (req, res) =>
 app.get("/health", (req, res) =>
   res.json({ ok: true, service: "ShopHub API" }),
 );
+app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 // Route-lar
 app.use("/api/auth", require("./routes/auth.routes"));
