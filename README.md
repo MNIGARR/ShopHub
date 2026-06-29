@@ -1,7 +1,7 @@
 A full-stack e-commerce reference project with a **Node.js/Express REST API** and a **Vite + vanilla JavaScript frontend**.
 
-- **Backend:** `shophub-back/` — Node.js + Express ilə yazdığım REST API
-- **Frontend:** `shophub-front/` — Vite + plain JavaScript + HTML/CSS ilə qurduğum sadə UI
+- **Backend:** `shophub-back/` — written REST API with Node.js + Express
+- **Frontend:** `shophub-front/` — created modern and simple UI with Vite + plain JavaScript + HTML/CSS
 ShopHub demonstrates a complete shopping flow (authentication, product browsing, cart, checkout, order history) and includes an admin area for managing products, categories, users, and orders.
 
 ---
