@@ -345,9 +345,3 @@ Recommended next improvements:
 - Add CI checks (lint/test/build).
 
 ---
-
-If you want, I can also generate:
-
-- a matching **database schema SQL file**,
-- a **Postman collection**,
-- and a **Docker Compose** setup for one-command local startup.
